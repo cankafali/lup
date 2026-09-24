@@ -8,8 +8,9 @@ export type DrawingSpec =
   | {
       kind: "solitaire";
       innerDiameter: number;
-      band: number;
       stone: number;
+      /** Bant kesiti: genişlik (parmak ekseni boyunca) × kalınlık (radyal). Ön görünüşteki
+       *  halka kalınlığı = `thickness` (K-047). */
       section: { width: number; thickness: number };
     }
   | { kind: "twist"; innerDiameter: number; band: number; turns: number }
@@ -102,7 +103,6 @@ export const products: readonly Product[] = [
     drawingSpec: {
       kind: "solitaire",
       innerDiameter: 17.3,
-      band: 2.2,
       stone: 5.1,
       section: { width: 2.2, thickness: 1.6 },
     },

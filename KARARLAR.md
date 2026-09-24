@@ -298,12 +298,14 @@
 - **Karar:** Ön görünüşte bant radyal kalınlığı 2.2 mm (§11.2 A: "bant 2.2 mm → dış r 86.8"), kesitte kalınlık 1.6 mm, genişlik 2.2 mm (§11.2 C). İkisi de şartnamedeki gibi çizildi.
 - **Gerekçe:** Ön görünüşteki radyal ölçü kesitteki kalınlıkla aynı olmalı; şartname iki farklı değer veriyor. Tasarım kararı üretmemek için ikisi de korundu. **Kuyumcu/tasarımcı onayı gerekiyor.**
 - **Geri alma:** `drawingSpec.band` ya da `section.thickness`.
+- **Çözüm (2026-09-24, kullanıcı onayı):** Kesit doğru: genişlik 2.2 mm, kalınlık 1.6 mm. Ön görünüşteki halka kalınlığı 1.6 mm: iç Ø 17.3 → iç r 69.2, dış r (8.65 + 1.6) × 8 = 82.0. Ön görünüşteki ölçü etiketi "1.6 mm". Hero'daki "BANT 2.2 mm" bandın genişliğidir, değişmedi. Uygulama: tektaşın `drawingSpec`'inden ayrı `band` alanı kaldırıldı; ön görünüş halka kalınlığını `section.thickness`'tan okuyor, böylece iki değer bir daha ayrışamaz. Mağaza'daki 48px çizim de aynı değeri kullanıyor. Toplam yükseklik buna göre 22.3 mm'ye indi.
 
 ### K-048 · 2026-09-24 · Levha yazıları
 
 - **Karar:** Ölçüler birimsiz ("17.3"); sağ üstte "ÖLÇEK 2:1 / ÖLÇÜLER mm". Her görünüşün altında başlık: "ÖN GÖRÜNÜŞ", "ÜST GÖRÜNÜŞ — 6:1", "KESİT A-A — 10:1", "DÜZ AÇILIM". Taşlı ön görünüşlerde bandın altında kesit işareti "A · A".
 - **Gerekçe:** Teknik çizim alışkanlığı; kalabalık levhada her ölçüde "mm" tekrarı okunmayı zorlaştırıyor. Şartname yalnızca "KESİT A-A" başlığını veriyor.
 - **Geri alma:** `copy.ts` → `productPage`.
+- **İstisna (K-047 çözümü):** Ön görünüşteki halka kalınlığı etiketi kullanıcı isteğiyle birimli ("1.6 mm"). Aynı ölçü burma ve telkari ön görünüşlerinde de birimli ("1.8 mm", "2.6 mm"); diğer levha ölçüleri birimsiz.
 
 ### K-049 · 2026-09-24 · Kesit taraması hesapla kırpılıyor
 

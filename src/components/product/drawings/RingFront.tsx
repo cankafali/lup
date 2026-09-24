@@ -132,7 +132,13 @@ export function ringFrontView(
         label: `Ø ${fmt(spec.innerDiameter)}`,
         knockout: true,
       },
-      { from: [cx + rIn, cy], to: [cx + rOut, cy], label: fmt(spec.band), extendEnd: 36 },
+      // Halka kalınlığı birimiyle yazılır ("1.6 mm"); hero'daki "BANT 2.2 mm" genişliktir (K-047).
+      {
+        from: [cx + rIn, cy],
+        to: [cx + rOut, cy],
+        label: `${fmt(spec.band)} mm`,
+        extendEnd: 36,
+      },
       {
         from: [totalX, top],
         to: [totalX, bottom],

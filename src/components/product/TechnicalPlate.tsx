@@ -41,7 +41,11 @@ function plateFor(spec: DrawingSpec): Plate {
       const p = stoneProfile(spec.innerDiameter, spec.stone);
       return {
         views: [
-          ringFrontView(spec, CENTER.front),
+          // Ön görünüşteki halka kalınlığı = kesit kalınlığı (K-047)
+          ringFrontView(
+            { innerDiameter: spec.innerDiameter, band: spec.section.thickness, stone: spec.stone },
+            CENTER.front,
+          ),
           ringTopView(spec.stone, CENTER.top),
           bandSectionView(spec.section, CENTER.section),
         ],

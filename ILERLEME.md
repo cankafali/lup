@@ -119,7 +119,7 @@
 
 **Açık kalanlar (sonraki aşamalara)**
 
-- **K-047: bant kalınlığı ön görünüşte 2.2, kesitte 1.6 — kuyumcu/tasarımcı onayı gerekiyor.**
+- ~~K-047: bant kalınlığı ön görünüşte 2.2, kesitte 1.6~~ → çözüldü (kullanıcı onayı): halka kalınlığı 1.6 mm, dış r 82.0, etiket "1.6 mm".
 - Aşama 5: levha çizim sırası (`data-draw`), sertifika girişi (`data-cert-row`, `data-stamp`), durum noktası nabzı.
 - Aşama 6: mobil sıralama (önce sertifika başlığı, sonra levha, sonra satırlar; buton altta sabit).
 - Aşama 7: diğer 5 tipin üst görünüşü/kesiti/detayı, "Diğer parçalar" şeridi (§11.4), sayfa geçişi (§11.5).

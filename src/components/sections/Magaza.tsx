@@ -42,7 +42,7 @@ export function Magaza() {
                 {ICON_SPEC?.kind === "solitaire" && (
                   <RingFront
                     innerDiameter={ICON_SPEC.innerDiameter}
-                    band={ICON_SPEC.band}
+                    band={ICON_SPEC.section.thickness}
                     stone={ICON_SPEC.stone}
                   />
                 )}
