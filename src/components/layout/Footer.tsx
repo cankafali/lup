@@ -60,7 +60,8 @@ export function Footer() {
           </FitText>
         </div>
 
-        <div className="grid grid-cols-3 items-baseline gap-4 py-6 font-mono text-mono-s text-lead">
+        {/* relative: wordmark'ın (konumlu kap) taşan kutusunun üstünde kalsın, "YUKARI" tıklanabilsin */}
+        <div className="relative grid grid-cols-3 items-baseline gap-4 py-6 font-mono text-mono-s text-lead">
           <span>{footer.copyright}</span>
           <span className="text-center">{footer.motto}</span>
           <a href="#" className={`justify-self-end ${LINK}`}>

@@ -47,30 +47,33 @@ export function PhotoOverlay({
       className={clsx("[container-type:size] relative overflow-hidden", className)}
       style={{ "--photo-x": position[0], "--photo-y": position[1] }}
     >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        sizes={sizes}
-        className="object-cover"
-        style={{ objectPosition: "calc(var(--photo-x) * 100%) calc(var(--photo-y) * 100%)" }}
-        data-hires={src}
-        {...(priority ? { loading: "eager" as const, fetchPriority: "high" as const } : {})}
-      />
-      {children && (
-        <div
-          data-photo-frame
-          className="pointer-events-none absolute"
-          style={{
-            width: frameW,
-            height: frameH,
-            left: `calc((100cqw - ${frameW}) * var(--photo-x))`,
-            top: `calc((100cqh - ${frameH}) * var(--photo-y))`,
-          }}
-        >
-          {children}
-        </div>
-      )}
+      {/* Görsel + bindirme birlikte hareket eder (fotoğraf içi parallax, §10.4) */}
+      <div data-photo-inner className="absolute inset-0">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes={sizes}
+          className="object-cover"
+          style={{ objectPosition: "calc(var(--photo-x) * 100%) calc(var(--photo-y) * 100%)" }}
+          data-hires={src}
+          {...(priority ? { loading: "eager" as const, fetchPriority: "high" as const } : {})}
+        />
+        {children && (
+          <div
+            data-photo-frame
+            className="pointer-events-none absolute"
+            style={{
+              width: frameW,
+              height: frameH,
+              left: `calc((100cqw - ${frameW}) * var(--photo-x))`,
+              top: `calc((100cqh - ${frameH}) * var(--photo-y))`,
+            }}
+          >
+            {children}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

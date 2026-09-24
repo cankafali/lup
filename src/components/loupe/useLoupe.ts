@@ -4,7 +4,14 @@ import { useEffect, useRef, type RefObject } from "react";
 import { usePathname } from "next/navigation";
 import { gsap } from "@/lib/gsap";
 import { LOUPE } from "@/lib/tokens";
-import { applyHires, cloneContent, measureSticky, type StickyClone } from "./cloneContent";
+import {
+  applyHires,
+  cloneContent,
+  collectSync,
+  measureSticky,
+  type StickyClone,
+  type SyncPair,
+} from "./cloneContent";
 import { markHintSeen } from "./hint";
 
 /** Üzerindeyken sistem imleci geri gelir, lup dış halkaya küçülür (§9.4). */
@@ -73,6 +80,7 @@ function createLoupe(
   const last = { sx: NaN, sy: NaN };
   let clone: HTMLElement | null = null;
   let sticky: StickyClone[] = [];
+  let synced: SyncPair[] = [];
   let holdTimer: number | undefined;
   let holdStart: { x: number; y: number } | null = null;
 
@@ -117,6 +125,7 @@ function createLoupe(
       stage.style.height = `${doc.scrollHeight}px`;
       if (hires) applyHires(next);
       sticky = measureSticky(source, next, stage);
+      synced = collectSync(source, next);
       clone = next;
       failed = false;
     } catch (err) {
@@ -125,6 +134,7 @@ function createLoupe(
       stage.replaceChildren();
       clone = null;
       sticky = [];
+      synced = [];
       failed = true;
     }
     root.dataset.ready = failed ? "ring" : "clone";
@@ -249,6 +259,27 @@ function createLoupe(
     if (touchActive || holdStart) e.preventDefault();
   };
 
+  // --- Aynalama (K-066) -------------------------------------------------------
+
+  /**
+   * Scrub/pin'li öğelerin satır içi stilini klona yaz (yalnızca stil; layout okuması yok).
+   * Pin'lenen öğe `position: fixed` olur; klonda sahneye göre konumlandığı için kaydırma kadar aşağı itilir.
+   */
+  const mirror = (sy: number) => {
+    for (const pair of synced) {
+      const css = pair.live.style.cssText;
+      if (css !== pair.css) {
+        pair.css = css;
+        pair.copy.style.cssText = css;
+        pair.fixedAt = NaN;
+      }
+      if (pair.live.style.position === "fixed" && pair.fixedAt !== sy) {
+        pair.fixedAt = sy;
+        pair.copy.style.translate = `0 ${sy}px`;
+      }
+    }
+  };
+
   // --- Kare döngüsü (GSAP ticker; Lenis ile aynı saat, §9.3) -------------------
 
   const tick = () => {
@@ -263,6 +294,8 @@ function createLoupe(
     pos.y += vy;
     const sx = window.scrollX;
     const sy = window.scrollY;
+    // Scrub/pin öğeleri kaydırma dursa da (scrub gecikmesi, nabız) değişebilir; lup açıkken her karede
+    if (state === "active") mirror(sy);
     const moving = Math.abs(vx) > 0.01 || Math.abs(vy) > 0.01;
     if (!dirty && !moving && sx === last.sx && sy === last.sy) return;
     dirty = false;

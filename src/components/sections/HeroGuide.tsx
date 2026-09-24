@@ -2,7 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { refreshLoupe } from "@/components/loupe/useLoupe";
+import { MOTION, onDone } from "@/components/motion/helpers";
+import { introTime } from "@/components/motion/intro";
+import { gsap, useGSAP } from "@/lib/gsap";
 import { coverPoint, type CoverFit, type Pt } from "@/lib/overlay";
+import { DURATION, EASE } from "@/lib/tokens";
 
 type HeroGuideProps = {
   /** Hero fotoğrafının kırpma bilgisi (PhotoOverlay ile aynı). */
@@ -51,6 +55,33 @@ export function HeroGuide({ fit, stone }: HeroGuideProps) {
   useEffect(() => {
     if (line) refreshLoupe();
   }, [line]);
+
+  // Hero girişi (§10.1 adım 5): 0.8 s'de taştan lupa doğru çizilir. Çizgi ölçüme bağlı olduğu
+  // için girişin saatine göre gecikmeyle; bir kez.
+  const drawn = useRef(false);
+  useGSAP(
+    () => {
+      const el = svgRef.current?.querySelector("[data-hero-guide]");
+      if (!line || !el || drawn.current) return;
+      drawn.current = true;
+      if (!window.matchMedia(MOTION).matches) return;
+      gsap.fromTo(
+        el,
+        { drawSVG: "100% 100%" },
+        {
+          drawSVG: "0% 100%",
+          duration: DURATION.base,
+          delay: Math.max(0, 0.8 - introTime()),
+          ease: EASE.gsapDraw,
+          onComplete: () => {
+            gsap.set(el, { clearProps: "strokeDasharray,strokeDashoffset" });
+            onDone();
+          },
+        },
+      );
+    },
+    { dependencies: [line] },
+  );
 
   return (
     <svg

@@ -22,6 +22,8 @@ type CalloutProps = {
   dotSize?: 6 | 8 | 10;
   /** Çizgi ve mono etiket rengi; fotoğrafın koyu bölgesinde paper. */
   tone?: "graphite" | "paper";
+  /** Animasyon/test için ad (`data-callout="…"`). */
+  name?: string;
   className?: string;
 };
 
@@ -46,6 +48,7 @@ export function Callout({
   dot = "graphite",
   dotSize = 10,
   tone = "graphite",
+  name,
   className,
 }: CalloutProps) {
   const [w, h] = viewBox;
@@ -53,7 +56,7 @@ export function Callout({
 
   return (
     <span
-      data-callout
+      data-callout={name ?? ""}
       className={clsx(
         "pointer-events-none absolute inset-0 block",
         tone === "paper" ? "text-paper" : "text-graphite",

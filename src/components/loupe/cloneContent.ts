@@ -50,6 +50,28 @@ export function applyHires(clone: HTMLElement) {
   });
 }
 
+/** Kaydırmaya bağlı (scrub/pin) canlı öğe ↔ klondaki karşılığı; satır içi stili her karede aynalanır. */
+export type SyncPair = {
+  live: HTMLElement | SVGElement;
+  copy: HTMLElement | SVGElement;
+  /** Son aynalanan satır içi stil */
+  css: string;
+  /** Pin'liyken klonda uygulanan kaydırma (px) */
+  fixedAt: number;
+};
+
+/** `data-loupe-sync` işaretli öğeleri klondaki karşılıklarıyla eşler (belge sırası aynı). */
+export function collectSync(source: HTMLElement, clone: HTMLElement): SyncPair[] {
+  const live = source.querySelectorAll<HTMLElement | SVGElement>("[data-loupe-sync]");
+  const copies = clone.querySelectorAll<HTMLElement | SVGElement>("[data-loupe-sync]");
+  const out: SyncPair[] = [];
+  live.forEach((el, i) => {
+    const copy = copies[i];
+    if (copy) out.push({ live: el, copy, css: "", fixedAt: NaN });
+  });
+  return out;
+}
+
 /** Öğenin sahne (stage) içindeki dikey konumu; dönüşümlerden etkilenmeyen offset zinciriyle. */
 function offsetWithin(el: HTMLElement, root: HTMLElement) {
   let y = 0;

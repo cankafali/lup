@@ -7,7 +7,7 @@
 | 2 — Ana sayfa statik | 2026-09-24 | 2026-09-24 | Tamam |
 | 3 — Ürün detay statik | 2026-09-24 | 2026-09-24 | Tamam |
 | 4 — Lup | 2026-09-24 | 2026-09-24 | Tamam |
-| 5 — Animasyonlar | — | — | — |
+| 5 — Animasyonlar | 2026-09-24 | 2026-09-24 | Tamam |
 | 6 — Mobil ve tablet | — | — | — |
 | 7 — Kalan çizim tipleri ve cilalar | — | — | — |
 | 8 — Erişilebilirlik, performans, SEO, deploy | — | — | — |
@@ -150,6 +150,33 @@
 
 **Açık kalanlar (sonraki aşamalara)**
 
-- Aşama 5: animasyon `onComplete`'lerinde `refreshLoupe()`. 10× pin'i klonda ele alınacak: pin'lenen bölüm klonda sabitlenmez, yapışkan öğelerdeki gibi kaydırmaya göre transform gerekecek. Lenis gelince kaydırma değeri `window.scrollY` ile aynı kalıyor (Lenis pencereyi kaydırıyor).
+- ~~Aşama 5: `refreshLoupe()` ve 10× pin'inin klonda ele alınması~~ → yapıldı (K-066).
 - Aşama 6: ipucunun mobil düzendeki yeri (K-061).
 - Gerçek cihaz testi (iOS Safari: uzun basma, titreşim yok) Aşama 8'de.
+
+---
+
+## Aşama 5 — Animasyonlar
+
+**Yapılanlar**
+
+- `src/lib/lenis.tsx` (Lenis + GSAP ticker + ScrollTrigger, anchor linkler), `src/lib/gsap.ts`'e DrawSVGPlugin.
+- `src/components/motion/`: `useMotion`, `helpers` (ölçü, not, başlık maskesi, bölüm başlığı, temizlik, lup aynalama), `HeroMotion`, `VitrinMotion`, `MakroMotion`, `AtolyeMotion`, `MagazaMotion`, `NavMotion`, `PlateMotion`, `MotionReady`, `intro.ts`, `introScript.ts`; `PulseDot`.
+- §14.3 envanterinin tamamı: hero girişi + parallax, başlıklar + etiketler, tepsi hücreleri + ölçüler (+ hover'da yeniden çizim), 10× pin + scrub, Atölye fotoğrafı + notlar + iç parallax, sayaçlar, Mağaza 10× / 1:1, durum noktası nabzı, levha çizimi, sertifika girişi (damga vurma). Ayrıca Nav gizle/göster ve Lenis ile anchor kaydırma.
+- Lup: `data-loupe-sync` aynalaması (K-066); animasyon bitişlerinde `refreshLoupe()`.
+
+**Kabul** (CDP ile headless Edge'de, tekerlek ve tıklama olaylarıyla)
+
+- [x] Lenis + ScrollTrigger entegrasyonu; §14.3 envanteri. Hero girişi 0.7 / 1.3 / 1.9 / 3.2 sn karelerinde şartnamedeki sırayla. Ürün sayfası: eksen → kontur → detay → ölçü → etiket; sertifika 0.4 sn'den itibaren satır satır, damgalar en sonda.
+- [x] Animasyon bitişlerinde lup klonu tazeleniyor: Vitrin girişinden sonra klondaki hücreler ve başlık son halinde. Pin'li 10×'te klon her karede aynalanıyor.
+- [x] Reduced motion'da hiçbir hareket yok, içerik tam görünür: `js-anim` yok, pin yok, transform/clip yok, sayaçlar son değerinde, Nav sabit.
+- [x] Hızlı kaydırmada ScrollTrigger konumları kaymıyor: 90 tekerlek olayıyla en alta inince tüm tek seferlik girişler tetiklenmiş; pin bitince 10× bölümü aralayıcının dibinde (2560 + 1080 = 3640). `ScrollTrigger.refresh()` fontlar ve görseller yüklenince (`MotionReady`).
+- [x] Nav aşağı kaydırmada gizleniyor (`translateY(−96)`), yukarıda geri geliyor. Anchor linkler Lenis ile yumuşak kayıyor.
+- [x] Konsolda hata yok.
+- [x] `pnpm lint`, `pnpm typecheck`, `pnpm build` temiz.
+
+**Açık kalanlar (sonraki aşamalara)**
+
+- Aşama 6: Mobilde 10× pin yok (kod hazır, düzen Aşama 6'da); mobil MENÜ açıkken Nav gizlenmemeli.
+- Aşama 7: sayfa geçişi (§11.5) bu animasyon sistemiyle birlikte ele alınacak.
+- Aşama 8: hero `data-intro` gizlemesinin LCP'ye etkisi Lighthouse'ta ölçülecek.

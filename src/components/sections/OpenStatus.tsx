@@ -3,6 +3,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { refreshLoupe } from "@/components/loupe/useLoupe";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
+import { PulseDot } from "@/components/primitives/PulseDot";
 import { getOpenStatus } from "@/lib/openStatus";
 
 const MINUTE = 60_000;
@@ -44,12 +45,7 @@ export function OpenStatus({ fallback }: OpenStatusProps) {
 
   return (
     <p className="flex items-center gap-2">
-      <span
-        aria-hidden
-        data-status-dot
-        data-open={status?.open || undefined}
-        className="size-1.5 shrink-0 rounded-full bg-graphite"
-      />
+      <PulseDot active={status?.open ?? false} />
       <MonoLabel>{label}</MonoLabel>
     </p>
   );

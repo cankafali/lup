@@ -11,6 +11,8 @@ type PlateFrameProps = {
   labelledBy?: string;
   /** Üstteki 1px bölüm çizgisi ve levha no (hero'da Nav satırı üstlenir). */
   header?: boolean;
+  /** Yükleme animasyonu olan bölge: JS gelene kadar CSS ile gizli (`data-intro`, K-064). */
+  intro?: boolean;
   className?: string;
 };
 
@@ -33,10 +35,16 @@ export function PlateFrame({
   id,
   labelledBy,
   header = true,
+  intro = false,
   className,
 }: PlateFrameProps) {
   return (
-    <section id={id} aria-labelledby={labelledBy} className={clsx("relative", className)}>
+    <section
+      id={id}
+      aria-labelledby={labelledBy}
+      data-intro={intro || undefined}
+      className={clsx("relative", className)}
+    >
       {header && (
         <div className="absolute inset-x-0 top-0">
           <div className="container-lup">

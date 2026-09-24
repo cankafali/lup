@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { nav } from "@/content/copy";
+import { NavMotion } from "@/components/motion/NavMotion";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 
 /**
@@ -8,7 +9,8 @@ import { MonoLabel } from "@/components/primitives/MonoLabel";
  */
 export function Nav() {
   return (
-    <header data-loupe-hide className="absolute inset-x-0 top-0 z-20 bg-paper">
+    <header data-loupe-hide data-loupe-off className="fixed inset-x-0 top-0 z-20 bg-paper">
+      <NavMotion />
       <div className="container-lup">
         <nav
           aria-label={nav.label}

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { productPage } from "@/content/copy";
 import { getProduct, products } from "@/content/products";
+import { PlateMotion } from "@/components/motion/PlateMotion";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { Certificate } from "@/components/product/Certificate";
 import { TechnicalPlate } from "@/components/product/TechnicalPlate";
@@ -26,7 +27,8 @@ export default async function ProductPage({ params }: PageProps<"/parca/[slug]">
   if (!product) notFound();
 
   return (
-    <main className="pt-24 max-md:pt-16">
+    <main data-intro className="pt-24 max-md:pt-16">
+      <PlateMotion />
       <div className="container-lup flex items-baseline justify-between py-4">
         <Link
           href={productPage.back.href}

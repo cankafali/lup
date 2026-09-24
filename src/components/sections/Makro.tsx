@@ -5,6 +5,7 @@ import { DimensionLine } from "@/components/primitives/DimensionLine";
 import { Headline, type HeadlineLine } from "@/components/primitives/Headline";
 import { Lens } from "@/components/primitives/Lens";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
+import { MakroMotion } from "@/components/motion/MakroMotion";
 import { pct, type Pt, type ViewBox } from "@/lib/overlay";
 
 /** Bölüm koordinat uzayı (§10.3): 1440×900 tuval; genişliğe göre ölçeklenir, 1440'ta birebir. */
@@ -25,12 +26,14 @@ const NOTES: { point: Pt; to: Pt; labelAt: Pt; label: string }[] = [
 export function Makro() {
   return (
     <PlateFrame plate={3} id="makro" labelledBy="makro-baslik" className="h-[max(900px,100svh)]">
+      <MakroMotion />
       {/* Tuval: içerik kabıyla aynı genişlikte (≤ 1440), dikeyde ortalı */}
       <div
         data-makro-stage
         className="[container-type:inline-size] absolute inset-x-0 top-1/2 mx-auto aspect-[1440/900] w-full max-w-[calc(var(--grid-max)+2*var(--grid-margin))] -translate-y-1/2"
       >
         <div
+          data-makro-lens
           className="absolute -translate-x-1/2 -translate-y-1/2"
           style={{ left: pct(LENS_CENTER[0], STAGE[0]), top: pct(LENS_CENTER[1], STAGE[1]) }}
         >
@@ -74,7 +77,7 @@ export function Makro() {
       <div className="relative container-lup h-full pt-[110px]">
         <div className="grid-lup">
           <div className="col-span-4">
-            <MonoLabel tone="stamp" className="block">
+            <MonoLabel tone="stamp" data-anim-label className="block">
               {makro.label}
             </MonoLabel>
             <Headline

@@ -394,3 +394,85 @@
 - **Karar:** `requestIdleCallback` yoksa (Safari) klon 200 ms sonra kurulur.
 - **Gerekçe:** §17 klonun boşta kurulmasını istiyor; Safari bu API'yi desteklemiyor.
 - **Geri alma:** Gerekmez.
+
+---
+
+## Aşama 5
+
+### K-063 · 2026-09-24 · Çizgi çizimi DrawSVGPlugin ile
+
+- **Karar:** Ölçü okları, kılavuz çizgiler, eksenler ve levha çizimi `gsap/DrawSVGPlugin` ile (dasharray + dashoffset). Tek seferlik girişler bitince çizim stilleri temizleniyor (`clearDraw`); sonraki boyut değişimlerinde çizgiler kısalmıyor.
+- **Gerekçe:** Eklenti `gsap` paketinin içinde (3.13'ten beri ücretsiz); yeni bağımlılık değil. `non-scaling-stroke` çizgileri ekran boyunda ölçüyor; elle `getTotalLength` hesabı bu çizgilerde yanlış çıkardı.
+- **Geri alma:** `helpers.ts`'te `drawSVG` yerine elle `strokeDashoffset`.
+
+### K-064 · 2026-09-24 · Giriş bölgeleri JS gelene kadar gizli
+
+- **Karar:** `<head>`'deki küçük betik, hareket izni varsa `<html>`'e `js-anim` ekler. CSS `html.js-anim:not(.anim-ready) [data-intro]` bölgelerini (hero, ürün sayfası) gizler. Bölüm animasyonları başlangıç durumlarını kurduktan sonra `MotionReady` `anim-ready` ekler. JS 4 sn içinde gelmezse gizleme kalkar. JS kapalıysa ve reduced motion'da hiç gizlenmez. `<html>`'de `suppressHydrationWarning` (sınıfları hidrasyondan önce betik, sonra Lenis/lup ekliyor).
+- **Gerekçe:** Giriş animasyonları ekranın üstünde; gizleme olmadan içerik önce görünüp sonra kaybolur, ardından animasyonla gelirdi.
+- **Geri alma:** Betiği ve CSS kuralını kaldırmak.
+
+### K-065 · 2026-09-24 · Animasyon mimarisi
+
+- **Karar:** Her bölümün animasyonu ayrı bir istemci bileşeninde (`src/components/motion/*Motion.tsx`). Bileşen bölümüne boş bir `<span hidden>` çapa koyar, kapsam çapanın ebeveynidir; sunucu bileşenleri değişmedi. `useMotion` her şeyi `gsap.matchMedia` içinde kurar: `(prefers-reduced-motion: no-preference)` yoksa hiçbir şey kurulmaz ve içerik SSR'daki son halinde kalır. `useGSAP` söküm yapar.
+- **Gerekçe:** §14.2. Bölümler sunucuda render olmaya devam ediyor; hareket yalnızca istemci katmanında.
+- **Geri alma:** Gerekmez.
+
+### K-066 · 2026-09-24 · Kaydırmaya bağlı öğeler lupta aynalanıyor
+
+- **Karar:** Scrub/pin'li öğeler (`data-loupe-sync`) lupun kopyasında her karede aynalanıyor: canlı öğenin satır içi stili klona yazılıyor (layout okuması yok). Pin'lenen öğe `position: fixed` olduğunda klonda kaydırma kadar `translate` ile aşağı itiliyor. Kapsam: hero parallax katmanları, 10× bölümü (pin + lup + notlar + ölçü), Atölye fotoğraf içi parallax, durum noktası nabzı.
+- **Gerekçe:** §9.5 yalnızca tek seferlik animasyonların bitince tazelenmesini tanımlıyor. Scrub'lı içerik sürekli değişiyor ve pin'lenen bölüm klonda sayfanın başına düşüyordu. Testte 10× pin'liyken lup dev lupun merkezini doğru gösterdi (`translate: 0 3100px` = scrollY).
+- **Geri alma:** `syncWithLoupe` çağrılarını kaldırmak (lup scrub'lı içerikte eski hali gösterir).
+
+### K-067 · 2026-09-24 · Hero parallax'ı lup katmanını da taşıyor
+
+- **Karar:** Örnek lup ve kılavuz çizgi ayrı bir katmanda (`data-hero-lens-layer`); fotoğrafla aynı parallax'ı (`yPercent 0 → 12`) alıyor. Kılavuz çizgi ölçüme bağlı olduğu için `HeroGuide` içinde, girişin saatine göre 0.8 sn'de çiziliyor.
+- **Gerekçe:** Yalnızca fotoğraf kayarsa kılavuz çizginin taş ucu taştan kopardı.
+- **Geri alma:** Parallax hedefinden `layer`'ı çıkarmak.
+
+### K-068 · 2026-09-24 · Başlık satır maskesi
+
+- **Karar:** Maske `clip-path`; alt kenarı satır kutusundan başlıyor ve satırla birlikte %40 aşağı açılıyor. Yan ve üst kenarlar geniş (italik taşma, İ/Ğ noktaları). Animasyon bitince maske ve transform temizleniyor.
+- **Gerekçe:** Düz `overflow: hidden` son halde alt uzantıları (g, ç, ş, p) keserdi (K-019).
+- **Geri alma:** `helpers.ts` → `revealHeadline`.
+
+### K-069 · 2026-09-24 · Lenis ve anchor linkler
+
+- **Karar:** `LenisProvider` §14.1'deki gibi, ama örnek `useState` yerine modül düzeyinde tutuluyor (`useSyncExternalStore`; efekt içinde `setState` yok). Aynı sayfadaki `#…` / `/#…` linkleri pencere yakalama evresinde Lenis'e yönlendiriliyor: `offset` = Nav yüksekliği (§8.9: −96, mobilde −64), `duration` 1.2. Başka sayfadan gelen `/#vitrin` Next'e bırakılıyor. "YUKARI ↑" (`#`) başa kaydırıyor. `lenis/dist/lenis.css` eklendi.
+- **Gerekçe:** §8.9. Test: "01 VİTRİN" ve "TEZGÂHA İN" 804'e (vitrin − 96), "YUKARI" 0'a yumuşak kayıyor.
+- **Geri alma:** Gerekmez.
+
+### K-070 · 2026-09-24 · Nav sabit; aşağıda gizlenir, yukarıda gelir
+
+- **Karar:** Nav `position: fixed`. Kaydırma Nav yüksekliğini geçince aşağı yönde `yPercent −100`, yukarı yönde 0 (0.6 sn, expo.out). Reduced motion'da hep görünür. Nav `data-loupe-off`: üstündeyken lup boşta, çünkü Nav klonda yok.
+- **Gerekçe:** §8.9 süreyi vermiyor; token'daki `DURATION.base`.
+- **Geri alma:** `NavMotion.tsx`.
+
+### K-071 · 2026-09-24 · Atölye fotoğraf içi parallax %12 büyütmeyle
+
+- **Karar:** `PhotoOverlay`'e görsel + bindirmeyi saran iç katman (`data-photo-inner`) eklendi. Parallax bu katmanı `yPercent −6 → 6` taşıyor, kenar boşluğu açılmasın diye 1.12 ölçekte.
+- **Gerekçe:** §10.4. Bindirmeler fotoğrafla birlikte hareket ediyor, kilit bozulmuyor.
+- **Geri alma:** Gerekmez.
+
+### K-072 · 2026-09-24 · Scrub zaman çizelgesinde süre ölçeği
+
+- **Karar:** 10× zaman çizelgesi 0–1 aralığında. Not ve ölçü animasyonlarının süreleri çarpanla küçültülüyor (`drawCallout(…, 0.1)`, `drawDimension(…, 0.1, 0.15)`), sona 0.15'lik bekleme eklendi.
+- **Gerekçe:** §10.3'teki dilimler (0.3 → 0.7 notlar, 0.7 → 0.85 ölçü, 0.85 → 1 okuma).
+- **Geri alma:** Gerekmez.
+
+### K-073 · 2026-09-24 · Durum noktası nabzı `PulseDot`
+
+- **Karar:** Mağaza ve sertifikadaki durum noktası tek bir istemci bileşeni (`PulseDot`): açıkken ya da vitrindeyken GSAP ile nabız (1 → 0.35, 1.6 sn, sine.inOut, yoyo). Reduced motion'da sabit. Kapalıyken nabız yok.
+- **Gerekçe:** §10.5, §11.3, §14.3.
+- **Geri alma:** Gerekmez.
+
+### K-074 · 2026-09-24 · Footer alt satırı tıklanabilir (hata düzeltmesi)
+
+- **Karar:** Footer'ın alt satırı `relative`.
+- **Gerekçe:** Wordmark'ın konumlu kabının taşan kutusu alt satırın üstünde boyanıyor, "YUKARI ↑" tıklamalarını yakalıyordu (test sırasında bulundu).
+- **Geri alma:** Gerekmez.
+
+### K-075 · 2026-09-24 · GSAP `nullTargetWarn: false`
+
+- **Karar:** Kırılıma göre bulunmayan hedefler (1024 altında hero lupu) konsola uyarı yazmıyor.
+- **Gerekçe:** Uyarılar gürültüydü; hedefler bilerek yok.
+- **Geri alma:** `lib/gsap.ts`.

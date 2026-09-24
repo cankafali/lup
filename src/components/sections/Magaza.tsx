@@ -5,6 +5,7 @@ import { PlateFrame } from "@/components/layout/PlateFrame";
 import { Button } from "@/components/primitives/Button";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { RingFront } from "@/components/product/drawings/RingFront";
+import { MagazaMotion } from "@/components/motion/MagazaMotion";
 import { waLink } from "@/lib/whatsapp";
 import { OpenStatus } from "./OpenStatus";
 
@@ -20,13 +21,14 @@ export function Magaza() {
       labelledBy="magaza-baslik"
       className="min-h-[900px] pt-[110px] pb-16"
     >
+      <MagazaMotion />
       <div className="container-lup">
-        <h2 id="magaza-baslik">
+        <h2 id="magaza-baslik" data-anim-label>
           <MonoLabel>{magaza.label}</MonoLabel>
         </h2>
 
         {/* Büyük karşılaştırma: iki yarım, ortada 1px dikey çizgi */}
-        <div className="relative mt-10 grid-lup min-h-[420px]">
+        <div data-compare-block className="relative mt-10 grid-lup min-h-[420px]">
           <span aria-hidden className="absolute inset-y-0 left-1/2 w-px bg-graphite" />
           <div className="col-span-6 flex flex-col">
             <MonoLabel tone="lead">{magaza.site.label}</MonoLabel>

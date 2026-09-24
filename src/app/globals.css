@@ -1,4 +1,5 @@
 @import "../styles/tokens.css";
+@import "lenis/dist/lenis.css";
 
 /* Grid (§7) — kolon sayısı, kenar ve ara tokens.css'teki kırılımlarla değişir. */
 @utility container-lup {
@@ -37,6 +38,12 @@
     html.has-loupe :is(input, textarea) {
       cursor: text;
     }
+  }
+
+  /* Giriş animasyonu olan bölgeler, animasyon kurulana kadar gizli (K-064). Yalnızca betik
+     `js-anim` eklediyse: JS kapalı ya da reduced motion'da içerik hep görünür. */
+  html.js-anim:not(.anim-ready) [data-intro] {
+    opacity: 0;
   }
 
   /* Dokunmatik lup açıkken uzun basma menüsü ve metin seçimi çıkmasın (§9.6). */

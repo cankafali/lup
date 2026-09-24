@@ -2,6 +2,7 @@ import { certificate as c } from "@/content/copy";
 import type { Product } from "@/content/products";
 import { Button } from "@/components/primitives/Button";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
+import { PulseDot } from "@/components/primitives/PulseDot";
 import { Stamp } from "@/components/primitives/Stamp";
 import { waLink } from "@/lib/whatsapp";
 import { Signature } from "./Signature";
@@ -79,7 +80,7 @@ export function Certificate({ product: p }: { product: Product }) {
       </Button>
 
       <p className="mt-4 flex items-center gap-2">
-        <span aria-hidden data-status-dot className="size-1.5 shrink-0 rounded-full bg-graphite" />
+        <PulseDot active={p.status === "Vitrinde"} />
         <MonoLabel>{c.status[p.status]}</MonoLabel>
       </p>
 

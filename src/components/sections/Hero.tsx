@@ -9,6 +9,7 @@ import { Lens } from "@/components/primitives/Lens";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { PhotoOverlay } from "@/components/primitives/PhotoOverlay";
 import { pct, type Pt, type ViewBox } from "@/lib/overlay";
+import { HeroMotion } from "@/components/motion/HeroMotion";
 import { HeroGuide } from "./HeroGuide";
 
 // Bindirme koordinatları hero-tektas.jpg'nin piksel uzayında (§10.1).
@@ -29,9 +30,11 @@ export function Hero() {
       plate={1}
       header={false}
       labelledBy="hero-baslik"
+      intro
       className="h-svh max-h-[1000px] min-h-[760px] overflow-hidden"
     >
-      <div className="absolute inset-0">
+      <HeroMotion />
+      <div data-hero-photo className="absolute inset-0">
         <PhotoOverlay
           src={hero.image.src}
           alt={hero.image.alt}
@@ -58,6 +61,7 @@ export function Hero() {
           />
           <MonoLabel
             aria-hidden
+            data-hero-mark
             className="absolute -translate-x-1/2 -translate-y-1/2"
             style={{
               left: pct(SECTION_MARK[0], IMG[0]),
@@ -74,14 +78,15 @@ export function Hero() {
             labelAt={[1210, 380]}
             labelAlign="end"
             dotSize={8}
+            name="band"
           />
           {/* Taş işareti: sayfanın üç odak kırmızısından biri */}
-          <Callout viewBox={IMG} point={STONE} dot="stamp" />
+          <Callout viewBox={IMG} point={STONE} dot="stamp" name="stone" />
         </PhotoOverlay>
       </div>
 
       {/* Nav altındaki ikinci satır */}
-      <div className="absolute inset-x-0 top-24 max-md:hidden">
+      <div data-hero-meta className="absolute inset-x-0 top-24 max-md:hidden">
         <div className="container-lup flex justify-between pt-4">
           <MonoLabel size="s" tone="lead">
             {hero.coords}
@@ -97,24 +102,29 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Örnek lup: 4. kolonun başı, üstten 172px; 1024 altında gizli */}
-      <div className="absolute inset-x-0 top-[172px] hidden lg:block">
-        <div className="container-lup">
-          <div className="grid-lup">
-            <div data-hero-lens className="relative col-span-3 col-start-4">
-              <Lens src="/images/lup-hero.jpg" alt={hero.lens.alt} diameter={240} ring={8} />
-              <p className="absolute top-1/2 right-[calc(100%+24px)] w-max -translate-y-1/2">
-                <MonoLabel tone="stamp" className="block">
-                  {hero.lens.mark}
-                </MonoLabel>
-                <MonoLabel className="mt-1 block">{hero.lens.caption}</MonoLabel>
-              </p>
+      {/* Örnek lup + kılavuz çizgi: fotoğrafla aynı parallax katmanında (taşa kilitli kalsın) */}
+      <div data-hero-lens-layer className="pointer-events-none absolute inset-0">
+        {/* 4. kolonun başı, üstten 172px; 1024 altında gizli */}
+        <div className="absolute inset-x-0 top-[172px] hidden lg:block">
+          <div className="container-lup">
+            <div className="grid-lup">
+              <div data-hero-lens className="relative col-span-3 col-start-4">
+                <Lens src="/images/lup-hero.jpg" alt={hero.lens.alt} diameter={240} ring={8} />
+                <p
+                  data-hero-caption
+                  className="absolute top-1/2 right-[calc(100%+24px)] w-max -translate-y-1/2"
+                >
+                  <MonoLabel tone="stamp" className="block">
+                    {hero.lens.mark}
+                  </MonoLabel>
+                  <MonoLabel className="mt-1 block">{hero.lens.caption}</MonoLabel>
+                </p>
+              </div>
             </div>
           </div>
         </div>
+        <HeroGuide fit={{ w: IMG[0], h: IMG[1] }} stone={STONE} />
       </div>
-
-      <HeroGuide fit={{ w: IMG[0], h: IMG[1] }} stone={STONE} />
 
       <div className="absolute inset-x-0 bottom-0">
         <div className="relative container-lup pb-14">
@@ -129,7 +139,10 @@ export function Hero() {
             }))}
           />
           <div className="pointer-events-none absolute inset-x-(--grid-margin) bottom-12 grid-lup">
-            <div className="pointer-events-auto col-span-3 col-start-10 max-w-[240px] max-lg:col-span-4 max-lg:col-start-5">
+            <div
+              data-hero-note
+              className="pointer-events-auto col-span-3 col-start-10 max-w-[240px] max-lg:col-span-4 max-lg:col-start-5"
+            >
               <MonoLabel className="block">{hero.note}</MonoLabel>
               <a
                 href={hero.down.href}

@@ -10,6 +10,7 @@ type TitleBlockProps = {
 export function TitleBlock({ cells, className }: TitleBlockProps) {
   return (
     <dl
+      data-plate-meta
       className={clsx(
         "grid grid-cols-[2fr_1fr_1.4fr_1fr_1fr] border border-graphite bg-paper",
         className,

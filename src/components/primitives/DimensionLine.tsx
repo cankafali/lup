@@ -81,7 +81,8 @@ export function DimensionLine({
         fill="none"
       >
         {offset > 0 && (
-          <g opacity={EXTENSION_OPACITY} data-dim-extension>
+          // %35 stroke-opacity ile (grup opaklığı değil): animasyon grubun opaklığını 0→1 oynatır
+          <g strokeOpacity={EXTENSION_OPACITY} data-dim-extension>
             <Hairline from={from} to={[x1 + ex, y1 + ey]} />
             <Hairline from={to} to={[x2 + ex, y2 + ey]} />
           </g>

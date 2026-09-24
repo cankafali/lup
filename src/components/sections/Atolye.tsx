@@ -5,6 +5,7 @@ import { Callout } from "@/components/primitives/Callout";
 import { Headline, type HeadlineLine } from "@/components/primitives/Headline";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { PhotoOverlay } from "@/components/primitives/PhotoOverlay";
+import { AtolyeMotion } from "@/components/motion/AtolyeMotion";
 import type { Pt, Side, ViewBox } from "@/lib/overlay";
 
 // Bindirme koordinatları atolye.jpg'nin piksel uzayında (§10.4).
@@ -27,8 +28,11 @@ const NOTES: { point: Pt; to: Pt; side: Side; label: string }[] = [
 export function Atolye() {
   return (
     <PlateFrame plate={4} id="atolye" labelledBy="atolye-baslik" className="pt-[110px] pb-16">
+      <AtolyeMotion />
       <div className="container-lup">
-        <MonoLabel className="block">{atolye.label}</MonoLabel>
+        <MonoLabel data-anim-label className="block">
+          {atolye.label}
+        </MonoLabel>
         <Headline
           id="atolye-baslik"
           size="l"
@@ -39,7 +43,7 @@ export function Atolye() {
 
       <div className="relative mt-[50px]">
         {/* Fotoğraf sol ekran kenarına taşar: 1440'ta 960px = kenar boşluğu + 8 kolon */}
-        <div className="relative w-[calc(50vw+240px)] max-lg:w-full">
+        <div data-atolye-photo className="relative w-[calc(50vw+240px)] max-lg:w-full">
           <PhotoOverlay
             src="/images/atolye.jpg"
             alt={atolye.photoAlt}
@@ -76,7 +80,7 @@ export function Atolye() {
                   key={s.unit}
                   className="flex flex-1 items-center border-t border-graphite text-display-l tabular-nums"
                 >
-                  {s.value}
+                  <span data-count={s.value}>{s.value}</span>
                   {/* Birim: rakamın taban çizgisinde, 14px sağda (44px'lik birimin 0.318em'i) */}
                   <span className="ml-[0.318em] font-serif text-[length:calc(1em*var(--stat-unit-scale))] font-normal tracking-normal italic">
                     {s.unit}

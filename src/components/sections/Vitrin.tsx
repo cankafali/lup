@@ -4,6 +4,7 @@ import { PlateFrame } from "@/components/layout/PlateFrame";
 import { Button } from "@/components/primitives/Button";
 import { Headline, type HeadlineLine } from "@/components/primitives/Headline";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
+import { VitrinMotion } from "@/components/motion/VitrinMotion";
 import { TrayCell } from "./TrayCell";
 
 /** İkinci satır 3. kolondan başlar ve 34px bindirir. */
@@ -16,8 +17,11 @@ const TITLE_LAYOUT: Pick<HeadlineLine, "indent" | "overlap">[] = [
 export function Vitrin() {
   return (
     <PlateFrame plate={2} id="vitrin" labelledBy="vitrin-baslik" className="pt-[150px] pb-16">
+      <VitrinMotion />
       <div className="container-lup">
-        <MonoLabel className="block">{vitrin.label}</MonoLabel>
+        <MonoLabel data-anim-label className="block">
+          {vitrin.label}
+        </MonoLabel>
         <div className="relative mt-6">
           <Headline
             id="vitrin-baslik"
@@ -32,7 +36,7 @@ export function Vitrin() {
         </div>
 
         {/* Tepsi: 3×2, aralıksız; dış çerçeve line-strong, ayırıcılar line */}
-        <ul className="mt-[100px] grid grid-cols-3 border border-line-strong">
+        <ul data-tray className="mt-[100px] grid grid-cols-3 border border-line-strong">
           {products.map((p) => (
             <li
               key={p.slug}

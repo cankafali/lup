@@ -122,6 +122,7 @@ export function TechnicalPlate({ product, total }: { product: Product; total: nu
           <MonoLabel
             key={`${i}-${j}`}
             aria-hidden
+            data-plate-note
             size="s"
             className={clsx("absolute w-max -translate-y-1/2", ALIGN[n.align ?? "start"])}
             style={{ left: pct(n.at[0], W), top: pct(n.at[1], H) }}
@@ -151,7 +152,7 @@ export function TechnicalPlate({ product, total }: { product: Product; total: nu
         </>
       )}
 
-      <div className="absolute top-12 right-12 text-right">
+      <div data-plate-meta className="absolute top-12 right-12 text-right">
         <MonoLabel size="s" tone="lead" className="block">
           {productPage.plate(product.no, total)}
         </MonoLabel>

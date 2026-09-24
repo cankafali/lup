@@ -6,7 +6,10 @@ import { Footer } from "@/components/layout/Footer";
 import { GridLines } from "@/components/layout/GridLines";
 import { Nav } from "@/components/layout/Nav";
 import { Loupe } from "@/components/loupe/Loupe";
+import { INTRO_SCRIPT } from "@/components/motion/introScript";
+import { MotionReady } from "@/components/motion/MotionReady";
 import { site } from "@/content/site";
+import { LenisProvider } from "@/lib/lenis";
 import "./globals.css";
 
 const instrument = Instrument_Serif({
@@ -29,21 +32,30 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // <html> sınıflarına hidrasyondan önce betik (js-anim) ve sonra Lenis/lup ekleme yapıyor
     <html
       lang="tr"
       className={`${GeistSans.variable} ${GeistMono.variable} ${instrument.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
+      </head>
       <body>
-        {/* Lup bu düğümü klonlar (§9.2). overflow-x: clip — kenara taşan eksen/çizgiler
-            yatay kaydırma üretmesin; clip kaydırma kabı oluşturmadığı için sticky bozulmaz. */}
-        <div id="lup-content" className="relative overflow-x-clip">
-          <GridLines />
-          <Nav />
-          {children}
-          <Footer />
-        </div>
-        {/* İçeriğin kardeşi: klonlanmaz, içeriğin üstünde sabit (§9.2) */}
-        <Loupe />
+        <LenisProvider>
+          {/* Lup bu düğümü klonlar (§9.2). overflow-x: clip — kenara taşan eksen/çizgiler
+              yatay kaydırma üretmesin; clip kaydırma kabı oluşturmadığı için sticky bozulmaz. */}
+          <div id="lup-content" className="relative overflow-x-clip">
+            <GridLines />
+            <Nav />
+            {children}
+            <Footer />
+          </div>
+          {/* İçeriğin kardeşi: klonlanmaz, içeriğin üstünde sabit (§9.2) */}
+          <Loupe />
+          {/* En son: giriş animasyonları kurulduktan sonra gizlemeyi kaldırır */}
+          <MotionReady />
+        </LenisProvider>
       </body>
     </html>
   );
