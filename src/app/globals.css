@@ -19,4 +19,114 @@
     outline: 2px solid var(--color-graphite);
     outline-offset: 3px;
   }
+
+  /* Lup imleci (§9.4): yalnızca JS lupu kurduğunda (`has-loupe`) ve ince imleçte.
+     Etkileşimli öğelerde sistem imleci geri gelir; tamamı link olan tepsi hücreleri hariç (K-056). */
+  @media (pointer: fine) {
+    html.has-loupe,
+    html.has-loupe * {
+      cursor: none;
+    }
+    html.has-loupe
+      :is(a, button, [role="button"], summary, label, select):not([data-loupe-magnify]),
+    html.has-loupe
+      :is(a, button, [role="button"], summary, label, select):not([data-loupe-magnify])
+      * {
+      cursor: pointer;
+    }
+    html.has-loupe :is(input, textarea) {
+      cursor: text;
+    }
+  }
+
+  /* Dokunmatik lup açıkken uzun basma menüsü ve metin seçimi çıkmasın (§9.6). */
+  html[data-loupe-touch] {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Lup (§9.1). Durumlar: off (görünmez) · idle (yalnızca dış halka) · active. */
+@layer components {
+  .loupe {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 50;
+    width: var(--loupe-d);
+    height: var(--loupe-d);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate3d(-1000px, -1000px, 0);
+    transition: opacity var(--duration-fast) var(--ease-lup);
+    /* Her karede transform değişir; kendi katmanında kalsın, boyama olmasın (§9.8) */
+    will-change: transform;
+  }
+  .loupe:is([data-state="idle"], [data-state="active"]) {
+    opacity: 1;
+  }
+
+  .loupe-ring {
+    position: absolute;
+    inset: calc(-1 * var(--loupe-ring));
+    border: var(--loupe-ring) solid
+      color-mix(in oklab, var(--color-graphite) calc(var(--loupe-ring-opacity) * 100%), transparent);
+    border-radius: 9999px;
+    will-change: transform; /* esneme */
+  }
+
+  .loupe-glass {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: var(--color-paper);
+    transition: opacity var(--duration-fast) var(--ease-lup);
+  }
+  /* 1px kenar ve nişan sahnenin üstünde; kenar sahnenin başlangıç noktasını kaydırmasın diye ayrı katman */
+  .loupe-glass::before,
+  .loupe-glass::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .loupe-glass::before {
+    inset: 0;
+    border: 1px solid var(--color-graphite);
+    border-radius: inherit;
+    /* Nişan: 1px, kolu 8px, %40 */
+    background:
+      linear-gradient(
+          color-mix(in oklab, var(--color-graphite) 40%, transparent),
+          color-mix(in oklab, var(--color-graphite) 40%, transparent)
+        )
+        center / calc(2 * var(--loupe-cross)) 1px no-repeat,
+      linear-gradient(
+          color-mix(in oklab, var(--color-graphite) 40%, transparent),
+          color-mix(in oklab, var(--color-graphite) 40%, transparent)
+        )
+        center / 1px calc(2 * var(--loupe-cross)) no-repeat;
+  }
+
+  .loupe-stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+  }
+
+  /* "10×": dış halkanın 45° noktasının dışında */
+  .loupe-label {
+    position: absolute;
+    left: calc(50% + (var(--loupe-d) / 2 + var(--loupe-ring)) * 0.7071 + 4px);
+    top: calc(50% - (var(--loupe-d) / 2 + var(--loupe-ring)) * 0.7071 - 4px);
+    transform: translateY(-100%);
+    transition: opacity var(--duration-fast) var(--ease-lup);
+  }
+
+  .loupe[data-state="idle"] :is(.loupe-glass, .loupe-label) {
+    opacity: 0;
+  }
 }

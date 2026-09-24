@@ -5,6 +5,7 @@ import { Instrument_Serif } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { GridLines } from "@/components/layout/GridLines";
 import { Nav } from "@/components/layout/Nav";
+import { Loupe } from "@/components/loupe/Loupe";
 import { site } from "@/content/site";
 import "./globals.css";
 
@@ -41,6 +42,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
           <Footer />
         </div>
+        {/* İçeriğin kardeşi: klonlanmaz, içeriğin üstünde sabit (§9.2) */}
+        <Loupe />
       </body>
     </html>
   );

@@ -23,6 +23,7 @@ export function TrayCell({ product: p }: { product: Product }) {
     <Link
       href={`/parca/${p.slug}`}
       aria-label={`${p.name} — ${p.dataLine}`}
+      data-loupe-magnify
       className="group [container-type:inline-size] relative block aspect-[4/5] after:pointer-events-none after:absolute after:-inset-px after:border after:border-transparent after:transition-colors after:duration-(--duration-fast) after:ease-lup hover:z-10 hover:after:border-graphite focus-visible:z-10 focus-visible:outline-offset-[-2px]"
     >
       {o.kind === "lens" ? (

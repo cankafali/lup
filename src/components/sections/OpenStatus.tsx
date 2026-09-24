@@ -1,6 +1,7 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import { refreshLoupe } from "@/components/loupe/useLoupe";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { getOpenStatus } from "@/lib/openStatus";
 
@@ -34,6 +35,12 @@ type OpenStatusProps = {
 export function OpenStatus({ fallback }: OpenStatusProps) {
   const minute = useSyncExternalStore(subscribe, getMinute, getServerMinute);
   const status = minute === null ? null : getOpenStatus(new Date(minute * MINUTE));
+  const label = status ? status.label : fallback;
+
+  // Metin değişince lupun kopyası da güncellensin (§9.5)
+  useEffect(() => {
+    refreshLoupe();
+  }, [label]);
 
   return (
     <p className="flex items-center gap-2">
@@ -43,7 +50,7 @@ export function OpenStatus({ fallback }: OpenStatusProps) {
         data-open={status?.open || undefined}
         className="size-1.5 shrink-0 rounded-full bg-graphite"
       />
-      <MonoLabel>{status ? status.label : fallback}</MonoLabel>
+      <MonoLabel>{label}</MonoLabel>
     </p>
   );
 }

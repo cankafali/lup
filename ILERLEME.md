@@ -6,7 +6,7 @@
 | 1 — Token'lar, tipografi, grid, primitives | 2026-09-24 | 2026-09-24 | Tamam |
 | 2 — Ana sayfa statik | 2026-09-24 | 2026-09-24 | Tamam |
 | 3 — Ürün detay statik | 2026-09-24 | 2026-09-24 | Tamam |
-| 4 — Lup | — | — | — |
+| 4 — Lup | 2026-09-24 | 2026-09-24 | Tamam |
 | 5 — Animasyonlar | — | — | — |
 | 6 — Mobil ve tablet | — | — | — |
 | 7 — Kalan çizim tipleri ve cilalar | — | — | — |
@@ -123,3 +123,33 @@
 - Aşama 5: levha çizim sırası (`data-draw`), sertifika girişi (`data-cert-row`, `data-stamp`), durum noktası nabzı.
 - Aşama 6: mobil sıralama (önce sertifika başlığı, sonra levha, sonra satırlar; buton altta sabit).
 - Aşama 7: diğer 5 tipin üst görünüşü/kesiti/detayı, "Diğer parçalar" şeridi (§11.4), sayfa geçişi (§11.5).
+
+---
+
+## Aşama 4 — Lup
+
+**Yapılanlar**
+
+- `src/components/loupe/`: `Loupe.tsx` (işaretleme), `useLoupe.ts` (denetleyici + `refreshLoupe`), `cloneContent.ts` (klon temizliği, hi-res, yapışkan ölçümü), `hint.ts` + `LoupeHint.tsx` (mobil ilk ziyaret ipucu).
+- `src/lib/gsap.ts` (§14.1); `LOUPE` token'larına `ringMobile`, `touchSlop`, `idleMs`, `stretch`, `crosshair`.
+- `globals.css`: `.loupe*` görünüm durumları, imleç kuralları (`html.has-loupe`), dokunmatik seçim kapatma.
+- `layout.tsx`: `<Loupe />` `#lup-content`'in kardeşi. Tepsi hücreleri `data-loupe-magnify`, sertifika `data-loupe-sticky`.
+- Klon tazeleme: ResizeObserver (150 ms), rota değişimi, `HeroGuide` çizgisi, `OpenStatus` metni, ipucu kalkınca.
+
+**Kabul** (CDP ile headless Edge'de, gerçek fare ve dokunma olaylarıyla test edildi)
+
+- [x] §9'daki maddeler: iç Ø 200 / halka 16 (mobil 140 / 12), `10×` etiketi, nişan, 3.3× büyütme, lerp 0.15, ±%4 esneme. Boşta: 1.2 sn hareketsizlik, link, kenar boşluğu. Pencere dışı → görünmez. Klon: id yok, `inert`, Nav ve lens etiketleri çıkarılmış.
+- [x] Masaüstünde fare: lup merkezi imleçte (taş üstünde merkez 931.9, 473.0; sahne dönüşümü formülle birebir).
+- [x] Mobilde basılı tut: 180 ms sonra açılır, parmağın 60px üstünde. Sürüklerken sayfa kaymaz; hızlı kaydırmada açılmaz; parmak kalkınca kaybolur.
+- [x] Hi-res: lup ilk açılınca 10 görselin 10'u orijinale geçiyor, `srcset` siliniyor; büyütülen fotoğraf keskin (görüntüyle kontrol edildi).
+- [x] Linklerin üstünde lup küçülüyor, sistem imleci `pointer`; içerikte imleç gizli (K-056 istisnası: tepsi hücreleri).
+- [x] 60fps: Tracing'de lup hareketi boyunca ana sayfada ve ürün sayfasında 0 Layout, 0 Paint. Karede yalnızca stil güncelleme + kompozit; lup yeni alanlar açtıkça GPU'da raster işleri.
+- [x] Ürün sayfasında SVG çizimler lupla keskin büyüyor (vektör).
+- [x] Kapalı durumlar: reduced motion'da lup tek karede hedefte ve esneme yok. Klon hatasında yalnızca halka kalıyor, hata konsola yazılıyor. JS kapalıyken `has-loupe` sınıfı eklenmiyor, normal imleç.
+- [x] `pnpm lint`, `pnpm typecheck`, `pnpm build` temiz.
+
+**Açık kalanlar (sonraki aşamalara)**
+
+- Aşama 5: animasyon `onComplete`'lerinde `refreshLoupe()`. 10× pin'i klonda ele alınacak: pin'lenen bölüm klonda sabitlenmez, yapışkan öğelerdeki gibi kaydırmaya göre transform gerekecek. Lenis gelince kaydırma değeri `window.scrollY` ile aynı kalıyor (Lenis pencereyi kaydırıyor).
+- Aşama 6: ipucunun mobil düzendeki yeri (K-061).
+- Gerçek cihaz testi (iOS Safari: uzun basma, titreşim yok) Aşama 8'de.

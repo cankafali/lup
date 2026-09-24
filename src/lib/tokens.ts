@@ -12,12 +12,17 @@ export const LOUPE = {
   diameter: 200,
   diameterMobile: 140,
   ring: 16, // dış halka kalınlığı (px)
+  ringMobile: 12, // §9.6
   ringOpacity: 0.25,
   scale: 3.3, // gerçek büyütme
   label: "10×", // gösterilen etiket
   lerp: 0.15,
   touchOffsetY: 60, // mobilde parmağın üstüne kaydırma
   touchHoldMs: 180,
+  touchSlop: 10, // basılı tutma sayılmadan önce izin verilen kayma (px)
+  idleMs: 1200, // hareketsizlikten sonra boşta (§9.1)
+  stretch: 0.04, // hıza göre en fazla ±%4 esneme (§9.3)
+  crosshair: 8, // nişan kolu (px)
 } as const;
 
 /** Display boyutlarının 1440 referans değerleri (px); tokens.css'teki clamp()'lerin üst sınırı. */

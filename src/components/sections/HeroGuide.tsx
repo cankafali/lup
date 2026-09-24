@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { refreshLoupe } from "@/components/loupe/useLoupe";
 import { coverPoint, type CoverFit, type Pt } from "@/lib/overlay";
 
 type HeroGuideProps = {
@@ -45,6 +46,11 @@ export function HeroGuide({ fit, stone }: HeroGuideProps) {
     ro.observe(lens);
     return () => ro.disconnect();
   }, [w, h, x, y, sx, sy]);
+
+  // Çizgi ölçümden sonra çizilir; lupun kopyası da çizgiyi içersin (§9.5)
+  useEffect(() => {
+    if (line) refreshLoupe();
+  }, [line]);
 
   return (
     <svg

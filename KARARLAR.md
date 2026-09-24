@@ -342,3 +342,55 @@
 - **Karar:** Ön görünüşte taşın üstündeki kırmızı işaret (Ø8) "damga dili" sayıldı; ürün sayfasının odak kırmızıları buton + Nav randevu.
 - **Gerekçe:** §11.2 "taşın üstünde kırmızı işaret" ile §11.3 "sayfanın tek odak kırmızısı buton" ancak §5.1'deki "küçük işaret noktaları bütçeye girmez" kuralıyla birlikte tutarlı.
 - **Geri alma:** `dot="graphite"`.
+
+---
+
+## Aşama 4
+
+### K-055 · 2026-09-24 · Lupun yapısı
+
+- **Karar:** `Loupe.tsx` yalnızca işaretlemeyi render eder. Tüm davranış `useLoupe.ts`'teki React dışı, emir kipindeki bir denetleyicide: işaretçi olayları, GSAP ticker'daki kare döngüsü, klonlama, ResizeObserver. Dışarıdan tazeleme için `refreshLoupe()` dışa açık (100 ms debounce). Şimdilik `HeroGuide`, `OpenStatus` ve `LoupeHint` çağırıyor; Aşama 5'te animasyon bitişleri çağıracak. `src/lib/gsap.ts` (§14.1) lup ticker'ı için bu aşamada eklendi.
+- **Gerekçe:** Kare başına React render'ı olmasın; her karede yalnızca `style.transform` yazılır. Lenis ile aynı saat (§9.3).
+- **Geri alma:** Gerekmez.
+
+### K-056 · 2026-09-24 · Tepsi hücreleri link olsa da büyütülür (`data-loupe-magnify`)
+
+- **Karar:** §9.4'teki "link üstünde lup küçülür, sistem imleci gelir" kuralından tepsi hücreleri muaf. Hücrelerde lup etkin ve imleç gizli; tıklanabilirliği hover'da beliren "İNCELE →" ve graphite çerçeve gösteriyor. Diğer tüm linklerde (Nav, "Tezgâha in", butonlar, footer) kural aynen geçerli.
+- **Gerekçe:** Hücrenin tamamı link (§10.2) ve Vitrin notu "İMLECİ BİR PARÇANIN ÜZERİNE GETİRİN" diyor. Kural aynen uygulanınca lup tam parçaların üstünde kapanıyordu. §10.2'deki "lup zaten büyütüyor, bu yüzden hover sade" ifadesi de hücrede lupun açık olduğunu varsayıyor.
+- **Geri alma:** `TrayCell.tsx`'ten `data-loupe-magnify`'ı kaldırmak.
+
+### K-057 · 2026-09-24 · Boşta durumunun tanımı
+
+- **Karar:** Lup şu durumlarda boşta (yalnız dış halka): 1.2 sn fare hareketi yoksa; etkileşimli öğe (K-056 hariç), `data-loupe-off` alanı ya da içerik kabının dışındaki kenar boşluğu üstündeyse (`max(--grid-margin, (genişlik − 1312) / 2)`); klon kurulamadıysa. Kaydırma da etkinlik sayılır: fare dururken sayfa kaydırılırsa lup boşa düşmez.
+- **Gerekçe:** §9.1 "etkileşimli olmayan kenar boşlukları" ifadesi kenar boşluğu olarak okundu. Kaydırmada içerik lupun altında aktığı için lupun kapanması amaca ters (§9.3: "içerik altında akar").
+- **Geri alma:** `useLoupe.ts` → `onScroll`, `onPointerMove`.
+
+### K-058 · 2026-09-24 · Klondaki yapışkan öğeler
+
+- **Karar:** Klon kaydırılmadığı için sertifikanın `sticky` konumu klonda oluşmuyordu. `data-loupe-sticky` işaretli öğeler klonda `relative` yapılıyor; doğal konumları ve kayma sınırları klon kurulurken bir kez ölçülüyor. Kaydırmadaki yerleri her karede kaydırma değerinden hesaplanıp `transform` ile veriliyor (karede layout okuması yok). Burma sayfasında 0, 200, 400 ve 800px kaydırmada canlı sayfa ile klon aynı konumda ölçüldü.
+- **Gerekçe:** §9.2'deki klon yaklaşımında sticky ele alınmıyordu. Ürün sayfasında sertifika yapışık.
+- **Geri alma:** Gerekmez.
+
+### K-059 · 2026-09-24 · Katmanlar ve kenar çizgisi
+
+- **Karar:** `.loupe` ve `.loupe-ring` kalıcı olarak `will-change: transform` (küçük katmanlar). Sahnede `will-change` yalnızca lup etkinken (§9.8). 1px kenar ve nişan, sahnenin üstündeki `::before` katmanında; sahnenin başlangıç noktası camın kenarıyla aynı.
+- **Gerekçe:** Transform'u JS'le değişen ama katmanı olmayan öğe her karede yeniden boyanır. Tracing ile ölçüldü: ana sayfada ve ürün sayfasında lup hareketi boyunca 0 Layout, 0 Paint.
+- **Geri alma:** Gerekmez.
+
+### K-060 · 2026-09-24 · Lupta SVG çizgileri de 3.3× kalınlaşır
+
+- **Karar:** Klondaki `vector-effect: non-scaling-stroke` çizgiler lupta 3.3 kat kalın görünür; bu olduğu gibi bırakıldı.
+- **Gerekçe:** `non-scaling-stroke` üst öğelerdeki CSS transform'ları hesaba katmaz. Sonuç gerçek bir lupla aynı (her şey aynı oranda büyür) ve vektör olduğu için keskin (§9.4).
+- **Geri alma:** Gerekmez.
+
+### K-061 · 2026-09-24 · Dokunmatik ayrıntılar
+
+- **Karar:** Basılı tutma sayılmadan önce 10px kayma payı; daha fazla kayarsa normal kaydırma. Lup açıkken ve basılı tutarken uzun basma menüsü ve metin seçimi kapalı (`html[data-loupe-touch]`). İlk ziyaret ipucu hero'da "↓ TEZGÂHA İN"in altında; kaba imleçte görünür, lup bir kez açılınca hem sayfadan hem lupun kopyasından kalkar. Konumu Aşama 6'da mobil düzenle birlikte gözden geçirilecek.
+- **Gerekçe:** §9.6. Kayma payı olmadan her dokunuş 180 ms sonra lup açardı. Uzun basma menüsü lupla çakışıyordu.
+- **Geri alma:** `LOUPE.touchSlop`, `globals.css`.
+
+### K-062 · 2026-09-24 · `requestIdleCallback` yedeği
+
+- **Karar:** `requestIdleCallback` yoksa (Safari) klon 200 ms sonra kurulur.
+- **Gerekçe:** §17 klonun boşta kurulmasını istiyor; Safari bu API'yi desteklemiyor.
+- **Geri alma:** Gerekmez.

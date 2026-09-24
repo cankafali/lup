@@ -41,6 +41,8 @@ export const hero = {
   coords: `${lat.toFixed(4)}° K / ${lng.toFixed(4)}° D`,
   note: "BU SİTEDE HER ŞEY\nKASITLI OLARAK KÜÇÜK.\nİMLECİNİZ BİR LUPTUR.",
   down: { label: "↓  TEZGÂHA İN", href: "#vitrin" },
+  /** Dokunmatik cihazlarda ilk ziyaret ipucu (§9.6) */
+  loupeHint: "BİR PARÇAYA BASILI TUTUN — LUP AÇILIR",
   lens: {
     mark: "10×",
     caption: "LUP = İMLECİNİZ\nTAŞ  Ø 5.1 mm · 0.50 ct · F · VS1",

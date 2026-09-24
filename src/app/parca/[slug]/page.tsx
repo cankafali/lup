@@ -47,7 +47,7 @@ export default async function ProductPage({ params }: PageProps<"/parca/[slug]">
           </div>
           {/* Sağ: sertifika (8–12. kolon), masaüstünde sabit; aradaki 1px dikey çizgi */}
           <div className="relative col-span-5 col-start-8 max-lg:col-span-full max-lg:col-start-1 lg:before:absolute lg:before:inset-y-0 lg:before:-left-[calc(var(--grid-gutter)/2)] lg:before:w-px lg:before:bg-graphite">
-            <div className="lg:sticky lg:top-[120px] lg:pb-16">
+            <div data-loupe-sticky className="lg:sticky lg:top-[120px] lg:pb-16">
               <Certificate product={product} />
             </div>
           </div>

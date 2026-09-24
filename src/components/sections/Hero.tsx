@@ -1,4 +1,5 @@
 import { hero, photoNote, plate } from "@/content/copy";
+import { LoupeHint } from "@/components/loupe/LoupeHint";
 import { PlateFrame } from "@/components/layout/PlateFrame";
 import { Axis } from "@/components/primitives/Axis";
 import { Callout } from "@/components/primitives/Callout";
@@ -136,6 +137,7 @@ export function Hero() {
               >
                 {hero.down.label}
               </a>
+              <LoupeHint text={hero.loupeHint} className="mt-3" />
             </div>
           </div>
         </div>
