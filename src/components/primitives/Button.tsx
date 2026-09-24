@@ -14,8 +14,7 @@ type ButtonProps = {
 };
 
 const VARIANT = {
-  primary:
-    "h-14 justify-between gap-6 bg-stamp px-6 font-mono text-mono-l text-paper uppercase",
+  primary: "h-14 justify-between gap-6 bg-stamp px-6 font-mono text-mono-l text-paper uppercase",
   link: "gap-[1ch] font-mono text-mono text-graphite uppercase",
 } as const;
 
@@ -31,7 +30,9 @@ export function Button({
   const classes = clsx("group inline-flex items-center", VARIANT[variant], className);
   const content = (
     <>
-      <span className={variant === "link" ? "underline decoration-1 underline-offset-4" : undefined}>
+      <span
+        className={variant === "link" ? "underline decoration-1 underline-offset-4" : undefined}
+      >
         {children}
       </span>
       <span

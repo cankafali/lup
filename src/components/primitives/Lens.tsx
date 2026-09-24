@@ -10,6 +10,10 @@ type LensProps = {
   alt: string;
   /** İç çap (1440 referansında px); dar ekranda orantılı küçülür. */
   diameter: number;
+  /** İç çap için CSS uzunluğu; verilirse `diameter`'ın ölçeklenmesinin yerine geçer (ör. hücreye göre `cqw`). */
+  diameterCss?: string;
+  /** Görselin `sizes` değeri; varsayılan çap kadar. */
+  sizes?: string;
   /** Dış halka kalınlığı (px): hero ve telkari 8, 10× bölümü 16. */
   ring?: number;
   /** "10×" */
@@ -31,6 +35,8 @@ export function Lens({
   src,
   alt,
   diameter,
+  diameterCss,
+  sizes,
   ring = 8,
   label,
   labelPlacement = "outside",
@@ -45,7 +51,7 @@ export function Lens({
       data-lens
       className={clsx("relative aspect-square w-(--lens-outer)", className)}
       style={{
-        "--lens-d": `min(${diameter}px, ${(diameter / CANVAS_REF) * 100}vw)`,
+        "--lens-d": diameterCss ?? `min(${diameter}px, ${(diameter / CANVAS_REF) * 100}vw)`,
         "--lens-ring": `${ring}px`,
         "--lens-outer": "calc(var(--lens-d) + 2 * var(--lens-ring))",
       }}
@@ -56,7 +62,7 @@ export function Lens({
             src={src}
             alt={alt}
             fill
-            sizes={`${diameter}px`}
+            sizes={sizes ?? `${diameter}px`}
             className="object-cover"
             data-hires={src}
           />

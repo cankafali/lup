@@ -15,18 +15,13 @@ const TONE = {
 } as const;
 
 /**
- * Geist Mono etiket (§8.2). Satır kırılımı `\n` ile.
+ * Geist Mono etiket (§8.2). Satır kırılımı `\n` ile; çift boşluklar korunur (`BANT  2.2 mm`).
  * Metin büyük harfle yazılır; text-transform yok, çünkü birimler (mm, g, ct) ve "No." küçük kalır.
  */
-export function MonoLabel({
-  size = "m",
-  tone = "graphite",
-  className,
-  ...rest
-}: MonoLabelProps) {
+export function MonoLabel({ size = "m", tone = "graphite", className, ...rest }: MonoLabelProps) {
   return (
     <span
-      className={clsx("font-mono whitespace-pre-line", SIZE[size], TONE[tone], className)}
+      className={clsx("font-mono whitespace-pre-wrap", SIZE[size], TONE[tone], className)}
       {...rest}
     />
   );

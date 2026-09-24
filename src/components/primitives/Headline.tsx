@@ -76,7 +76,7 @@ export function Headline({ as: Tag = "h2", size, lines, id, srLabel, className }
               <span
                 data-headline-line
                 className={clsx(
-                  "block",
+                  "block whitespace-nowrap",
                   line.italic &&
                     "font-serif text-[length:calc(var(--hl-size)*var(--italic-scale))] leading-none font-normal tracking-normal italic",
                 )}

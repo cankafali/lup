@@ -80,7 +80,7 @@ export default function KitPage() {
         <div className="container-lup pt-16">
           <KitHeading>01 — RENK VE TİPOGRAFİ</KitHeading>
 
-          <div className="grid-lup mb-16 gap-y-6">
+          <div className="mb-16 grid-lup gap-y-6">
             {COLORS.map(([name, bg, value]) => (
               <div key={name} className="col-span-2 max-md:col-span-2">
                 <div className={`${bg} mb-3 aspect-square border border-line`} />
@@ -97,13 +97,19 @@ export default function KitPage() {
               as="h1"
               size="xl"
               srLabel="Sönmez Kuyumculuk — Yakından bakın."
-              lines={[{ text: "Yakından" }, { text: "bakın.", italic: true, indent: "cols-2", overlap: 20 }]}
+              lines={[
+                { text: "Yakından" },
+                { text: "bakın.", italic: true, indent: "cols-2", overlap: 20 },
+              ]}
             />
           </Row>
           <Row name="DISPLAY L" full>
             <Headline
               size="l"
-              lines={[{ text: "Tezgâhta" }, { text: "altı parça.", italic: true, indent: "cols-2", overlap: 34 }]}
+              lines={[
+                { text: "Tezgâhta" },
+                { text: "altı parça.", italic: true, indent: "cols-2", overlap: 34 },
+              ]}
             />
           </Row>
           <Row name="DISPLAY M" full>
@@ -283,7 +289,13 @@ export default function KitPage() {
 
             <div className="col-span-4 max-md:col-span-4">
               <div className="relative aspect-[4/5] border border-line-strong">
-                <Callout viewBox={CELL} point={[140, 160]} dot="stamp" to={[300, 110]} label="TAŞ · ODAK" />
+                <Callout
+                  viewBox={CELL}
+                  point={[140, 160]}
+                  dot="stamp"
+                  to={[300, 110]}
+                  label="TAŞ · ODAK"
+                />
                 <Callout
                   viewBox={CELL}
                   point={[120, 300]}

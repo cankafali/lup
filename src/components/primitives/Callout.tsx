@@ -86,7 +86,9 @@ export function Callout({
           data-callout-label
           className={clsx(
             "absolute w-max",
-            labelAt ? labelAlign === "end" && "-translate-x-full text-right" : LABEL_SIDE[labelSide],
+            labelAt
+              ? labelAlign === "end" && "-translate-x-full text-right"
+              : LABEL_SIDE[labelSide],
           )}
           style={{ left: pct(anchor[0], w), top: pct(anchor[1], h) }}
         >

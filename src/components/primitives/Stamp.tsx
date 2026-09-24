@@ -37,7 +37,7 @@ export function Stamp({
     <span
       data-stamp
       className={clsx(
-        "inline-block border font-mono whitespace-nowrap uppercase [transform:rotate(var(--stamp-rot))]",
+        "inline-block [transform:rotate(var(--stamp-rot))] border font-mono whitespace-nowrap uppercase",
         shape === "oval" ? "rounded-full px-[10px] py-[3px]" : "px-[6px] py-[3px]",
         size === "m" ? "text-mono-l" : "text-mono",
         tone === "stamp" ? "border-stamp text-stamp" : "border-graphite text-graphite",

@@ -33,6 +33,16 @@
   --text-display-s--letter-spacing: -0.05em;
   --text-display-s--font-weight: 500;
 
+  /* Mağaza karşılaştırması: 10× (Geist) ve 1:1 (Instrument Serif), 1440'ta 200 / 240, mobilde 96 / 120 (§10.5, §15) */
+  --text-mega: clamp(96px, 13.9vw, 200px);
+  --text-mega--line-height: 1;
+  --text-mega--letter-spacing: -0.05em;
+  --text-mega--font-weight: 500;
+  --text-mega-italic: clamp(120px, 16.7vw, 240px);
+  --text-mega-italic--line-height: 1;
+  --text-mega-italic--letter-spacing: 0;
+  --text-mega-italic--font-weight: 400;
+
   /* Metin ölçeği */
   --text-item: 22px;
   --text-item--line-height: 1.2;
@@ -58,6 +68,7 @@
   /* Harf aralığı */
   --tracking-display: -0.05em;
   --tracking-mono: 0.06em;
+  --tracking-item: -0.02em; /* parça adı, Nav marka */
 
   /* Easing ve süreler */
   --ease-lup: cubic-bezier(0.22, 1, 0.36, 1); /* ana çıkış */
@@ -76,6 +87,7 @@
   --grid-cols: 12;
   --grid-max: 1312px; /* 1440 tuvalde içerik genişliği */
   --italic-scale: 1.15; /* başlıktaki italik kelime / başlık boyutu (§6) */
+  --stat-unit-scale: 0.423; /* atölye birimi / rakam: 44/104 masaüstü, 20/48 mobil (§10.4, §15) */
 }
 
 /* Tablet (768–1023) */

@@ -4,7 +4,7 @@
 |---|---|---|---|
 | 0 — Kurulum | 2026-09-24 | 2026-09-24 | Tamam |
 | 1 — Token'lar, tipografi, grid, primitives | 2026-09-24 | 2026-09-24 | Tamam |
-| 2 — Ana sayfa statik | — | — | — |
+| 2 — Ana sayfa statik | 2026-09-24 | 2026-09-24 | Tamam |
 | 3 — Ürün detay statik | — | — | — |
 | 4 — Lup | — | — | — |
 | 5 — Animasyonlar | — | — | — |
@@ -59,9 +59,38 @@
 
 **Açık kalanlar (sonraki aşamalara)**
 
-- Aşama 2: `PhotoOverlay` + `useOverlayPoint` (fotoğraf üstü, `slice` kırpmalı bindirmeler).
-- Aşama 2: Tepsi ölçülerinde etiket yönü. Burma'da (y 385) varsayılan "üst" etiket yüzüğün alt kenarına biniyor; hücre bazında `labelSide` verilecek.
-- Aşama 2: Metadata metinleri `layout.tsx`'ten `src/content/site.ts`'e taşınacak.
+- ~~Aşama 2: `PhotoOverlay` + `useOverlayPoint`~~ → yapıldı (K-026, K-027).
+- ~~Aşama 2: Tepsi ölçülerinde etiket yönü~~ → yapıldı (K-031).
+- ~~Aşama 2: Metadata metinleri `site.ts`'e~~ → yapıldı.
 - Aşama 5: `DimensionLine animate` (işaretler hazır: `data-animate`, `data-dim-line`, `data-dim-ticks`, `data-dim-label`), `Headline` satır maskesi (`data-headline-mask`).
 - Figma kıyası (K-011) limit açılınca.
 - `/_kit` son aşamada silinecek.
+
+---
+
+## Aşama 2 — Ana sayfa statik (animasyonsuz, lupsuz)
+
+**Yapılanlar**
+
+- İçerik: `site.ts` (§12.1 + `indexable`, saat dilimi), `products.ts` (6 parça, §12.2), `copy.ts` (tüm bölüm metinleri). Görsel alt metinleri görsellere bakılarak yazıldı.
+- `lib`: `whatsapp.ts` (§12.3), `openStatus.ts` (Europe/Istanbul), `overlay.ts`'e `coverPoint`.
+- Bileşenler: `Nav`, `Footer` (+ `FitText` wordmark), `PhotoOverlay`, `HeroGuide`, `OpenStatus`, `RingFront` (48px Mağaza çizimi), bölümler `Hero`, `Vitrin` + `TrayCell`, `Makro`, `Atolye`, `Magaza`.
+- `layout.tsx`: Nav + Footer, metadata `site.ts`'ten, `robots` `indexable` bayrağından.
+
+**Kabul**
+
+- [x] Masaüstü 1440 düzeni: yedi bölüm §10'daki ölçülerle yerleşti (CDP ile 1440×900 viewport'ta bölüm bölüm görüntü alındı). Figma v2 ile kıyas yapılamadı (K-011).
+- [x] Fotoğraf bindirmeleri kilitli: 1280×800, 1440×900, 1680×1050, 1920×1080'de hero taş işaretinin beklenen konumdan sapması 0px; kılavuz çizginin taş ucu işaretle 0px farkla çakışıyor. Tepsi ve Atölye bindirmeleri hücre/fotoğraf uzayında.
+- [x] "Şu an açık" doğru: 9 senaryo (açılış öncesi/sonrası, kapanış, Pazar, Pazartesi, UTC gün dönümü) Node'da test edildi; tarayıcıda hidrasyon sonrası "ŞU AN AÇIK" hesaplandı.
+- [x] Yer tutucu yok: `grep -rn "\[" src/content` yalnızca TS dizilerini döndürüyor; TODO / Lorem / [LOGO] yok.
+- [x] Kırmızı bütçesi: odak kırmızısı 3 (Nav "RANDEVU →", hero taş işareti, Mağaza "RANDEVU AL"). Diğer kırmızılar şartnamenin istediği `10×` etiketleri ve bütçe dışı 8 damga.
+- [x] Hiçbir genişlikte yatay taşma yok (1280–1920).
+- [x] `pnpm lint`, `pnpm typecheck`, `pnpm build` temiz.
+
+**Açık kalanlar (sonraki aşamalara)**
+
+- Aşama 3: `RingFront` ölçüleri ürün verisine (`products.ts`) taşınacak (K-042); `/parca/[slug]` rotası (tepsi linkleri şu an 404).
+- Aşama 4: Tepsi, Makro ve Hero görsellerinde `data-hires` hazır; Nav `data-loupe-hide`, Footer `data-loupe-off` hazır.
+- Aşama 5: Nav kaydırmada gizlenme; `OpenStatus` nabzı (`data-status-dot`); istatistik sayma; hero parallax; 10× pin.
+- Aşama 6: Mobil MENÜ, tepsi 2 kolon, 10× dikey düzen, Vitrin notunun mobil yeri (şu an `< lg` gizli).
+- Figma kıyasında bakılacaklar: hero'da taş ekseninin `Ø 5.1 mm` etiketinden geçmesi, 10×'te yatay eksenin `TABLA` etiketinden geçmesi (ikisi de şartname koordinatlarının sonucu), footer yüksekliği (K-038), Atölye bindirmesi (K-030).

@@ -157,3 +157,109 @@
 - **Karar:** `globals.css` `@layer base`: tüm odaklanabilir öğelerde 2px graphite outline, 3px offset (§8.8, §16). Tepsi hücresi (Aşama 2) kendi `outline-offset: -2px` değerini verir.
 - **Gerekçe:** Aynı kural hem Button'da hem erişilebilirlik bölümünde geçiyor; tek yerde tanımlandı.
 - **Geri alma:** Gerekmez.
+
+---
+
+## Aşama 2
+
+### K-026 · 2026-09-24 · Fotoğraf bindirmesi CSS ile (`PhotoOverlay`)
+
+- **Karar:** §10'daki "SVG `xMidYMid slice` + `useOverlayPoint`" kalıbı yerine: `PhotoOverlay` bir boyut konteyneri (`container-type: size`). Görselin `cover` ile kapladığı dikdörtgen `cqw/cqh` birimleriyle CSS'te hesaplanıyor; bindirmeler (`DimensionLine`, `Callout`, eksenler) bu kutuya görselin piksel uzayında (`viewBox = [w, h]`) yerleşiyor. `object-position` `--photo-x/--photo-y` (0–1) ile veriliyor ve kutu hesabına aynen giriyor.
+- **Gerekçe:** Aynı kilidi JS'siz ve layout okumasız sağlıyor; SSR'da doğru, lup klonunda da doğru (§9.2). SVG `preserveAspectRatio` yalnızca `xMin/xMid/xMax` destekler; mobil hero'daki `72% 50%` (§15) gibi değerlerde kilit bozulurdu, bu yöntemde bozulmuyor. 1280, 1440, 1680 ve 1920'de taş işaretinin beklenen konumdan sapması 0px ölçüldü.
+- **Geri alma:** `PhotoOverlay`'i §10'daki SVG kalıbına çevirmek.
+
+### K-027 · 2026-09-24 · Hero kılavuz çizgisi: `HeroGuide` + `coverPoint`
+
+- **Karar:** Lup–taş çizgisi hero'ya göre konumlanan ayrı bir SVG (§10.1). Taş ucu `coverPoint()` ile (PhotoOverlay'le aynı formül), lup ucu lupun kenarındaki en yakın nokta. İkisi de yalnızca `ResizeObserver` tetiklenince ölçülüyor. `useOverlayPoint` adıyla ayrı bir kanca yazılmadı; tek kullanıcısı bu bileşen.
+- **Gerekçe:** Çizginin iki ucu farklı düzenlere bağlı: lup grid'e, taş fotoğraf kırpmasına. Ölçüm şart. 1280–1920'de çizgi ucu ile taş işareti arasındaki fark 0px.
+- **Geri alma:** Gerekmez.
+
+### K-028 · 2026-09-24 · Hero görseli `loading="eager"` + `fetchPriority="high"`
+
+- **Karar:** §13/§17'deki `priority` yerine bu iki öznitelik.
+- **Gerekçe:** Next 16'da `priority` kullanımdan kalktı (`preload` geldi). Doküman `fetchPriority` ile `preload`'ı birlikte önermiyor; şartname `fetchpriority="high"` istiyor.
+- **Geri alma:** `preload` prop'u.
+
+### K-029 · 2026-09-24 · Tektaş tepsi ölçüsü taşın üstüne taşındı
+
+- **Karar:** `Ø 5.1 mm TAŞ` ölçüsü `51→152, y 196` yerine `178→271, y 228` (hücrenin 440×550 uzayı).
+- **Gerekçe:** Şartnamenin verdiği `73% 55%` kırpmasıyla taş hücrede x 178–272, y ≈ 290'da (hücre görüntüsü ızgarayla ölçüldü). Verilen koordinatlar taşın sol üstünde, boşlukta kalıyordu. Yeni değerler, hero'daki taş ölçüsünün (görselde `805→935, y 318`) aynı kırpmadan geçirilmiş hali: ölçü, hero'daki gibi taşın hemen üstünde.
+- **Geri alma:** `products.ts`'te `overlay` alanı.
+
+### K-030 · 2026-09-24 · Atölye başlığında bindirme 11px
+
+- **Karar:** "üç kuşak." satırı için `overlap: 11`. "88px alta" ifadesi "ikinci satır birincinin üstünden 88px aşağıda başlar" diye okundu: satır kutusu 0.95 × 104 = 98.8 → 98.8 − 88 ≈ 11.
+- **Gerekçe:** 88px bindirmede de 34px'te de (Vitrin'deki değer) "üç" "tezgâh,"ın g kuyruğuna biniyor. Bu satır 338px içeriden başlıyor ve tam g'nin altına denk geliyor. Vitrin'deki 34px ise orada çakışmıyor ve korundu.
+- **Geri alma:** `Atolye.tsx`'te `TITLE_LAYOUT`.
+
+### K-031 · 2026-09-24 · Burma ve Su Yolu'nda ölçü etiketi altta
+
+- **Karar:** `Product.overlay`'e isteğe bağlı `labelSide` eklendi. Burma (`y 385`) ve Su Yolu (`y 418`) için `below`.
+- **Gerekçe:** İki ölçü de parçanın altında. Üstteki etiket parçanın alt kenarına biniyordu (Aşama 1'deki not).
+- **Geri alma:** Alanı kaldırmak (varsayılan: yatayda üst).
+
+### K-032 · 2026-09-24 · Bölüm ritmi ve boşluklar
+
+- **Karar:** Bölüm etiketi → başlık arası 24px. İçerik kadar uzayan bölümlerin (Vitrin, Atölye, Mağaza) alt boşluğu 64px. Hero başlığı alttan konumlanıyor (`pb-14`, 1440×900'de "Yakından" üstten 549px; şartname ~548). Hero'nun sağ alt notu alttan 48px.
+- **Gerekçe:** Şartname üst boşlukları veriyor; etiket–başlık arası ve alt boşluklar yok. Hero 760–1000px arasında değiştiği için başlık üstten sabitlenemez.
+- **Geri alma:** Figma kıyasında (K-011) güncellenir.
+
+### K-033 · 2026-09-24 · "TEMSİLİ GÖRSEL" yerleri
+
+- **Karar:** Hero: koordinat satırının sağında, levha no'nun altında. Vitrin: tepsi altı satırının ortasında. 10×: sol altta (§10.3). Atölye: fotoğrafın sol altında (§10.4).
+- **Gerekçe:** §13 "fotoğraf olan her bölümde bir yerde" diyor; Hero ve Vitrin için yer belirtilmemiş.
+- **Geri alma:** Gerekmez.
+
+### K-034 · 2026-09-24 · Hero örnek lupu ve açıklaması
+
+- **Karar:** Lup `Lens`'in kendi `10×` etiketi olmadan çiziliyor; `10×` soldaki açıklamanın ilk satırı. Açıklama lupa göre dikeyde ortalı, sağ kenarı lupun sol kenarından 24px uzakta.
+- **Gerekçe:** §10.1 `10×`'i açıklamanın içinde veriyor; ikinci bir `10×` tekrar olurdu. Dikey konum belirtilmemiş.
+- **Geri alma:** Gerekmez.
+
+### K-035 · 2026-09-24 · 10× bölümü 1440×900 tuval üzerinde
+
+- **Karar:** Lup, notlar ve çap ölçüsü, içerik kabıyla aynı genişlikte (≤ 1440) ve `aspect-[1440/900]` bir tuvalde. Tuval bölümde dikeyde ortalı, lup çapı `cqw` ile ölçekleniyor. Sol sütun (etiket, başlık, metin) HTML grid'de.
+- **Gerekçe:** §10.3 "bölüm kendi içinde viewBox 1440×900" diyor. 1440'ta koordinatlar birebir, üstünde içerik kabıyla ortalı, altında orantılı küçülüyor.
+- **Geri alma:** Gerekmez.
+
+### K-036 · 2026-09-24 · Yeni token'lar
+
+- **Karar:** `--text-mega` (10×: `clamp(96px, 13.9vw, 200px)`), `--text-mega-italic` (1:1: `clamp(120px, 16.7vw, 240px)`), `--tracking-item: -0.02em`, `--stat-unit-scale: 0.423` (birim/rakam: 44/104 masaüstü, 20/48 mobil).
+- **Gerekçe:** §10.5, §10.4 ve §15'teki boyutlar token'da değildi. Kural 5: sabit px font boyutu yazılmaz.
+- **Geri alma:** Gerekmez.
+
+### K-037 · 2026-09-24 · "Şu an açık" `useSyncExternalStore` ile
+
+- **Karar:** Sunucu anlık görüntüsü `null` → çalışma saatleri metni gösterilir. İstemcide dakika başlarında tetiklenen bir saate abone olunur ve durum `Europe/Istanbul` saatine göre hesaplanır.
+- **Gerekçe:** Hidrasyon uyumsuzluğu olmadan §10.5'teki davranış. Efekt içinde `setState` (ESLint `react-hooks` uyarısı) gerekmiyor. 9 gün/saat senaryosu Node'da test edildi.
+- **Geri alma:** Gerekmez.
+
+### K-038 · 2026-09-24 · Footer sırası ve yüksekliği
+
+- **Karar:** Sütunlar → wordmark (damgalar sağ üst köşesinde, akışa girmeden) → en alt satır. Wordmark alt satırla arasında boşluk bırakmadan duruyor. Footer 1440'ta ≈ 509px (şartname 440).
+- **Gerekçe:** §10.6 hem "wordmark footer altına 0 boşlukla oturur" hem "en alt satır" diyor; ikisi aynı anda sağlanamıyor. "En alt satır" korundu. 440px'e sığması için wordmark'ın ya küçülmesi ya da alt satırın üstüne binmesi gerekirdi.
+- **Geri alma:** Alt satırı wordmark'ın üstüne almak.
+
+### K-039 · 2026-09-24 · Çizgi renkleri (belirtilmeyen yerler)
+
+- **Karar:** Atölye adım tablosu ve Mağaza 10×/1:1 ayırıcısı graphite. Mağaza bilgi satırının üst çizgisi line-strong. Footer üst çizgisi graphite (§10.6).
+- **Gerekçe:** §5.1: "1px çizgiler = graphite"; bölüm ayırıcıları line-strong (§7).
+- **Geri alma:** Figma kıyasında güncellenir.
+
+### K-040 · 2026-09-24 · Nav ve Footer layout'ta; Nav hero'nun üstünde
+
+- **Karar:** `Nav` ve `Footer` `layout.tsx`'te, `#lup-content` içinde. Nav `absolute`, tam kâğıt zemin; hero fotoğrafı altından başlıyor. Nav linkleri `/#vitrin` biçiminde (ürün sayfasından da çalışsın). Kaydırmada gizlenme Aşama 5'te, mobil MENÜ Aşama 6'da.
+- **Gerekçe:** §10.1'deki viewport koordinatları (taş 927, 475) fotoğrafın 900px'lik hero'yu Nav'ın altı dahil kapladığını gösteriyor.
+- **Geri alma:** Gerekmez.
+
+### K-041 · 2026-09-24 · Prettier `printWidth: 100`, `.md` hariç
+
+- **Karar:** `.prettierrc.json`'a `printWidth: 100` eklendi; `.prettierignore`'a `*.md` eklendi.
+- **Gerekçe:** Kod 100 sütunla yazıldı; 80'de uzun Tailwind sınıf satırları gereksiz kırılıyordu. Markdown kayıtları (KARARLAR, ILERLEME) elle düzenleniyor.
+- **Geri alma:** Satırları silip `pnpm format`.
+
+### K-042 · 2026-09-24 · Mağaza'daki küçük yüzük çizimi
+
+- **Karar:** `RingFront` şimdiden yazıldı (bant, taş profili, iki tırnak; §11.2 A'nın geometrisi, ölçüsüz). Mağaza'da 48px, Tektaş Rüya ölçüleriyle (iç Ø 17.3, bant 2.2, taş Ø 5.1). Ölçüler şimdilik `Magaza.tsx`'te sabit; Aşama 3'te ürün verisine taşınacak.
+- **Gerekçe:** §10.5 "RingFront SVG'nin 48px'lik hali" diyor; bileşen Aşama 3'te ölçülerle genişleyecek.
+- **Geri alma:** Gerekmez.
