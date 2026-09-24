@@ -15,16 +15,45 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
 
-  /* Başlık ölçeği (1440'ta) */
-  --text-display-xl: 150px;
-  --text-display-l: 104px;
-  --text-display-m: 76px;
+  /* Başlık ölçeği — akışkan (§6). Yorumdaki değer 1440 referansıdır. */
+  --text-display-xl: clamp(64px, 10.4vw, 150px); /* 150px */
+  --text-display-xl--line-height: 0.95;
+  --text-display-xl--letter-spacing: -0.05em;
+  --text-display-xl--font-weight: 500;
+  --text-display-l: clamp(48px, 7.2vw, 104px); /* 104px */
+  --text-display-l--line-height: 0.95;
+  --text-display-l--letter-spacing: -0.05em;
+  --text-display-l--font-weight: 500;
+  --text-display-m: clamp(40px, 5.3vw, 76px); /* 76px */
+  --text-display-m--line-height: 1;
+  --text-display-m--letter-spacing: -0.05em;
+  --text-display-m--font-weight: 500;
+  --text-display-s: 56px; /* sertifika ürün adı (§11.3) */
+  --text-display-s--line-height: 1;
+  --text-display-s--letter-spacing: -0.05em;
+  --text-display-s--font-weight: 500;
+
+  /* Metin ölçeği */
   --text-item: 22px;
+  --text-item--line-height: 1.2;
+  --text-item--letter-spacing: -0.02em;
+  --text-item--font-weight: 500;
   --text-body-l: 18px;
+  --text-body-l--line-height: 1.45;
   --text-body: 16px;
+  --text-body--line-height: 1.45;
   --text-mono-l: 12px;
+  --text-mono-l--line-height: 1.4;
+  --text-mono-l--letter-spacing: 0.06em;
+  --text-mono-l--font-weight: 500;
   --text-mono: 10px;
+  --text-mono--line-height: 1.4;
+  --text-mono--letter-spacing: 0.06em;
+  --text-mono--font-weight: 500;
   --text-mono-s: 9px;
+  --text-mono-s--line-height: 1.4;
+  --text-mono-s--letter-spacing: 0.06em;
+  --text-mono-s--font-weight: 400;
 
   /* Harf aralığı */
   --tracking-display: -0.05em;
@@ -37,13 +66,34 @@
   --duration-base: 600ms;
   --duration-slow: 1200ms;
 
-  /* Grid */
+  /* Grid (masaüstü ≥1024) */
   --grid-margin: 64px;
   --grid-gutter: 24px;
 }
 
 :root {
   --radius: 0px; /* yuvarlak köşe yok — tek istisna oval damga ve lup */
+  --grid-cols: 12;
+  --grid-max: 1312px; /* 1440 tuvalde içerik genişliği */
+  --italic-scale: 1.15; /* başlıktaki italik kelime / başlık boyutu (§6) */
+}
+
+/* Tablet (768–1023) */
+@media (width < 1024px) {
+  :root {
+    --grid-cols: 8;
+    --grid-margin: 40px;
+    --grid-gutter: 20px;
+  }
+}
+
+/* Mobil (<768) */
+@media (width < 768px) {
+  :root {
+    --grid-cols: 4;
+    --grid-margin: 20px;
+    --grid-gutter: 16px;
+  }
 }
 
 html {

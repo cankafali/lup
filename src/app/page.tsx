@@ -1,3 +1,3 @@
 export default function Home() {
-  return <main id="lup-content" />;
+  return <main />;
 }

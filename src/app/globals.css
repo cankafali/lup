@@ -1,1 +1,22 @@
 @import "../styles/tokens.css";
+
+/* Grid (§7) — kolon sayısı, kenar ve ara tokens.css'teki kırılımlarla değişir. */
+@utility container-lup {
+  width: 100%;
+  max-width: calc(var(--grid-max) + 2 * var(--grid-margin));
+  margin-inline: auto;
+  padding-inline: var(--grid-margin);
+}
+
+@utility grid-lup {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+}
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-graphite);
+    outline-offset: 3px;
+  }
+}
