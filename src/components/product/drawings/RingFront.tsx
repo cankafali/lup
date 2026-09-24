@@ -1,13 +1,15 @@
-/** Çizim ölçeği: 1 mm = 8 birim (§11.2 A). */
-export const MM = 8;
+import { productPage } from "@/content/copy";
+import { Axis } from "@/components/primitives/Axis";
+import type { Pt } from "@/lib/overlay";
+import { MM, fmt, type PlateView } from "./types";
 
 type RingFrontProps = {
   /** İç çap (mm) */
   innerDiameter: number;
   /** Bant kalınlığı (mm) */
   band: number;
-  /** Yuvarlak taş (tektaş); verilmezse düz bant. */
-  stone?: { diameter: number };
+  /** Yuvarlak taşın rundist çapı (mm); verilmezse düz bant. */
+  stone?: number;
   /** Tırnak teli çapı (mm) */
   prong?: number;
 };
@@ -42,7 +44,7 @@ export function RingFront({ innerDiameter, band, stone, prong = 0.9 }: RingFront
 
   let stoneParts: React.ReactNode = null;
   if (stone) {
-    const p = stoneProfile(innerDiameter, stone.diameter);
+    const p = stoneProfile(innerDiameter, stone);
     const pw = prong * MM;
     const prongTop = p.girdleTop - (p.girdleTop - p.tableY) * 0.6;
     // Tırnak: ince dikdörtgen + yuvarlak uç; iç kenarı rundiste biner.
@@ -55,7 +57,7 @@ export function RingFront({ innerDiameter, band, stone, prong = 0.9 }: RingFront
     };
 
     stoneParts = (
-      <g data-drawing-stone>
+      <g data-draw="detail">
         <path
           d={`M ${-p.half} ${p.girdleTop} L ${-p.tableHalf} ${p.tableY} L ${p.tableHalf} ${p.tableY} L ${p.half} ${p.girdleTop}`}
         />
@@ -74,9 +76,97 @@ export function RingFront({ innerDiameter, band, stone, prong = 0.9 }: RingFront
 
   return (
     <g fill="none" stroke="currentColor" strokeWidth={1} data-drawing="ring-front">
-      <circle r={rOut} />
-      <circle r={rIn} />
+      <g data-draw="outline">
+        <circle r={rOut} />
+        <circle r={rIn} />
+      </g>
       {stoneParts}
     </g>
   );
+}
+
+/** Ön görünüşün üst ve alt sınırı (levha koordinatı). */
+export function ringFrontBounds(
+  spec: { innerDiameter: number; band: number; stone?: number },
+  [, cy]: Pt,
+) {
+  const rOut = (spec.innerDiameter / 2 + spec.band) * MM;
+  const top = spec.stone ? cy + stoneProfile(spec.innerDiameter, spec.stone).tableY : cy - rOut;
+  return { top, bottom: cy + rOut };
+}
+
+/**
+ * Levhadaki ön görünüş (§11.2 A): eksenler + iç çap, bant kalınlığı (dışarı çıkan ok),
+ * toplam yükseklik ve (taş varsa) taş çapı.
+ * `band` motifi (burma, telkari) bu görünüşün üstüne ayrı geometriyle eklenir.
+ */
+export function ringFrontView(
+  spec: { innerDiameter: number; band: number; stone?: number },
+  center: Pt,
+  extra?: React.ReactNode,
+): PlateView {
+  const [cx, cy] = center;
+  const rIn = (spec.innerDiameter / 2) * MM;
+  const rOut = rIn + spec.band * MM;
+  const { top, bottom } = ringFrontBounds(spec, center);
+  const p = spec.stone ? stoneProfile(spec.innerDiameter, spec.stone) : null;
+  const totalX = cx - rOut - 24;
+
+  return {
+    geometry: (
+      <>
+        <g className="text-graphite" data-draw="axis">
+          <Axis from={[cx, top - 26]} to={[cx, bottom + 26]} />
+          <Axis from={[cx - rOut - 14, cy]} to={[cx + rOut + 14, cy]} />
+        </g>
+        <g transform={`translate(${cx} ${cy})`}>
+          <RingFront innerDiameter={spec.innerDiameter} band={spec.band} stone={spec.stone} />
+        </g>
+        {extra}
+      </>
+    ),
+    dims: [
+      {
+        from: [cx - rIn, cy],
+        to: [cx + rIn, cy],
+        label: `Ø ${fmt(spec.innerDiameter)}`,
+        knockout: true,
+      },
+      { from: [cx + rIn, cy], to: [cx + rOut, cy], label: fmt(spec.band), extendEnd: 36 },
+      {
+        from: [totalX, top],
+        to: [totalX, bottom],
+        label: fmt((bottom - top) / MM),
+        labelSide: "left",
+        offset: cx - totalX - (p ? p.tableHalf : 0),
+      },
+      ...(p && spec.stone
+        ? [
+            {
+              from: [cx - p.half, top - 18] as Pt,
+              to: [cx + p.half, top - 18] as Pt,
+              label: `Ø ${fmt(spec.stone)}`,
+              offset: cy + p.girdleTop - (top - 18),
+            },
+          ]
+        : []),
+    ],
+    notes: [
+      { at: [cx, bottom + 44], text: productPage.views.front, align: "center" },
+      ...(p
+        ? [
+            {
+              at: [cx - 22, bottom + 14] as Pt,
+              text: productPage.sectionMark,
+              align: "center" as const,
+            },
+            {
+              at: [cx + 22, bottom + 14] as Pt,
+              text: productPage.sectionMark,
+              align: "center" as const,
+            },
+          ]
+        : []),
+    ],
+  };
 }

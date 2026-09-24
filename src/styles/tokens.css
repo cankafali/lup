@@ -44,6 +44,9 @@
   --text-mega-italic--font-weight: 400;
 
   /* Metin ölçeği */
+  --text-subtitle: 28px; /* sertifika italik alt başlık, Instrument Serif (§11.3) */
+  --text-subtitle--line-height: 1.15;
+  --text-subtitle--font-weight: 400;
   --text-item: 22px;
   --text-item--line-height: 1.2;
   --text-item--letter-spacing: -0.02em;

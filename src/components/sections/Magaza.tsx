@@ -1,4 +1,5 @@
 import { magaza } from "@/content/copy";
+import { getProduct } from "@/content/products";
 import { site } from "@/content/site";
 import { PlateFrame } from "@/components/layout/PlateFrame";
 import { Button } from "@/components/primitives/Button";
@@ -7,8 +8,8 @@ import { RingFront } from "@/components/product/drawings/RingFront";
 import { waLink } from "@/lib/whatsapp";
 import { OpenStatus } from "./OpenStatus";
 
-/** Küçük yüzük çizimi: Tektaş Rüya'nın ön görünüşü (iç Ø 17.3, bant 2.2, taş Ø 5.1 mm). */
-const ICON_RING = { innerDiameter: 17.3, band: 2.2, stone: { diameter: 5.1 } };
+/** Küçük yüzük çizimi: Tektaş Rüya'nın ön görünüşü, levhadaki ölçülerle. */
+const ICON_SPEC = getProduct("tektas-ruya")?.drawingSpec;
 
 /** 05 — Mağaza (§10.5). Harita yok. */
 export function Magaza() {
@@ -38,7 +39,13 @@ export function Magaza() {
                 viewBox="-92 -99 184 192"
                 className="size-12 shrink-0 text-graphite [&_*]:[vector-effect:non-scaling-stroke]"
               >
-                <RingFront {...ICON_RING} />
+                {ICON_SPEC?.kind === "solitaire" && (
+                  <RingFront
+                    innerDiameter={ICON_SPEC.innerDiameter}
+                    band={ICON_SPEC.band}
+                    stone={ICON_SPEC.stone}
+                  />
+                )}
               </svg>
               <p className="text-body whitespace-pre-line text-lead">{magaza.site.text}</p>
             </div>

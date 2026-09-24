@@ -1,5 +1,23 @@
 import type { Side } from "@/lib/overlay";
 
+/**
+ * Teknik levha ölçüleri (mm). Tektaş şartnameden (§11.2); diğerleri temsili (K-044).
+ * `kind`, ürünün `drawing` alanıyla aynıdır.
+ */
+export type DrawingSpec =
+  | {
+      kind: "solitaire";
+      innerDiameter: number;
+      band: number;
+      stone: number;
+      section: { width: number; thickness: number };
+    }
+  | { kind: "twist"; innerDiameter: number; band: number; turns: number }
+  | { kind: "drop-earring"; total: number; stone: { length: number; width: number } }
+  | { kind: "tennis"; count: number; pitch: number; width: number; stone: number; length: number }
+  | { kind: "pear-pendant"; total: number; stone: { length: number; width: number } }
+  | { kind: "filigree"; innerDiameter: number; band: number; stone: number; wire: number };
+
 export type Product = {
   slug: string;
   no: string; // "01"
@@ -22,6 +40,7 @@ export type Product = {
   dataLine: string; // tepsi veri satırı
   status: "Vitrinde" | "Sipariş üzerine";
   drawing: "solitaire" | "twist" | "drop-earring" | "tennis" | "pear-pendant" | "filigree";
+  drawingSpec: DrawingSpec;
   image: {
     src: string;
     hires: string;
@@ -80,6 +99,13 @@ export const products: readonly Product[] = [
     dataLine: "YÜZÜK · 18K · 3.4 g · Ø 5.1 mm",
     status: "Vitrinde",
     drawing: "solitaire",
+    drawingSpec: {
+      kind: "solitaire",
+      innerDiameter: 17.3,
+      band: 2.2,
+      stone: 5.1,
+      section: { width: 2.2, thickness: 1.6 },
+    },
     image: img(
       "hero-tektas.jpg",
       1376,
@@ -107,6 +133,7 @@ export const products: readonly Product[] = [
     dataLine: "YÜZÜK · 22 AYAR · 2.9 g",
     status: "Vitrinde",
     drawing: "twist",
+    drawingSpec: { kind: "twist", innerDiameter: 18.2, band: 1.8, turns: 16 },
     image: img(
       "vitrin-burma.jpg",
       928,
@@ -132,6 +159,7 @@ export const products: readonly Product[] = [
     dataLine: "KÜPE · 18K · 2 × 0.40 ct",
     status: "Vitrinde",
     drawing: "drop-earring",
+    drawingSpec: { kind: "drop-earring", total: 24, stone: { length: 7, width: 5 } },
     image: img(
       "vitrin-damla.jpg",
       928,
@@ -163,6 +191,7 @@ export const products: readonly Product[] = [
     dataLine: "BİLEKLİK · 18K · 42 TAŞ",
     status: "Vitrinde",
     drawing: "tennis",
+    drawingSpec: { kind: "tennis", count: 42, pitch: 4.2, width: 3, stone: 2.4, length: 175 },
     image: img(
       "vitrin-su-yolu.jpg",
       928,
@@ -188,6 +217,7 @@ export const products: readonly Product[] = [
     dataLine: "KOLYE UCU · 18K · 0.70 ct",
     status: "Vitrinde",
     drawing: "pear-pendant",
+    drawingSpec: { kind: "pear-pendant", total: 12, stone: { length: 8, width: 5.4 } },
     image: img(
       "vitrin-armut.jpg",
       928,
@@ -213,6 +243,7 @@ export const products: readonly Product[] = [
     dataLine: "YÜZÜK · 22 AYAR · EL İŞİ",
     status: "Vitrinde",
     drawing: "filigree",
+    drawingSpec: { kind: "filigree", innerDiameter: 17.8, band: 2.6, stone: 4.3, wire: 0.3 },
     image: img(
       "telkari-makro.jpg",
       1024,

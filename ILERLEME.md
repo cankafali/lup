@@ -5,7 +5,7 @@
 | 0 — Kurulum | 2026-09-24 | 2026-09-24 | Tamam |
 | 1 — Token'lar, tipografi, grid, primitives | 2026-09-24 | 2026-09-24 | Tamam |
 | 2 — Ana sayfa statik | 2026-09-24 | 2026-09-24 | Tamam |
-| 3 — Ürün detay statik | — | — | — |
+| 3 — Ürün detay statik | 2026-09-24 | 2026-09-24 | Tamam |
 | 4 — Lup | — | — | — |
 | 5 — Animasyonlar | — | — | — |
 | 6 — Mobil ve tablet | — | — | — |
@@ -89,8 +89,37 @@
 
 **Açık kalanlar (sonraki aşamalara)**
 
-- Aşama 3: `RingFront` ölçüleri ürün verisine (`products.ts`) taşınacak (K-042); `/parca/[slug]` rotası (tepsi linkleri şu an 404).
+- ~~Aşama 3: `RingFront` ölçüleri ürün verisine; `/parca/[slug]` rotası~~ → yapıldı.
 - Aşama 4: Tepsi, Makro ve Hero görsellerinde `data-hires` hazır; Nav `data-loupe-hide`, Footer `data-loupe-off` hazır.
 - Aşama 5: Nav kaydırmada gizlenme; `OpenStatus` nabzı (`data-status-dot`); istatistik sayma; hero parallax; 10× pin.
 - Aşama 6: Mobil MENÜ, tepsi 2 kolon, 10× dikey düzen, Vitrin notunun mobil yeri (şu an `< lg` gizli).
 - Figma kıyasında bakılacaklar: hero'da taş ekseninin `Ø 5.1 mm` etiketinden geçmesi, 10×'te yatay eksenin `TABLA` etiketinden geçmesi (ikisi de şartname koordinatlarının sonucu), footer yüksekliği (K-038), Atölye bindirmesi (K-030).
+
+---
+
+## Aşama 3 — Ürün detay sayfası statik
+
+**Yapılanlar**
+
+- `/parca/[slug]`: `generateStaticParams` (6 parça, SSG), `dynamicParams = false` (bilinmeyen slug → 404), `generateMetadata` (`{ad} — No. {certNo}`, açıklama).
+- `TechnicalPlate`: tek SVG levha (800×1100), kesim izleri, sağ üstte levha no + ölçek, antet tablosu.
+- Çizimler: `RingFront` (ön), `RingTop` (faset diyagramı), `BandSection` (taramalı D kesit), `TitleBlock`; `TwistFront`, `DropEarringFront`, `TennisFront` (düz açılım), `PearPendantFront`, `FiligreeFront`.
+- Tektaş: ön görünüşte kırmızı taş işareti + levhanın sağ üstünde statik lup (Ø170, `lup-detay.jpg`) ve 1px kılavuz çizgi.
+- `Certificate`: başlık satırı, ad (56px), italik alt başlık (28px, `--text-subtitle`), açıklama, özellik satırları, imza SVG'si, üç damga (−2°, +1°, −1°), WhatsApp butonu, durum satırı, alt not. Masaüstünde `sticky top: 120px`.
+- Mağaza'daki küçük yüzük çizimi artık `drawingSpec`'ten okunuyor.
+
+**Kabul**
+
+- [x] 6 slug statik üretiliyor (build çıktısında `●`); `/parca/yok` → 404.
+- [x] `solitaire` levhası tam: ön görünüş, üst görünüş (faset diyagramı), bant kesiti (taramalı), antet, lup bağlantısı.
+- [x] Diğer 5 tip: ön görünüş (düz açılım) + antet.
+- [x] Sertifika tüm satırlar, imza, damgalar, WhatsApp butonu. Mesaj doğru kodlanmış: link çözülünce "Merhaba, sitede Tektaş Rüya (No. 0147) parçasını gördüm. …" birebir çıkıyor.
+- [x] Teknik çizimler ikon gibi değil: her görünüşte eksen, en az 3 ölçü, uzatma çizgileri var. Tektaş ön görünüşünde 4 ölçü (iç çap, bant, toplam yükseklik, taş çapı), üst görünüşte 3 (rundist, tabla, tırnak aralığı), kesitte 3 (genişlik, kalınlık, yan duvar). Diğer tiplerde 3–4 ölçü. Altı levha 1440×900'de render edilip kontrol edildi.
+- [x] `pnpm lint`, `pnpm typecheck`, `pnpm build` temiz.
+
+**Açık kalanlar (sonraki aşamalara)**
+
+- **K-047: bant kalınlığı ön görünüşte 2.2, kesitte 1.6 — kuyumcu/tasarımcı onayı gerekiyor.**
+- Aşama 5: levha çizim sırası (`data-draw`), sertifika girişi (`data-cert-row`, `data-stamp`), durum noktası nabzı.
+- Aşama 6: mobil sıralama (önce sertifika başlığı, sonra levha, sonra satırlar; buton altta sabit).
+- Aşama 7: diğer 5 tipin üst görünüşü/kesiti/detayı, "Diğer parçalar" şeridi (§11.4), sayfa geçişi (§11.5).

@@ -153,3 +153,56 @@ export const footer = {
   motto: "BU SİTEDE HER ŞEY 10×",
   top: "YUKARI ↑",
 };
+
+const [masterFirst = "", ...masterRest] = site.master.name.split(" ");
+
+export const productPage = {
+  back: { label: "← TEZGÂHA DÖN", href: "/#vitrin" },
+  plate: (no: string, total: number) => `LEVHA ${no} / ${pad2(total)}`,
+  scale: "ÖLÇEK 2:1\nÖLÇÜLER mm",
+  views: {
+    front: "ÖN GÖRÜNÜŞ",
+    top: "ÜST GÖRÜNÜŞ — 6:1",
+    section: "KESİT A-A — 10:1",
+    flat: "DÜZ AÇILIM",
+  },
+  sectionMark: "A",
+  filigreeWire: (wire: number) => `TELKARİ · TEL Ø ${wire}`,
+  tennisBreak: "···",
+  lensAlt: "Dört tırnaklı yuvadaki yuvarlak pırlantanın önden makro görüntüsü",
+  titleBlock: {
+    part: "PARÇA",
+    no: "NO",
+    master: "USTA",
+    scale: "ÖLÇEK",
+    date: "TARİH",
+    masterValue: `${masterFirst.charAt(0)}. ${masterRest.join(" ")}`,
+    scaleValue: "2:1",
+    dateValue: "03.2026",
+  },
+};
+
+export const certificate = {
+  title: "SERTİFİKA",
+  no: (certNo: string) => `No. ${certNo}`,
+  rows: {
+    karat: "AYAR",
+    weight: "AĞIRLIK",
+    stone: "TAŞ",
+    carat: "KARAT",
+    color: "RENK",
+    clarity: "BERRAKLIK",
+    cut: "KESİM",
+    size: "ÖLÇÜ",
+    status: "DURUM",
+  },
+  master: `USTA — ${upper(site.master.name)}`,
+  masterStamp: `USTA · ${site.master.initials}`,
+  signatureLabel: `${site.master.name} imzası`,
+  cta: "Mağazada 1:1 görün",
+  status: {
+    Vitrinde: `ŞU AN VİTRİNDE · ${upper(site.address.area)}`,
+    "Sipariş üzerine": `SİPARİŞ ÜZERİNE · ${upper(site.address.area)}`,
+  },
+  note: "GÖRSELLER VE DEĞERLER TEMSİLİDİR. PARÇANIN KENDİSİ MAĞAZADADIR.",
+};

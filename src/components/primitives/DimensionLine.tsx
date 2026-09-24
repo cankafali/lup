@@ -7,15 +7,19 @@ import { MonoLabel } from "./MonoLabel";
 const TICK = 5;
 const EXTENSION_OPACITY = 0.35;
 
-type DimensionLineProps = {
+export type DimensionLineProps = {
   from: Pt;
   to: Pt;
   /** "Ø 18.2 mm" */
   label: string;
-  /** Varsayılan: yatay çizgide üst, dikey çizgide sağ. */
+  /** Varsayılan: yatay çizgide üst, dikey çizgide sağ (extendEnd varsa yatayda sağ, dikeyde alt). */
   labelSide?: Side;
   /** > 0 ise uçlardan ölçülen nesneye (etiketin karşı yönü) uzatma çizgileri. */
   offset?: number;
+  /** Dar ölçüler için: çizgi `to`'dan bu kadar dışarı uzar, etiket uzantının ucuna oturur. */
+  extendEnd?: number;
+  /** Etiketin arkası kâğıt: altındaki eksen/çizgi yazının içinden geçmez (teknik levha). */
+  knockout?: boolean;
   tone?: "graphite" | "paper";
   /** Görünür olunca çizilsin mi (animasyon Aşama 5'te bağlanır). */
   animate?: boolean;
@@ -34,6 +38,8 @@ export function DimensionLine({
   label,
   labelSide,
   offset = 0,
+  extendEnd = 0,
+  knockout = false,
   tone = "graphite",
   animate = false,
   viewBox,
@@ -45,13 +51,17 @@ export function DimensionLine({
   const dx = x2 - x1;
   const dy = y2 - y1;
   const len = Math.hypot(dx, dy) || 1;
+  const horizontal = Math.abs(dx) >= Math.abs(dy);
   // Çizgiye dik çentik vektörü
   const nx = (-dy / len) * TICK;
   const ny = (dx / len) * TICK;
-  const side = labelSide ?? (Math.abs(dx) >= Math.abs(dy) ? "above" : "right");
+  const side =
+    labelSide ?? (extendEnd ? (horizontal ? "right" : "below") : horizontal ? "above" : "right");
   const [sx, sy] = SIDE_VEC[side];
   const ex = -sx * offset;
   const ey = -sy * offset;
+  const end: Pt = extendEnd ? [x2 + (dx / len) * extendEnd, y2 + (dy / len) * extendEnd] : to;
+  const anchor: Pt = extendEnd ? end : [(x1 + x2) / 2, (y1 + y2) / 2];
 
   return (
     <span
@@ -76,7 +86,7 @@ export function DimensionLine({
             <Hairline from={to} to={[x2 + ex, y2 + ey]} />
           </g>
         )}
-        <Hairline from={from} to={to} data-dim-line />
+        <Hairline from={from} to={end} data-dim-line />
         <g data-dim-ticks>
           <Hairline from={[x1 - nx, y1 - ny]} to={[x1 + nx, y1 + ny]} />
           <Hairline from={[x2 - nx, y2 - ny]} to={[x2 + nx, y2 + ny]} />
@@ -84,8 +94,8 @@ export function DimensionLine({
       </svg>
       <span
         data-dim-label
-        className={clsx("absolute w-max", LABEL_SIDE[side])}
-        style={{ left: pct((x1 + x2) / 2, w), top: pct((y1 + y2) / 2, h) }}
+        className={clsx("absolute w-max", LABEL_SIDE[side], knockout && "bg-paper px-1")}
+        style={{ left: pct(anchor[0], w), top: pct(anchor[1], h) }}
       >
         <MonoLabel tone={tone} className="block">
           {label}

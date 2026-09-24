@@ -263,3 +263,80 @@
 - **Karar:** `RingFront` şimdiden yazıldı (bant, taş profili, iki tırnak; §11.2 A'nın geometrisi, ölçüsüz). Mağaza'da 48px, Tektaş Rüya ölçüleriyle (iç Ø 17.3, bant 2.2, taş Ø 5.1). Ölçüler şimdilik `Magaza.tsx`'te sabit; Aşama 3'te ürün verisine taşınacak.
 - **Gerekçe:** §10.5 "RingFront SVG'nin 48px'lik hali" diyor; bileşen Aşama 3'te ölçülerle genişleyecek.
 - **Geri alma:** Gerekmez.
+- **Aşama 3 notu:** Ölçüler artık `products.ts`'teki `drawingSpec`'ten okunuyor (K-044).
+
+---
+
+## Aşama 3
+
+### K-043 · 2026-09-24 · Levha: görünüşler veri olarak
+
+- **Karar:** Her görünüş (`ringFrontView`, `ringTopView`, `bandSectionView`, …) `{ geometry, dims, notes }` döndürüyor. Geometri levhanın tek SVG'sine (viewBox 800×1100) giriyor; ölçüler `DimensionLine` ile, notlar `MonoLabel` ile HTML olarak aynı uzaya yerleşiyor. Çizgiler `data-draw="axis | outline | detail"` ile işaretli; Aşama 5'teki çizim sırası (eksen → kontur → detay → ölçü → etiket) buna bağlanacak.
+- **Gerekçe:** §11.2 "levha tek SVG" ve §8.3 "etiketler HTML" kuralları aynı anda sağlanıyor. Parça tipleri aynı bileşenlerin parametreli hali (§11.2).
+- **Geri alma:** Gerekmez.
+
+### K-044 · 2026-09-24 · Ürün verisine `drawingSpec` eklendi
+
+- **Karar:** `Product`'a tipine göre ayrışan `drawingSpec` (mm) eklendi; `kind` alanı `drawing` ile aynı. Tektaş şartnameden: iç Ø 17.3, bant 2.2, taş Ø 5.1, kesit 2.2 × 1.6. Diğerleri **temsili**: Burma iç Ø 18.2 (şartname), bant 1.8, 16 tur. Damla boy 24 (şartname), taş 7 × 5. Su Yolu 42 × 4.2 aralık, en 3.0, taş Ø 2.4, boy 175 (şartname: 42 taş, 17.5 cm). Armut uç 12 (şartname), taş 8 × 5.4. Telkari iç Ø 17.8, bant 2.6, taş Ø 4.3, tel Ø 0.3 (şartname).
+- **Gerekçe:** Şartname yalnızca tektaş için tam ölçü veriyor. Diğer değerler karat ve boydan makul çıkarımlar. Gerçek parçalar ölçülünce yalnızca bu alan güncellenir.
+- **Geri alma:** Değerleri `products.ts`'te düzeltmek.
+
+### K-045 · 2026-09-24 · Üst görünüş 6:1 (24 birim/mm)
+
+- **Karar:** Faset diyagramı 24 birim/mm'de çiziliyor; görünüş başlığı "ÜST GÖRÜNÜŞ — 6:1".
+- **Gerekçe:** Şartname üst görünüşe ölçek vermiyor. Levha ölçeğinde (8 birim/mm) 5.1 mm'lik taş 41 birim çıkıyor; 57 fasetli diyagram okunmaz.
+- **Geri alma:** `RingTop.tsx`'te `SCALE`.
+
+### K-046 · 2026-09-24 · Bant kesiti 10:1 (40 birim/mm)
+
+- **Karar:** Kesit 12 birim/mm yerine 40 birim/mm; başlık "KESİT A-A — 10:1".
+- **Gerekçe:** 12 birim/mm'de kesit 26×19 birim kaldı, ölçü etiketleri sığmadı ve görünüş §19'daki "ikon gibi değil" kuralını karşılamadı (render edilip bakıldı). Oranlar, tarama (45°, 4 birim) ve ölçüler şartnamedeki gibi.
+- **Geri alma:** `BandSection.tsx`'te `SCALE = 12`.
+
+### K-047 · 2026-09-24 · Bant kalınlığındaki iç tutarsızlık olduğu gibi bırakıldı
+
+- **Karar:** Ön görünüşte bant radyal kalınlığı 2.2 mm (§11.2 A: "bant 2.2 mm → dış r 86.8"), kesitte kalınlık 1.6 mm, genişlik 2.2 mm (§11.2 C). İkisi de şartnamedeki gibi çizildi.
+- **Gerekçe:** Ön görünüşteki radyal ölçü kesitteki kalınlıkla aynı olmalı; şartname iki farklı değer veriyor. Tasarım kararı üretmemek için ikisi de korundu. **Kuyumcu/tasarımcı onayı gerekiyor.**
+- **Geri alma:** `drawingSpec.band` ya da `section.thickness`.
+
+### K-048 · 2026-09-24 · Levha yazıları
+
+- **Karar:** Ölçüler birimsiz ("17.3"); sağ üstte "ÖLÇEK 2:1 / ÖLÇÜLER mm". Her görünüşün altında başlık: "ÖN GÖRÜNÜŞ", "ÜST GÖRÜNÜŞ — 6:1", "KESİT A-A — 10:1", "DÜZ AÇILIM". Taşlı ön görünüşlerde bandın altında kesit işareti "A · A".
+- **Gerekçe:** Teknik çizim alışkanlığı; kalabalık levhada her ölçüde "mm" tekrarı okunmayı zorlaştırıyor. Şartname yalnızca "KESİT A-A" başlığını veriyor.
+- **Geri alma:** `copy.ts` → `productPage`.
+
+### K-049 · 2026-09-24 · Kesit taraması hesapla kırpılıyor
+
+- **Karar:** Tarama çizgileri `clipPath` yerine dışbükey profil çokgenine göre hesapla kırpılıyor (Cyrus–Beck).
+- **Gerekçe:** Lup klonu tüm `id`'leri siliyor (§9.2); `clip-path: url(#…)` klonda kırılır, tarama profilden taşardı.
+- **Geri alma:** Gerekmez.
+
+### K-050 · 2026-09-24 · `DimensionLine`'a `knockout` ve `extendEnd`
+
+- **Karar:** `knockout`: etiketin arkası kâğıt, altındaki eksen yazının içinden geçmez (eksen üstündeki çap ölçüleri). `extendEnd`: dar ölçüde çizgi dışarı uzar, etiket ucuna oturur (bant kalınlığı, §11.2 A "dışarı çıkan ok").
+- **Gerekçe:** Teknik çizim kuralları; §8.3'teki etiket konumlamasıyla uyumlu.
+- **Geri alma:** Gerekmez.
+
+### K-051 · 2026-09-24 · Sertifika ayrıntıları
+
+- **Karar:** Parçada olmayan bilgilerin satırı atlanıyor (Burma'da taş satırları yok; kesim yalnızca tektaşta). İkinci damga ayar etiketinin ilk parçası ("18K · 750" → "18K", "22 AYAR · 916" → "22 AYAR"). Durum satırı "ŞU AN VİTRİNDE · KAPALIÇARŞI" (sipariş üzerine olanlarda "SİPARİŞ ÜZERİNE · …"). İmza 200×60 kutuda tek `<path>` (birden çok alt yol), 1.5px, `role="img"` + etiket.
+- **Gerekçe:** §11.3'teki tablo tektaş örneği; diğer parçalar için genelleme.
+- **Geri alma:** `Certificate.tsx`.
+
+### K-052 · 2026-09-24 · Ürün sayfası yerleşimi
+
+- **Karar:** Levha sütunu 1440'a kadar sol kenar boşluğuna taşıyor (`-ml` kenar boşluğu); 1440 üstünde ortalanan kabın solunda kalıyor. Sütunlar arası 1px graphite çizgi ara boşluğun ortasında. Sertifika `lg`'de `sticky; top: 120px`. Nav altında satır: sol "← TEZGÂHA DÖN" (`/#vitrin`), sağ "LEVHA 0X / 06". `dynamicParams = false` → bilinmeyen slug 404.
+- **Gerekçe:** §11.1. 1440 üstünde tam ekran kenarına taşımak kap dışı ölçüm gerektirir; levha zaten kendi kesim izleriyle çerçeveli.
+- **Geri alma:** Gerekmez.
+
+### K-053 · 2026-09-24 · Antet tablosu değerleri
+
+- **Karar:** USTA "M. Sönmez" (`site.master.name`'den türetilir), ÖLÇEK "2:1", TARİH tüm parçalarda "03.2026".
+- **Gerekçe:** Şartname tarihi yalnızca tektaş için veriyor.
+- **Geri alma:** `copy.ts` → `productPage.titleBlock`.
+
+### K-054 · 2026-09-24 · Levhadaki kırmızı taş işareti bütçe dışı
+
+- **Karar:** Ön görünüşte taşın üstündeki kırmızı işaret (Ø8) "damga dili" sayıldı; ürün sayfasının odak kırmızıları buton + Nav randevu.
+- **Gerekçe:** §11.2 "taşın üstünde kırmızı işaret" ile §11.3 "sayfanın tek odak kırmızısı buton" ancak §5.1'deki "küçük işaret noktaları bütçeye girmez" kuralıyla birlikte tutarlı.
+- **Geri alma:** `dot="graphite"`.
