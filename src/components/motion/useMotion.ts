@@ -2,9 +2,10 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
-import { DESKTOP, MOTION } from "./helpers";
+import { DESKTOP, MOTION, WIDE } from "./helpers";
 
-type Conditions = { motion: boolean; desktop: boolean };
+/** desktop: ≥ 768 (tablet dahil) · wide: ≥ 1024 */
+type Conditions = { motion: boolean; desktop: boolean; wide: boolean };
 type Setup = (root: HTMLElement, conditions: Conditions) => void | (() => void);
 
 /**
@@ -18,10 +19,10 @@ export function useMotion(setup: Setup) {
     const root = anchor.current?.parentElement;
     if (!root) return;
     const mm = gsap.matchMedia();
-    mm.add({ motion: MOTION, desktop: DESKTOP }, (ctx) => {
-      const { motion, desktop } = ctx.conditions as Conditions;
-      if (!motion) return;
-      return setup(root, { motion, desktop });
+    mm.add({ motion: MOTION, desktop: DESKTOP, wide: WIDE }, (ctx) => {
+      const conditions = ctx.conditions as Conditions;
+      if (!conditions.motion) return;
+      return setup(root, conditions);
     });
     return () => mm.revert();
   });

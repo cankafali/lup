@@ -15,19 +15,33 @@ const IMG: ViewBox = [1264, 848];
  * İkinci satır 338px içeride; birinci satırın üstünden 88px aşağıda başlar
  * (satır kutusu 0.95 × 104 = 98.8 → bindirme ≈ 11px). 88px bindirme satırları çakıştırıyor (K-030).
  */
-const TITLE_LAYOUT: Pick<HeadlineLine, "indent" | "overlap">[] = [{}, { indent: 338, overlap: 11 }];
+const TITLE_LAYOUT: Pick<HeadlineLine, "indent" | "indentMobile" | "overlap">[] = [
+  {},
+  { indent: 338, indentMobile: "cols-1", overlap: 11 },
+];
 
-/** Notlar: nokta (görsel px) → çizgi ucu → etiket yönü (sağ üst, sol üst, aşağı). */
-const NOTES: { point: Pt; to: Pt; side: Side; label: string }[] = [
-  { point: [615, 358], to: [705, 288], side: "right", label: atolye.notes.ring },
-  { point: [270, 173], to: [190, 113], side: "left", label: atolye.notes.loupe },
-  { point: [1099, 421], to: [1099, 511], side: "below", label: atolye.notes.drawing },
+/** Notlar: nokta (görsel px) → çizgi ucu → etiket yönü (sağ üst, sol üst, aşağı). Mobilde ilk ikisi (§15). */
+const NOTES: { point: Pt; to: Pt; side: Side; label: string; mobile: boolean }[] = [
+  { point: [615, 358], to: [705, 288], side: "right", label: atolye.notes.ring, mobile: true },
+  { point: [270, 173], to: [190, 113], side: "left", label: atolye.notes.loupe, mobile: true },
+  {
+    point: [1099, 421],
+    to: [1099, 511],
+    side: "below",
+    label: atolye.notes.drawing,
+    mobile: false,
+  },
 ];
 
 /** 04 — Atölye (§10.4). */
 export function Atolye() {
   return (
-    <PlateFrame plate={4} id="atolye" labelledBy="atolye-baslik" className="pt-[110px] pb-16">
+    <PlateFrame
+      plate={4}
+      id="atolye"
+      labelledBy="atolye-baslik"
+      className="pt-[110px] pb-16 max-md:pt-24"
+    >
       <AtolyeMotion />
       <div className="container-lup">
         <MonoLabel data-anim-label className="block">
@@ -63,6 +77,7 @@ export function Atolye() {
                 variant="tag"
                 dot="ring"
                 tone="paper"
+                className={n.mobile ? undefined : "max-md:hidden"}
               />
             ))}
           </PhotoOverlay>
@@ -78,7 +93,7 @@ export function Atolye() {
               {site.stats.map((s) => (
                 <p
                   key={s.unit}
-                  className="flex flex-1 items-center border-t border-graphite text-display-l tabular-nums"
+                  className="flex flex-1 items-center border-t border-graphite text-display-l tabular-nums max-lg:py-4 max-lg:[&:not(:first-child)]:border-l max-lg:[&:not(:first-child)]:pl-4"
                 >
                   <span data-count={s.value}>{s.value}</span>
                   {/* Birim: rakamın taban çizgisinde, 14px sağda (44px'lik birimin 0.318em'i) */}
@@ -93,12 +108,12 @@ export function Atolye() {
       </div>
 
       {/* Dört adım */}
-      <div className="container-lup mt-[100px]">
+      <div className="container-lup mt-[100px] max-md:mt-16">
         <ol className="grid grid-cols-4 border-y border-graphite max-lg:grid-cols-2">
           {atolye.steps.map((step) => (
             <li
               key={step.label}
-              className="min-h-[230px] border-graphite p-6 [&:not(:first-child)]:border-l"
+              className="min-h-[230px] border-graphite p-6 max-lg:even:border-l max-md:min-h-0 max-md:p-4 lg:[&:not(:first-child)]:border-l max-lg:[&:nth-child(n+3)]:border-t"
             >
               <MonoLabel tone="lead" className="block">
                 {step.label}

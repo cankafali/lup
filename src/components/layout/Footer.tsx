@@ -5,11 +5,11 @@ import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { Stamp } from "@/components/primitives/Stamp";
 import { waLink } from "@/lib/whatsapp";
 
-const LINK = "underline-offset-4 hover:underline";
+const LINK = "tap underline-offset-4 hover:underline";
 
 function Column({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="col-span-3 max-md:col-span-2">
+    <div className="col-span-3 max-lg:col-span-4 max-md:col-span-2">
       <MonoLabel tone="lead" className="block">
         {title}
       </MonoLabel>
@@ -61,10 +61,10 @@ export function Footer() {
         </div>
 
         {/* relative: wordmark'ın (konumlu kap) taşan kutusunun üstünde kalsın, "YUKARI" tıklanabilsin */}
-        <div className="relative grid grid-cols-3 items-baseline gap-4 py-6 font-mono text-mono-s text-lead">
+        <div className="relative grid grid-cols-3 items-baseline gap-4 py-6 font-mono text-mono-s text-lead max-md:grid-cols-1 max-md:gap-1">
           <span>{footer.copyright}</span>
-          <span className="text-center">{footer.motto}</span>
-          <a href="#" className={`justify-self-end ${LINK}`}>
+          <span className="text-center max-md:text-left">{footer.motto}</span>
+          <a href="#" className={`justify-self-end max-md:justify-self-start ${LINK}`}>
             {footer.top}
           </a>
         </div>

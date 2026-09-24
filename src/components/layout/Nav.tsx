@@ -2,10 +2,11 @@ import Link from "next/link";
 import { nav } from "@/content/copy";
 import { NavMotion } from "@/components/motion/NavMotion";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
+import { NavMenu } from "./NavMenu";
 
 /**
- * Üst gezinme (§8.9). Zemin tam kâğıt, bulanık/yarı saydam bant yok.
- * Kaydırmada gizlenip geri gelme Aşama 5'te; mobil MENÜ paneli Aşama 6'da.
+ * Üst gezinme (§8.9). Zemin tam kâğıt, bulanık/yarı saydam bant yok. Kaydırmada gizlenip
+ * geri gelir (NavMotion). Mobilde (< 768) 64px; bölüm linkleri ve randevu yerine "MENÜ".
  */
 export function Nav() {
   return (
@@ -16,7 +17,10 @@ export function Nav() {
           aria-label={nav.label}
           className="grid-lup h-24 items-center border-b border-line-strong max-md:h-16"
         >
-          <Link href="/" className="col-span-5 max-lg:col-span-4 max-md:col-span-2">
+          <Link
+            href="/"
+            className="col-span-5 flex min-h-11 flex-col justify-center max-lg:col-span-3 max-md:col-span-2"
+          >
             <span className="block text-body-l leading-none font-medium tracking-item">
               {nav.brand}
             </span>
@@ -25,10 +29,10 @@ export function Nav() {
             </MonoLabel>
           </Link>
 
-          <ul className="col-span-5 col-start-6 flex gap-[3ch] font-mono text-mono max-lg:hidden">
+          <ul className="col-span-5 col-start-6 flex gap-[3ch] font-mono text-mono max-lg:col-span-3 max-lg:col-start-4 max-md:hidden">
             {nav.links.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="flex gap-[1ch] hover:underline">
+                <Link href={link.href} className="tap flex gap-[1ch] hover:underline">
                   <span className="text-lead">{link.no}</span>
                   <span>{link.label}</span>
                 </Link>
@@ -38,10 +42,12 @@ export function Nav() {
 
           <Link
             href={nav.cta.href}
-            className="col-span-2 col-start-11 justify-self-end font-mono text-mono text-stamp hover:underline max-lg:col-start-7 max-md:col-start-3"
+            className="col-span-2 col-start-11 tap justify-self-end font-mono text-mono text-stamp hover:underline max-lg:col-start-7 max-md:hidden"
           >
             {nav.cta.label}
           </Link>
+
+          <NavMenu className="col-span-2 col-start-3 justify-self-end md:hidden" />
         </nav>
       </div>
     </header>

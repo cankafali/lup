@@ -17,10 +17,10 @@ const IMG: ViewBox = [hero.image.w, hero.image.h];
 const STONE: Pt = [869, 404];
 const SECTION_MARK: Pt = [880, 520];
 
-/** Satır 1: optik düzeltme −8px. Satır 2: 3. kolondan başlar, −20px bindirir. */
-const TITLE_LAYOUT: Pick<HeadlineLine, "indent" | "overlap">[] = [
+/** Satır 1: optik düzeltme −8px. Satır 2: 3. kolondan (mobilde 2.) başlar, −20px bindirir. */
+const TITLE_LAYOUT: Pick<HeadlineLine, "indent" | "indentMobile" | "overlap">[] = [
   { indent: -8 },
-  { indent: "cols-2", overlap: 20 },
+  { indent: "cols-2", indentMobile: "cols-1", overlap: 20 },
 ];
 
 /** 01 — Hero (§10.1). */
@@ -31,7 +31,7 @@ export function Hero() {
       header={false}
       labelledBy="hero-baslik"
       intro
-      className="h-svh max-h-[1000px] min-h-[760px] overflow-hidden"
+      className="h-svh max-h-[1000px] min-h-[760px] overflow-hidden max-md:min-h-[600px]"
     >
       <HeroMotion />
       <div data-hero-photo className="absolute inset-0">
@@ -42,11 +42,13 @@ export function Hero() {
           height={hero.image.h}
           sizes="100vw"
           priority
+          positionMobile={[0.72, 0.5]}
           className="size-full"
         >
+          {/* Mobilde yalnızca taş işareti ve çap ölçüsü kalır (§15) */}
           <svg
             aria-hidden
-            className="absolute inset-0 size-full text-graphite"
+            className="absolute inset-0 size-full text-graphite max-md:hidden"
             viewBox={`0 0 ${IMG[0]} ${IMG[1]}`}
             preserveAspectRatio="none"
           >
@@ -62,7 +64,7 @@ export function Hero() {
           <MonoLabel
             aria-hidden
             data-hero-mark
-            className="absolute -translate-x-1/2 -translate-y-1/2"
+            className="absolute -translate-x-1/2 -translate-y-1/2 max-md:hidden"
             style={{
               left: pct(SECTION_MARK[0], IMG[0]),
               top: pct(SECTION_MARK[1], IMG[1]),
@@ -79,6 +81,7 @@ export function Hero() {
             labelAlign="end"
             dotSize={8}
             name="band"
+            className="max-md:hidden"
           />
           {/* Taş işareti: sayfanın üç odak kırmızısından biri */}
           <Callout viewBox={IMG} point={STONE} dot="stamp" name="stone" />
@@ -101,6 +104,15 @@ export function Hero() {
           </p>
         </div>
       </div>
+
+      {/* Mobilde koordinat satırı gizli; temsili görsel notu sağ üstte */}
+      <MonoLabel
+        size="s"
+        tone="lead"
+        className="absolute top-[76px] right-(--grid-margin) md:hidden"
+      >
+        {photoNote}
+      </MonoLabel>
 
       {/* Örnek lup + kılavuz çizgi: fotoğrafla aynı parallax katmanında (taşa kilitli kalsın) */}
       <div data-hero-lens-layer className="pointer-events-none absolute inset-0">
@@ -127,7 +139,7 @@ export function Hero() {
       </div>
 
       <div className="absolute inset-x-0 bottom-0">
-        <div className="relative container-lup pb-14">
+        <div className="relative container-lup pb-14 max-md:pb-8">
           <Headline
             as="h1"
             id="hero-baslik"
@@ -138,15 +150,16 @@ export function Hero() {
               ...TITLE_LAYOUT[i],
             }))}
           />
-          <div className="pointer-events-none absolute inset-x-(--grid-margin) bottom-12 grid-lup">
+          {/* Sağ alt metin; mobilde başlığın altına iner (§15) */}
+          <div className="pointer-events-none absolute inset-x-(--grid-margin) bottom-12 grid-lup max-md:pointer-events-auto max-md:static max-md:mt-6 max-md:block">
             <div
               data-hero-note
-              className="pointer-events-auto col-span-3 col-start-10 max-w-[240px] max-lg:col-span-4 max-lg:col-start-5"
+              className="pointer-events-auto col-span-3 col-start-10 max-w-[240px] max-lg:col-span-3 max-lg:col-start-6"
             >
               <MonoLabel className="block">{hero.note}</MonoLabel>
               <a
                 href={hero.down.href}
-                className="mt-5 inline-block font-mono text-mono whitespace-pre underline-offset-4 hover:underline"
+                className="mt-5 tap inline-block font-mono text-mono whitespace-pre underline-offset-4 hover:underline max-md:mt-3"
               >
                 {hero.down.label}
               </a>

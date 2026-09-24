@@ -7,8 +7,10 @@ type PhotoOverlayProps = {
   /** Görselin piksel boyutu; bindirmelerin viewBox'ı budur. */
   width: number;
   height: number;
-  /** object-position oranları (0–1). Duyarlı değişim için `--photo-x` / `--photo-y` sınıfla ezilebilir. */
+  /** object-position oranları (0–1); bindirme kutusu da aynı değerle hesaplanır. */
   position?: readonly [number, number];
+  /** Mobilde (< 768) object-position (§15 hero: 72% 50%). */
+  positionMobile?: readonly [number, number];
   sizes: string;
   /** LCP görseli: eager + fetchPriority high (Next 16'da `priority` kullanımdan kalktı). */
   priority?: boolean;
@@ -32,6 +34,7 @@ export function PhotoOverlay({
   width,
   height,
   position = [0.5, 0.5],
+  positionMobile = position,
   sizes,
   priority = false,
   className,
@@ -44,8 +47,17 @@ export function PhotoOverlay({
   return (
     <div
       data-photo-overlay
-      className={clsx("[container-type:size] relative overflow-hidden", className)}
-      style={{ "--photo-x": position[0], "--photo-y": position[1] }}
+      className={clsx(
+        "[container-type:size] relative overflow-hidden",
+        "[--photo-x:var(--px)] [--photo-y:var(--py)] max-md:[--photo-x:var(--px-m)] max-md:[--photo-y:var(--py-m)]",
+        className,
+      )}
+      style={{
+        "--px": position[0],
+        "--py": position[1],
+        "--px-m": positionMobile[0],
+        "--py-m": positionMobile[1],
+      }}
     >
       {/* Görsel + bindirme birlikte hareket eder (fotoğraf içi parallax, §10.4) */}
       <div data-photo-inner className="absolute inset-0">

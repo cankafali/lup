@@ -19,6 +19,9 @@ const subscribe = (fn: () => void) => {
 const LenisCtx = createContext<Lenis | null>(null);
 export const useLenis = () => useContext(LenisCtx);
 
+/** Anchor kaydırması başlarken yayınlanır (mobil menü kapansın). */
+export const ANCHOR_EVENT = "lup:anchor";
+
 /** Kaydırma hedefi olarak Nav'ın yüksekliği kadar üstte dur (§8.9: offset −96, mobilde 64). */
 const navOffset = () => -(document.querySelector("header")?.offsetHeight ?? 96);
 
@@ -39,9 +42,12 @@ function onAnchorClick(e: MouseEvent) {
   if (target === null) return;
   e.preventDefault();
   e.stopPropagation();
+  window.dispatchEvent(new Event(ANCHOR_EVENT));
+  // force: mobil menü açıkken Lenis durdurulmuş olabilir
   lenis.scrollTo(target === 0 ? 0 : (target as HTMLElement), {
     offset: target === 0 ? 0 : navOffset(),
     duration: 1.2,
+    force: true,
   });
 }
 

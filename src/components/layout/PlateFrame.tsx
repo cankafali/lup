@@ -17,14 +17,15 @@ type PlateFrameProps = {
 };
 
 const CORNERS = [
-  "top-6 left-6 border-t border-l",
-  "top-6 right-6 border-t border-r",
-  "bottom-6 left-6 border-b border-l",
-  "bottom-6 right-6 border-b border-r",
+  "top-6 left-6 border-t border-l max-md:top-2 max-md:left-2",
+  "top-6 right-6 border-t border-r max-md:top-2 max-md:right-2",
+  "bottom-6 left-6 border-b border-l max-md:bottom-2 max-md:left-2",
+  "bottom-6 right-6 border-b border-r max-md:right-2 max-md:bottom-2",
 ] as const;
 
 /**
- * Levha (§7): dört köşede kesim izi (16px L, köşeden 24px içeride),
+ * Levha (§7): dört köşede kesim izi (16px L, köşeden 24px içeride; mobilde 8px — 20px kenar
+ * boşluğunda levha numarasıyla çakışmasın, K-081),
  * üstte bölüm çizgisi ve sağ üstte levha numarası. Çizgi ve no bölümün dolgusundan
  * bağımsız olarak en üstte durur; kesim izleri içeriğin (fotoğrafların) üstünde kalır.
  */

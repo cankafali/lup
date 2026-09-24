@@ -10,6 +10,8 @@ export type HeadlineLine = {
   /** Instrument Serif Italic, başlığın 1.15 katı. Başlık başına en fazla bir. */
   italic?: boolean;
   indent?: Indent;
+  /** Mobilde (< 768) girinti; verilmezse `indent` (§15: "1 kolon içeride"). */
+  indentMobile?: Indent;
   /** Önceki satırın altına bindirme (1440 referansında px). */
   overlap?: number;
 };
@@ -67,9 +69,10 @@ export function Headline({ as: Tag = "h2", size, lines, id, srLabel, className }
             {i > 0 && " "}
             <span
               data-headline-mask
-              className="block"
+              className="ml-[var(--hl-indent,0px)] block max-md:ml-[var(--hl-indent-m,var(--hl-indent,0px))]"
               style={{
-                marginLeft: indentValue(line.indent),
+                "--hl-indent": indentValue(line.indent),
+                "--hl-indent-m": indentValue(line.indentMobile),
                 marginTop: line.overlap ? `calc(-1 * ${refPx(line.overlap)})` : undefined,
               }}
             >

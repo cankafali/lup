@@ -8,6 +8,8 @@ import { DURATION, EASE } from "@/lib/tokens";
 export const MOTION = "(prefers-reduced-motion: no-preference)";
 /** 10× pin'i ve ağır sahneler (§14.2: mobilde pin yok). */
 export const DESKTOP = "(min-width: 768px)";
+/** Masaüstü düzeni (10× tuvali, hero lupu). */
+export const WIDE = "(min-width: 1024px)";
 
 /** Animasyon bitince lupun kopyası son hali göstersin (§9.5). */
 export const onDone = () => refreshLoupe();

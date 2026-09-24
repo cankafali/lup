@@ -15,7 +15,7 @@ type ButtonProps = {
 
 const VARIANT = {
   primary: "h-14 justify-between gap-6 bg-stamp px-6 font-mono text-mono-l text-paper uppercase",
-  link: "gap-[1ch] font-mono text-mono text-graphite uppercase",
+  link: "tap gap-[1ch] font-mono text-mono text-graphite uppercase",
 } as const;
 
 /** Tek CTA stili (§8.8) ve ikincil link. */

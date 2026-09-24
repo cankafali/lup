@@ -8,7 +8,7 @@
 | 3 — Ürün detay statik | 2026-09-24 | 2026-09-24 | Tamam |
 | 4 — Lup | 2026-09-24 | 2026-09-24 | Tamam |
 | 5 — Animasyonlar | 2026-09-24 | 2026-09-24 | Tamam |
-| 6 — Mobil ve tablet | — | — | — |
+| 6 — Mobil ve tablet | 2026-09-24 | 2026-09-24 | Tamam |
 | 7 — Kalan çizim tipleri ve cilalar | — | — | — |
 | 8 — Erişilebilirlik, performans, SEO, deploy | — | — | — |
 
@@ -180,3 +180,54 @@
 - Aşama 6: Mobilde 10× pin yok (kod hazır, düzen Aşama 6'da); mobil MENÜ açıkken Nav gizlenmemeli.
 - Aşama 7: sayfa geçişi (§11.5) bu animasyon sistemiyle birlikte ele alınacak.
 - Aşama 8: hero `data-intro` gizlemesinin LCP'ye etkisi Lighthouse'ta ölçülecek.
+
+## Aşama 6 — Mobil ve tablet
+
+**Yapılanlar**
+
+- Nav: mobilde marka + `MENÜ`; tam ekran menü paneli (`NavMenu`, K-076). Tablette 8 kolona sıkışmış masaüstü Nav'ı.
+- Yardımcılar:
+  - `tap` (K-077);
+  - başlıkta `indentMobile`;
+  - `PhotoOverlay`'de `positionMobile` (hero 72% 50%);
+  - `useMotion`'a `wide` (≥ 1024) koşulu;
+  - `ANCHOR_EVENT`.
+- Bölümler:
+  - hero (lup ve kılavuz gizli, taş işareti ve çap ölçüsü kalıyor, not başlığın altında);
+  - Vitrin (2 kolon, sade hücre, K-080);
+  - 10× (dikey düzen, tablette pin, K-078);
+  - Atölye (2 not, 3 hücre istatistik, 2×2 adım);
+  - Mağaza (alt alta, tek sütun bilgi);
+  - Footer (2×2).
+- Ürün detay: sertifika başlığı üstte, levha pencereleri (`PlateWindow`), 2 sütunlu antet, sertifika gövdesi, yapışık WhatsApp butonu (K-079).
+- Düzeltmeler:
+  - kesim izleri mobilde (K-081);
+  - 1024'te 10× metni (K-083);
+  - tablette hero notu (K-082);
+  - levha no/ölçek bloğu 768–1280 aralığında lupun üstünde (K-084).
+
+**Kabul** (CDP ile headless Edge'de; mobil ölçüm dokunma emülasyonuyla, `pointer: coarse`)
+
+- [x] Yatay kaydırma yok: 360, 390, 768, 900, 1024, 1280, 1440, 1920 genişliklerinde ana sayfada ve iki ürün sayfasında `scrollWidth == innerWidth`.
+- [x] 390'da ana sayfa ve ürün sayfasında 44px'ten küçük dokunma hedefi yok.
+- [x] Mobil menü:
+  - açılınca odak `KAPAT`'ta ve Lenis duruyor;
+  - Escape ile kapanınca odak `MENÜ`'ye dönüyor;
+  - "Atölye"ye dokununca panel kapanıyor, bölüm Nav'ın altına (64px) kayıyor.
+- [x] 10×:
+  - mobilde pin yok, noktalar ve notlar görünür;
+  - 768'de yığın pin'li (aralayıcı 1856 = 832 + 1024), lup 0.35 → 1, noktalar ve notlar sırayla, ölçü sonda;
+  - pin bitince yerinde.
+- [x] Ürün sayfası (390):
+  - altı üründe levha pencerelerinde kesilen etiket yok;
+  - yapışık buton alttan 12px, 56px yüksek;
+  - footer'a gelince akışta kalıyor.
+- [x] Tablet (768): Nav tek satır, tepsi 3 kolon, ürün detay tek sütun.
+- [x] Masaüstü (1440) değişmedi.
+- [x] `pnpm lint`, `pnpm typecheck`, `pnpm build` temiz.
+
+**Açık kalanlar (sonraki aşamalara)**
+
+- Gerçek cihaz testi (iOS Safari'de `svh`, `safe-area`, dokunarak lup) bu ortamda yapılamadı.
+- Aşama 7: yeni görünüşler eklendikçe `plateCrops` kutuları güncellenecek (burma, damla, armut, su yolu, telkari için şu an tek pencere).
+- Figma karşılaştırması: Figma MCP kotası açılınca.

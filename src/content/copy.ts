@@ -20,11 +20,15 @@ export const nav = {
   label: "Ana menü",
   // Ürün sayfasından da çalışsın diye kök yolla.
   links: [
-    { no: "01", label: "VİTRİN", href: "/#vitrin" },
-    { no: "02", label: "ATÖLYE", href: "/#atolye" },
-    { no: "03", label: "MAĞAZA", href: "/#magaza" },
+    { no: "01", label: "VİTRİN", title: "Vitrin", href: "/#vitrin" },
+    { no: "02", label: "ATÖLYE", title: "Atölye", href: "/#atolye" },
+    { no: "03", label: "MAĞAZA", title: "Mağaza", href: "/#magaza" },
   ],
   cta: { label: "RANDEVU →", href: "/#magaza" },
+  /** Mobil menü (§8.9) */
+  menu: "MENÜ",
+  close: "KAPAT",
+  menuLabel: "Bölümler",
 };
 
 const { lat, lng } = site.address.coords;

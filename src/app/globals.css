@@ -15,6 +15,16 @@
   column-gap: var(--grid-gutter);
 }
 
+/* Dokunmatikte küçük linkler en az 44×44 dokunma alanı alır (§15); görünüm değişmez. */
+@utility tap {
+  @media (pointer: coarse) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 @layer base {
   :focus-visible {
     outline: 2px solid var(--color-graphite);

@@ -476,3 +476,77 @@
 - **Karar:** Kırılıma göre bulunmayan hedefler (1024 altında hero lupu) konsola uyarı yazmıyor.
 - **Gerekçe:** Uyarılar gürültüydü; hedefler bilerek yok.
 - **Geri alma:** `lib/gsap.ts`.
+
+### K-076 · 2026-09-24 · Mobil menü: `body`'ye açılan panel, Lenis durur
+
+- **Karar:** `NavMenu` (§8.9), `MENÜ` düğmesiyle `document.body`'ye portal olarak açılan tam ekran kâğıt panel (`role="dialog"`, `aria-modal`, `data-loupe-off`). Üstte marka + `KAPAT`, ortada numaralı bölümler (Display M), altta `RANDEVU →`. Açıkken Lenis durur. Escape, `KAPAT` ya da bir bölüm seçilince kapanır ve odak `MENÜ`'ye döner. Anchor kaydırması `lib/lenis.tsx`'teki `ANCHOR_EVENT` (`lup:anchor`) olayını yayınlıyor; menü bu olayda önce `lenis.start()` çağırıp sonra kapanıyor.
+- **Gerekçe:** Nav kaydırmada transform aldığı için panel Nav'ın içinde sabit kalamaz. `lenis.start()` içte `reset()` çağırıp sürmekte olan `scrollTo` animasyonunu durduruyor. Menü kapanırken başlatılırsa bölüme kaydırma iptal oluyordu (testte bulundu).
+- **Geri alma:** `NavMenu.tsx`'i sil, `Nav.tsx`'te bağlantıları mobilde de göster.
+
+### K-077 · 2026-09-24 · Dokunma hedefi: `tap` yardımcı sınıfı
+
+- **Karar:** `@utility tap`: yalnızca `(pointer: coarse)` altında `inline-flex`, `min-height/min-width: 44px`, dikeyde ortalı. Metin bağlantılarında (Nav, hero "TEZGÂHA İN", geri, telefon, footer, `Button` link varyantı, menü) kullanılıyor. Marka bağlantısı her zaman `min-h-11`, görünüm değişmiyor.
+- **Gerekçe:** §15, "dokunma hedefleri ≥ 44×44". Fare kullanan masaüstünde metin satırlarının yüksekliği ve hizası bozulmasın.
+- **Geri alma:** `globals.css`'ten `tap`'i kaldır.
+
+### K-078 · 2026-09-24 · 10× bölümü 1024 altında dikey düzen, tablette pin'li
+
+- **Karar:** 1440×900 tuval yalnızca ≥ 1024'te. Altında `data-makro-stack` var: başlık → metin → lup → çap ölçüsü → numaralı not listesi (Mono). Lup çapı `min(560px, genişlik − 32)`. Lup üstündeki 1–4 numaralı noktalar iç dairenin koordinatından (`inLens`) yerleşiyor, çap ölçüsü aynı oranla (663 → 1135) iç çapa oturuyor. Tablette (768–1023) yığın pin'li: `center center`, `+=100%`, scrub 0.6; lup 0.35 → 1, noktalar sırayla, notlar noktalarıyla birlikte, ölçü en sonda. Mobilde pin yok, noktalar ve notlar görünür olunca sırayla beliriyor.
+- **Gerekçe:** §15. Tablette "pin'li ama lup 560px" isteniyor. 768'de masaüstü tuvali lupu 373px'e indirir ve sağdaki notlar ekrandan taşar. Bu yüzden tablet de dikey düzeni kullanıyor, pin'i masaüstünden alıyor.
+- **Geri alma:** `Makro.tsx`'teki `lg:hidden` yığını ve `MakroMotion`'daki tablet dalı.
+
+### K-079 · 2026-09-24 · Ürün detay mobil: levha pencereleri ve bölünmüş sertifika
+
+- **Karar:** Mobilde levha tam boyutta çizilip `PlateWindow` ile kırpılıyor. Kırpma kutuları levha biriminde ve tipe göre (`plateCrops`):
+  - tektaş: ön görünüş + lup `[230,90,540,370]`, üst görünüş + kesit `[110,620,590,290]`;
+  - telkari: sağdaki tel notu için genişletilmiş `[218,135,516,390]`;
+  - su yolu: alçak düz açılım `[190,220,380,230]`;
+  - diğerleri: `[200,160,450,340]`.
+
+  Pencerede antet ve sağ üstteki levha no/ölçek gösterilmiyor (`windowed`): levha no sayfanın başında, antet pencerelerin altında 2 sütunlu ızgarada (`TitleBlock layout="grid"`). İkinci pencere ekran okuyucudan gizli. Sertifika ikiye bölünüyor: `head` (no + ad + alt başlık, çerçevesiz) levhanın üstünde, `body` (açıklama, satırlar, imza, damgalar) altında. WhatsApp butonu (`CertificateCta`) sayfanın altına yapışık: `sticky bottom-0`, `safe-area` boşluğuyla.
+- **Gerekçe:** §15'teki "gerekirse levha 2 parçaya bölünür" ve "etiketler min 9px" şartları. Etiketler HTML ve sabit boyutlu, levha 350px'e sığdırılınca birbirinin üstüne biniyordu. Pencerede sağ üst levha no/ölçek lupun altında kalıyordu. Test: altı ürünün hiçbirinde pencere kenarında kesilen etiket yok.
+- **Geri alma:** `page.tsx`'te `md:hidden` pencere bloğunu kaldır, levhayı mobilde de tam göster.
+
+### K-080 · 2026-09-24 · Tepsi hücresi 1024 altında sadeleşiyor
+
+- **Karar:**
+  - < 1024: veri satırı, "İNCELE →" ve telkari notu gizli; ad hücrenin altına iniyor (16px içeride).
+  - < 768: ad 16px, no/damga/ad 12px içeride, ölçü etiketleri 9px (Mono S), telkari lupundaki "10×" etiketi gizli.
+  - Veri satırı bağlantının `aria-label`'ında kalıyor.
+- **Gerekçe:** §15'te mobilde veri satırı gizli. Tablette 3 kolon kalıyor (§15), ama 768'de hücre ≈ 229px: ad iki satıra bölünüp fotoğrafın ve ölçünün üstüne biniyordu, telkari notu lupun üstüne düşüyordu. "İNCELE →" yalnızca hover'da çıkıyor, dokunmatikte anlamı yok. Mobilde "10×" etiketi 916 damgasıyla çakışıyordu.
+- **Geri alma:** `TrayCell.tsx`'teki `max-lg:` sınıfları.
+
+### K-081 · 2026-09-24 · Kesim izleri mobilde 8px içeride
+
+- **Karar:** `PlateFrame` köşe izleri < 768'de köşeden 8px içeride (masaüstünde 24px).
+- **Gerekçe:** 20px'lik mobil kenar boşluğunda 24px içerideki iz, sağ üstteki levha numarasının üstüne biniyordu.
+- **Geri alma:** `PlateFrame.tsx`'teki `CORNERS`.
+
+### K-082 · 2026-09-24 · Mobil ve tablet yerleşim ayrıntıları
+
+- **Karar:**
+  - İki satırlı başlıkların ikinci satırı mobilde 1 kolon içeride (`indentMobile: "cols-1"`, hero, Vitrin, Atölye).
+  - Mobilde bölüm üst boşluğu 96px.
+  - Hero:
+    - mobilde en az 600px yüksek;
+    - "TEMSİLİ GÖRSEL" notu mobilde sağ üstte;
+    - sağ alt not tablette 6. kolondan başlıyor, "bakın." ile çakışmıyor.
+  - Vitrin notu < 1024'te başlığın altında, sola hizalı.
+  - Tepsi mobilde 2 kolon; ayırıcılar kolon sayısına göre.
+  - Atölye istatistikleri < 1024'te yan yana, adımlar 2×2.
+  - Mağaza: tablette yan yana, mobilde alt alta.
+  - Footer: tablette 2×2, mobilde alt satır tek sütun.
+- **Gerekçe:** §15. Mobildeki hero yüksekliği 100svh. 600px alt sınırı, alçak ekranlarda başlık ile notun üst üste binmesini önlüyor.
+- **Geri alma:** İlgili bölüm dosyalarındaki `max-md:` / `max-lg:` sınıfları.
+
+### K-083 · 2026-09-24 · 10× metni 1024–1279'da daralıyor
+
+- **Karar:** ≥ 1024'te 10× gövde metninin genişliği `min(360px, 37vw − 128px)`: lupun sol kenarı (tuvalin %37'si), eksen taşması (40px), ara (24px) ve kenar boşluğu (64px) düşülerek. 1024'te 251px, 1280'de 346px, 1440'ta 360px.
+- **Gerekçe:** 1024'te 360px'lik metin lupun halkasının ve yatay eksenin üstüne biniyordu.
+- **Geri alma:** `Makro.tsx`, `lg:max-w-[…]`.
+
+### K-084 · 2026-09-24 · Levha no/ölçek bloğu lupun üstünde kalıyor
+
+- **Karar:** Levhanın sağ üstündeki blok `top: min(48px, 12.125cqw − 48px)`: lupun üst kenarı (levha y 97 = genişliğin %12.125'i) eksi blok yüksekliği (38px) ve ara (10px). 1440'ta 48px (değişmedi), 1280'de 40, 768'de 35, 1024'te 22px. Lupla arası her genişlikte 8–14px.
+- **Gerekçe:** Blok sabit 48px'teydi, lup levhayla ölçeklenip yukarı çıkıyordu. Levhanın daraldığı 768–1280 aralığında son satır ("ÖLÇÜLER mm") lup halkasına değiyordu.
+- **Geri alma:** `TechnicalPlate.tsx`, `data-plate-meta` üzerindeki `style`.

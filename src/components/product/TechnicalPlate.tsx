@@ -81,20 +81,68 @@ const CORNERS = [
   "bottom-6 right-6 border-b border-r",
 ] as const;
 
+/** Antet tablosu hücreleri (§11.2 D). */
+export function titleCells(product: Product) {
+  const t = productPage.titleBlock;
+  return [
+    { label: t.part, value: product.name },
+    { label: t.no, value: product.certNo },
+    { label: t.master, value: t.masterValue },
+    { label: t.scale, value: t.scaleValue },
+    { label: t.date, value: t.dateValue },
+  ];
+}
+
+/** Mobilde levha pencereleri (§15): tektaş ön görünüş + lup, ardından üst görünüş + kesit. */
+export function plateCrops(spec: DrawingSpec): [number, number, number, number][] {
+  switch (spec.kind) {
+    case "solitaire":
+      return [
+        [230, 90, 540, 370],
+        [110, 620, 590, 290],
+      ];
+    // Tel notu halkanın sağında (≈ x 714'e kadar): pencere sağa genişler
+    case "filigree":
+      return [[218, 135, 516, 390]];
+    // Düz açılım yatay ve alçak (y ≈ 240–435): pencere de alçak
+    case "tennis":
+      return [[190, 220, 380, 230]];
+    default:
+      return [[200, 160, 450, 340]];
+  }
+}
+
+type TechnicalPlateProps = {
+  product: Product;
+  total: number;
+  /**
+   * Mobil pencere (PlateWindow) içinde: antet tablosu ve sağ üst levha no/ölçek levhanın dışında
+   * gösterilir (sayfa başlığı + ızgara antet); pencerede lupla çakışmasınlar.
+   */
+  windowed?: boolean;
+  /** Aynı levhanın ikinci penceresi: ekran okuyucudan gizli. */
+  decorative?: boolean;
+};
+
 /**
  * Sol sütundaki teknik levha (§11.2): tek SVG (viewBox 800×1100) + HTML ölçü etiketleri.
  * Kesim izleri, sağ üstte levha no ve ölçek, en altta antet tablosu.
  */
-export function TechnicalPlate({ product, total }: { product: Product; total: number }) {
+export function TechnicalPlate({
+  product,
+  total,
+  windowed = false,
+  decorative = false,
+}: TechnicalPlateProps) {
   const [W, H] = PLATE;
   const { views, stone } = plateFor(product.drawingSpec);
   const lensEdge = stone ? lensEdgeToward(stone) : null;
-  const t = productPage.titleBlock;
 
   return (
     <figure
       data-plate
-      aria-label={`${product.name} — teknik çizim`}
+      aria-label={decorative ? undefined : `${product.name} — teknik çizim`}
+      aria-hidden={decorative || undefined}
       className="[container-type:inline-size] relative aspect-[800/1100] w-full"
     >
       <svg
@@ -152,25 +200,31 @@ export function TechnicalPlate({ product, total }: { product: Product; total: nu
         </>
       )}
 
-      <div data-plate-meta className="absolute top-12 right-12 text-right">
-        <MonoLabel size="s" tone="lead" className="block">
-          {productPage.plate(product.no, total)}
-        </MonoLabel>
-        <MonoLabel size="s" tone="lead" className="block">
-          {productPage.scale}
-        </MonoLabel>
-      </div>
+      {!windowed && (
+        <div
+          data-plate-meta
+          className="absolute top-12 right-12 text-right"
+          // Levha daraldıkça lup yukarı çıkar; 3 satırlık blok (38px + 10px ara) lupun üstünde kalsın
+          style={
+            stone
+              ? {
+                  top: `min(48px, ${((LENS_CENTER[1] - LENS_D / 2 - LENS_RING) / W) * 100}cqw - 48px)`,
+                }
+              : undefined
+          }
+        >
+          <MonoLabel size="s" tone="lead" className="block">
+            {productPage.plate(product.no, total)}
+          </MonoLabel>
+          <MonoLabel size="s" tone="lead" className="block">
+            {productPage.scale}
+          </MonoLabel>
+        </div>
+      )}
 
-      <TitleBlock
-        className="absolute inset-x-[5%] bottom-[3.6%]"
-        cells={[
-          { label: t.part, value: product.name },
-          { label: t.no, value: product.certNo },
-          { label: t.master, value: t.masterValue },
-          { label: t.scale, value: t.scaleValue },
-          { label: t.date, value: t.dateValue },
-        ]}
-      />
+      {!windowed && (
+        <TitleBlock className="absolute inset-x-[5%] bottom-[3.6%]" cells={titleCells(product)} />
+      )}
 
       {CORNERS.map((pos) => (
         <span
