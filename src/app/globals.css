@@ -147,3 +147,57 @@
     opacity: 0;
   }
 }
+
+/* Sayfa geçişi (§11.5, K-089): vitrin ya da şerit hücresinden ürün sayfasına (lib/partTransition).
+   Tıklanan hücrenin fotoğrafı (`part-hold`) yerinde kalır, sayfanın geri kalanı 240 ms'de söner,
+   ardından yeni sayfa gelir ve levha çizilmeye başlar. Nav iki sayfada aynı: yerinde durur. */
+:root:active-view-transition-type(part-open) {
+  & #lup-content > header {
+    view-transition-name: site-header;
+  }
+  &::view-transition-old(root) {
+    animation: var(--duration-fast) var(--ease-lup) both vt-out;
+  }
+  &::view-transition-new(root) {
+    animation: var(--duration-fast) var(--ease-lup) var(--duration-fast) both vt-in;
+  }
+  &::view-transition-group(site-header),
+  &::view-transition-new(site-header) {
+    animation: none;
+  }
+  &::view-transition-old(site-header) {
+    display: none;
+  }
+}
+::view-transition-group(part-hold) {
+  animation: none;
+}
+::view-transition-old(part-hold) {
+  animation: var(--duration-fast) var(--ease-lup) var(--duration-fast) both vt-out;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* View Transitions yoksa: içerik söner, yeni sayfa gelince yeniden yanar (§11.5). */
+#lup-content {
+  transition: opacity var(--duration-fast) var(--ease-lup);
+}
+html.part-leaving #lup-content {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

@@ -7,6 +7,7 @@ import { PlateMotion } from "@/components/motion/PlateMotion";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { Certificate, CertificateCta } from "@/components/product/Certificate";
 import { TitleBlock } from "@/components/product/drawings/TitleBlock";
+import { OtherParts } from "@/components/product/OtherParts";
 import { PlateWindow } from "@/components/product/PlateWindow";
 import { plateCrops, TechnicalPlate, titleCells } from "@/components/product/TechnicalPlate";
 
@@ -86,6 +87,8 @@ export default async function ProductPage({ params }: PageProps<"/parca/[slug]">
           <CertificateCta product={product} />
         </div>
       </div>
+
+      <OtherParts current={product} />
     </main>
   );
 }

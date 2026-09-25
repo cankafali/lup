@@ -1,7 +1,7 @@
 import { productPage } from "@/content/copy";
 import { Axis } from "@/components/primitives/Axis";
 import type { Pt } from "@/lib/overlay";
-import { MM, fmt, pathOf, type PlateView } from "./types";
+import { MM, fmt, pathOf, TITLE_GAP, type PlateView } from "./types";
 
 /** Düz açılımda çizilen yuva sayısı (§11.2 `tennis`: 42 yuvanın 5'i). */
 const SHOWN = 5;
@@ -92,8 +92,11 @@ export function tennisFlatView(
       },
     ],
     notes: [
+      // Kesit düzlemi (A-A) ortadaki yuvanın ekseninde: iki uçta işaret
+      { at: [(xs[2] ?? cx) + 8, cy - W / 2 - 12], text: productPage.sectionMark },
+      { at: [(xs[2] ?? cx) + 8, cy + W / 2 + 12], text: productPage.sectionMark },
       { at: [breakX + BREAK_GAP / 2 - 4, cy - 7], text: productPage.tennisBreak, align: "center" },
-      { at: [cx, totalY + 50], text: productPage.views.flat, align: "center" },
+      { at: [cx, totalY + TITLE_GAP], text: productPage.views.flat, align: "center" },
     ],
   };
 }

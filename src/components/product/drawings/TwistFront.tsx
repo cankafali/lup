@@ -34,6 +34,7 @@ export function twistFrontView(
       <path d={pathOf(strand(0), true)} />
       <path d={pathOf(strand(Math.PI), true)} />
     </g>,
+    true,
   );
 
   const outerY = cy - rOut - 22;

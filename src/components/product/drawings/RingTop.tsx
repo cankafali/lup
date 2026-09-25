@@ -1,7 +1,7 @@
 import { productPage } from "@/content/copy";
 import { Axis } from "@/components/primitives/Axis";
 import type { Pt } from "@/lib/overlay";
-import { fmt, polar, type PlateView } from "./types";
+import { fmt, polar, TITLE_GAP, type PlateView } from "./types";
 
 /** Üst görünüş ölçeği: 1 mm = 24 birim (6:1); faset diyagramı 2:1'de okunmaz (K-045). */
 const SCALE = 24;
@@ -13,16 +13,12 @@ const PRONG_R = 0.45;
 const PRONG_ANGLES = [45, 135, 225, 315];
 
 /**
- * Taşın üstten görünüşü (§11.2 B): yuvarlak pırlanta faset diyagramı — rundist dairesi,
- * sekizgen tabla, 8 yıldız faseti, 8 ana taç faseti (uçurtma), 16 rundist faseti; 4 tırnak.
+ * Yuvarlak pırlanta faset diyagramı (üstten): sekizgen tabla, 8 yıldız, 8 ana taç (uçurtma),
+ * 16 rundist faseti. Rundist dairesi çizene bırakılır.
  */
-export function ringTopView(stone: number, center: Pt): PlateView {
-  const [cx, cy] = center;
-  const R = (stone / 2) * SCALE;
+export function roundBrilliant(center: Pt, R: number) {
   const Rt = TABLE * R;
   const Rs = Rt + STAR * (R - Rt);
-  const pr = PRONG_R * SCALE;
-
   const table = Array.from({ length: 8 }, (_, k) => polar(center, Rt, k * 45));
   const facets: [Pt, Pt][] = [];
   for (let k = 0; k < 8; k++) {
@@ -37,6 +33,18 @@ export function ringTopView(stone: number, center: Pt): PlateView {
       [star, polar(center, R, k * 45 + 22.5)], // rundist fasetlerini ayıran çizgi
     );
   }
+  return { table, facets, tableRadius: Rt };
+}
+
+/**
+ * Taşın üstten görünüşü (§11.2 B): yuvarlak pırlanta faset diyagramı — rundist dairesi,
+ * sekizgen tabla, 8 yıldız faseti, 8 ana taç faseti (uçurtma), 16 rundist faseti; 4 tırnak.
+ */
+export function ringTopView(stone: number, center: Pt): PlateView {
+  const [cx, cy] = center;
+  const R = (stone / 2) * SCALE;
+  const pr = PRONG_R * SCALE;
+  const { table, facets, tableRadius: Rt } = roundBrilliant(center, R);
 
   const prongY = cy - R * Math.SQRT1_2;
   const prongDx = R * Math.SQRT1_2;
@@ -86,6 +94,6 @@ export function ringTopView(stone: number, center: Pt): PlateView {
         offset: prongY - topDimY,
       },
     ],
-    notes: [{ at: [cx, bottomDimY + 44], text: productPage.views.top, align: "center" }],
+    notes: [{ at: [cx, bottomDimY + TITLE_GAP], text: productPage.views.top, align: "center" }],
   };
 }

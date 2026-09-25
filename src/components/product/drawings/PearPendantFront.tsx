@@ -1,11 +1,8 @@
 import { productPage } from "@/content/copy";
 import { Axis } from "@/components/primitives/Axis";
 import type { Pt } from "@/lib/overlay";
-import { pearPath } from "./pear";
-import { MM, fmt, type PlateView } from "./types";
-
-/** Kapalı yuva (çerçeve) kalınlığı (birim). */
-const BEZEL = 3.2;
+import { BEZEL, pearPath } from "./pear";
+import { MM, fmt, TITLE_GAP, type PlateView } from "./types";
 
 /**
  * Armut kolye ucu ön görünüşü (§11.2 `pear-pendant`): armut taş çerçevede, askı halkası ve
@@ -76,6 +73,6 @@ export function pearPendantFrontView(
         offset: widthY - roundY,
       },
     ],
-    notes: [{ at: [cx, widthY + 50], text: productPage.views.front, align: "center" }],
+    notes: [{ at: [cx, widthY + TITLE_GAP], text: productPage.views.front, align: "center" }],
   };
 }

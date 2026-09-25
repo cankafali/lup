@@ -1,15 +1,12 @@
 import { productPage } from "@/content/copy";
 import { Axis } from "@/components/primitives/Axis";
 import type { Pt } from "@/lib/overlay";
-import { pearPath } from "./pear";
-import { MM, fmt, type PlateView } from "./types";
-
-/** Kapalı yuva (çerçeve) kalınlığı (birim). */
-const BEZEL = 3.2;
+import { BEZEL, pearPath } from "./pear";
+import { MM, fmt, TITLE_GAP, type PlateView } from "./types";
 
 /**
  * Damla küpe ön görünüşü (§11.2 `drop-earring`): armut taş (damla konturu + çerçeve),
- * halka ve kanca profili. Ölçüler: toplam boy, taş boyu, taş eni.
+ * halka ve kanca. Ölçüler: toplam boy, taş boyu, taş eni.
  */
 export function dropEarringFrontView(
   spec: { total: number; stone: { length: number; width: number } },
@@ -44,10 +41,8 @@ export function dropEarringFrontView(
           <path d={pearPath([cx, bottom], L + BEZEL * 2.4, W + BEZEL * 2)} />
           <path d={pearPath([cx, stoneBottom], L, W)} />
           <circle cx={cx} cy={ringY} r={ringR} />
-          {/* Kanca: halkadan yukarı çıkar, tepeden kıvrılıp arkaya iner */}
-          <path
-            d={`M ${cx} ${ringY - ringR} L ${cx} ${top + 36} C ${cx} ${top + 10} ${cx + 14} ${top - 2} ${cx + 28} ${top + 4} C ${cx + 40} ${top + 10} ${cx + 44} ${top + 30} ${cx + 40} ${top + 56}`}
-          />
+          {/* Kanca önden tek tel: kıvrımı görüş doğrultusunda, profili yan görünüşte (K-086) */}
+          <path d={`M ${cx} ${ringY - ringR} L ${cx} ${top}`} />
         </g>
         <g fill="none" stroke="currentColor" data-draw="detail">
           <path d={pearPath([cx, roundY + r * 0.45], L * 0.5, W * 0.55)} />
@@ -77,6 +72,6 @@ export function dropEarringFrontView(
         offset: widthY - roundY,
       },
     ],
-    notes: [{ at: [cx, widthY + 50], text: productPage.views.front, align: "center" }],
+    notes: [{ at: [cx, widthY + TITLE_GAP], text: productPage.views.front, align: "center" }],
   };
 }

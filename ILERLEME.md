@@ -9,7 +9,7 @@
 | 4 — Lup | 2026-09-24 | 2026-09-24 | Tamam |
 | 5 — Animasyonlar | 2026-09-24 | 2026-09-24 | Tamam |
 | 6 — Mobil ve tablet | 2026-09-24 | 2026-09-24 | Tamam |
-| 7 — Kalan çizim tipleri ve cilalar | — | — | — |
+| 7 — Kalan çizim tipleri ve cilalar | 2026-09-25 | 2026-09-25 | Tamam |
 | 8 — Erişilebilirlik, performans, SEO, deploy | — | — | — |
 
 ---
@@ -230,4 +230,56 @@
 
 - Gerçek cihaz testi (iOS Safari'de `svh`, `safe-area`, dokunarak lup) bu ortamda yapılamadı.
 - Aşama 7: yeni görünüşler eklendikçe `plateCrops` kutuları güncellenecek (burma, damla, armut, su yolu, telkari için şu an tek pencere).
+- Figma karşılaştırması: Figma MCP kotası açılınca.
+
+## Aşama 7 — Kalan çizim tipleri ve cilalar
+
+**Yapılanlar**
+
+- Tam levhalar (§11.2):
+  - burma: ön, bant yüzeyi açılımı 6:1, tel kesiti 20:1 (K-085);
+  - damla: ön, armut faset diyagramı 6:1, yan görünüş (K-088);
+  - su yolu: düz açılım, yuva detayı 10:1, yuva kesiti 10:1 (K-092);
+  - armut: ön, yan görünüş 4:1, zincir halkası 20:1 (K-088);
+  - telkari: ön + lup, detay B 8:1 (K-091).
+- Ortak modüller: `hatch.ts` (tarama ve kırpma, K-093), `roundBrilliant`, `pearOutline`, `sampleCubic`, `offsetPolyline`.
+- Mobil levha pencereleri yeni görünüşlere göre (K-087).
+- Diğer parçalar şeridi (§11.4, K-090):
+  - `TrayCell compact`;
+  - `DragScroll`;
+  - lup klonunda iç kaydırma eşlemesi (`data-loupe-scroll`).
+- Sayfa geçişi (§11.5, K-089):
+  - `PartLink`, `lib/partTransition.ts`;
+  - `MotionReady` → `pageReady`;
+  - rota değişiminde lup, klon yenilenene kadar boşta.
+- Kroki: yapılmadı (K-094).
+
+**Kabul** (CDP ile headless Edge'de)
+
+- [x] Beş tipin levhası çiziliyor:
+  - altı levhada 390, 768, 1024, 1440'ta kesilen ya da birbirine binen etiket yok (otomatik ölçüm);
+  - görsel kontrol 1440 ve 390'da yapıldı.
+- [x] Levha girişi yeni görünüşlerde de sırayla (eksen → kontur → detay → ölçü → etiket); bitince satır içi çizim ve kırpma stili kalmıyor.
+- [x] Şerit:
+  - 1280'de 48px, 1024'te 304px taşma;
+  - sürükleyince kayıyor, bırakınca hücreye oturuyor (240);
+  - sürükleme sonrası tıklama gezinmiyor, normal tıklama gezinir;
+  - lup klonu aynı konumda;
+  - mobilde kenardan kenara, sayfada yatay taşma yok.
+- [x] Geçiş:
+  - vitrin → ürün ve şerit → ürün: `startViewTransition` türü `part-open`, adlar `root`, `site-header`, `part-hold`, hatasız bitiyor;
+  - 130 ms'de sayfa sönük, tıklanan fotoğraf yerinde;
+  - yeni sayfada kaydırma 0, Lenis kesintisiz;
+  - desteksiz tarayıcıda içerik sönüp (120 ms'de opaklık 0.05) yeni sayfada geri geliyor;
+  - reduced motion'da ve geri linkinde geçiş yok.
+- [x] Yatay taşma yok: 360–1920 arası sekiz genişlikte ana sayfa ve ürün sayfaları.
+- [x] `pnpm lint`, `pnpm typecheck`, `pnpm build` temiz.
+
+**Açık kalanlar (sonraki aşamalara)**
+
+- Aşama 8:
+  - geliştirme sunucusu hero görseli için "LCP, `loading="eager"` ekleyin" uyarısı veriyor, `PhotoOverlay`'in öncelik ayarı kontrol edilecek;
+  - Lighthouse.
+- Yeni görünüşlerin ölçüleri temsili (K-086): gerçek parçalar ölçülünce `products.ts` güncellenmeli.
+- Kroki için dükkânın gerçek konumu gerekiyor (K-094).
 - Figma karşılaştırması: Figma MCP kotası açılınca.

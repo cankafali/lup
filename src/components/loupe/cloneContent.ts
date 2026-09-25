@@ -72,6 +72,26 @@ export function collectSync(source: HTMLElement, clone: HTMLElement): SyncPair[]
   return out;
 }
 
+/** Kendi içinde kayan kap (§11.4 diğer parçalar şeridi) ↔ klondaki karşılığı. */
+export type ScrollPair = { live: HTMLElement; copy: HTMLElement };
+
+/**
+ * `data-loupe-scroll` işaretli kapları eşler ve klondakini canlının kaydırma konumuna getirir.
+ * Klon kopyalanırken iç kaydırma konumu taşınmaz; sonrası kaydırma olayıyla aynalanır.
+ */
+export function collectScroll(source: HTMLElement, clone: HTMLElement): ScrollPair[] {
+  const live = source.querySelectorAll<HTMLElement>("[data-loupe-scroll]");
+  const copies = clone.querySelectorAll<HTMLElement>("[data-loupe-scroll]");
+  const out: ScrollPair[] = [];
+  live.forEach((el, i) => {
+    const copy = copies[i];
+    if (!copy) return;
+    copy.scrollLeft = el.scrollLeft;
+    out.push({ live: el, copy });
+  });
+  return out;
+}
+
 /** Öğenin sahne (stage) içindeki dikey konumu; dönüşümlerden etkilenmeyen offset zinciriyle. */
 function offsetWithin(el: HTMLElement, root: HTMLElement) {
   let y = 0;

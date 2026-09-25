@@ -14,9 +14,29 @@ export type DrawingSpec =
       section: { width: number; thickness: number };
     }
   | { kind: "twist"; innerDiameter: number; band: number; turns: number }
-  | { kind: "drop-earring"; total: number; stone: { length: number; width: number } }
-  | { kind: "tennis"; count: number; pitch: number; width: number; stone: number; length: number }
-  | { kind: "pear-pendant"; total: number; stone: { length: number; width: number } }
+  | {
+      kind: "drop-earring";
+      total: number;
+      /** Armut taş: boy × en, derinlik (taç + köşk). */
+      stone: { length: number; width: number; depth: number };
+    }
+  | {
+      kind: "tennis";
+      count: number;
+      pitch: number;
+      width: number;
+      /** Yuva (kutu) yüksekliği. */
+      height: number;
+      stone: number;
+      length: number;
+    }
+  | {
+      kind: "pear-pendant";
+      total: number;
+      stone: { length: number; width: number; depth: number };
+      /** Zincir halkası: dış boy × dış en, tel çapı. */
+      chain: { length: number; width: number; wire: number };
+    }
   | { kind: "filigree"; innerDiameter: number; band: number; stone: number; wire: number };
 
 export type Product = {
@@ -159,7 +179,7 @@ export const products: readonly Product[] = [
     dataLine: "KÜPE · 18K · 2 × 0.40 ct",
     status: "Vitrinde",
     drawing: "drop-earring",
-    drawingSpec: { kind: "drop-earring", total: 24, stone: { length: 7, width: 5 } },
+    drawingSpec: { kind: "drop-earring", total: 24, stone: { length: 7, width: 5, depth: 3.2 } },
     image: img(
       "vitrin-damla.jpg",
       928,
@@ -191,7 +211,15 @@ export const products: readonly Product[] = [
     dataLine: "BİLEKLİK · 18K · 42 TAŞ",
     status: "Vitrinde",
     drawing: "tennis",
-    drawingSpec: { kind: "tennis", count: 42, pitch: 4.2, width: 3, stone: 2.4, length: 175 },
+    drawingSpec: {
+      kind: "tennis",
+      count: 42,
+      pitch: 4.2,
+      width: 3,
+      height: 2.2,
+      stone: 2.4,
+      length: 175,
+    },
     image: img(
       "vitrin-su-yolu.jpg",
       928,
@@ -217,7 +245,12 @@ export const products: readonly Product[] = [
     dataLine: "KOLYE UCU · 18K · 0.70 ct",
     status: "Vitrinde",
     drawing: "pear-pendant",
-    drawingSpec: { kind: "pear-pendant", total: 12, stone: { length: 8, width: 5.4 } },
+    drawingSpec: {
+      kind: "pear-pendant",
+      total: 12,
+      stone: { length: 8, width: 5.4, depth: 3.4 },
+      chain: { length: 1.6, width: 1.2, wire: 0.3 },
+    },
     image: img(
       "vitrin-armut.jpg",
       928,

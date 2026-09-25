@@ -7,15 +7,19 @@ import { Lens } from "@/components/primitives/Lens";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { pct, type Pt } from "@/lib/overlay";
 import { bandSectionView } from "./drawings/BandSection";
+import { chainLinkView } from "./drawings/ChainLink";
 import { dropEarringFrontView } from "./drawings/DropEarringFront";
-import { filigreeFrontView } from "./drawings/FiligreeFront";
+import { filigreeDetailView, filigreeFrontView } from "./drawings/FiligreeFront";
 import { pearPendantFrontView } from "./drawings/PearPendantFront";
+import { pearSideView, pearTopView } from "./drawings/PearViews";
 import { ringFrontView, stoneProfile } from "./drawings/RingFront";
 import { ringTopView } from "./drawings/RingTop";
 import { tennisFlatView } from "./drawings/TennisFront";
+import { tennisSectionView, tennisSettingView } from "./drawings/TennisViews";
 import { TitleBlock } from "./drawings/TitleBlock";
 import { twistFrontView } from "./drawings/TwistFront";
-import { CENTER, PLATE, type PlateView } from "./drawings/types";
+import { twistDevelopmentView, twistSectionView } from "./drawings/TwistViews";
+import { CENTER, MM, PLATE, type PlateView } from "./drawings/types";
 
 /** Levhanın sağ üst boşluğundaki statik lup (§11.2 A): merkez ve iç çap (levha birimi). */
 const LENS_CENTER: Pt = [660, 190];
@@ -30,15 +34,20 @@ const ALIGN = {
 
 type Plate = { views: PlateView[]; stone?: Pt };
 
+/** Taşlı yüzükte işaret noktası: tacın ortası (levha koordinatı). */
+function crownMark(innerDiameter: number, stone: number): Pt {
+  const [cx, cy] = CENTER.front;
+  const p = stoneProfile(innerDiameter, stone);
+  return [cx, cy + (p.tableY + p.girdleTop) / 2];
+}
+
 /**
- * Parça tipine göre görünüşler (§11.2). Aşama 3: `solitaire` tam (ön, üst, kesit);
- * diğer tipler ön görünüş (üst görünüş / kesit Aşama 7'de).
+ * Parça tipine göre görünüşler (§11.2): üstte A (ön görünüş ya da düz açılım), altta iki
+ * çeyrekte B ve C; telkaride altta ortada büyütülmüş detay. Taşlı yüzüklerde sağ üstte lup.
  */
 function plateFor(spec: DrawingSpec): Plate {
   switch (spec.kind) {
-    case "solitaire": {
-      const [cx, cy] = CENTER.front;
-      const p = stoneProfile(spec.innerDiameter, spec.stone);
+    case "solitaire":
       return {
         views: [
           // Ön görünüşteki halka kalınlığı = kesit kalınlığı (K-047)
@@ -49,20 +58,53 @@ function plateFor(spec: DrawingSpec): Plate {
           ringTopView(spec.stone, CENTER.top),
           bandSectionView(spec.section, CENTER.section),
         ],
-        // Taşın üstündeki işaret: tacın ortası
-        stone: [cx, cy + (p.tableY + p.girdleTop) / 2],
+        stone: crownMark(spec.innerDiameter, spec.stone),
       };
-    }
     case "twist":
-      return { views: [twistFrontView(spec, CENTER.front)] };
+      return {
+        views: [
+          twistFrontView(spec, CENTER.front),
+          // Açılım uzun: sol ölçü etiketi levha kenarına yaslanmasın diye biraz sağda
+          twistDevelopmentView(spec, [CENTER.top[0] + 25, CENTER.top[1]]),
+          twistSectionView(spec, CENTER.section),
+        ],
+      };
     case "drop-earring":
-      return { views: [dropEarringFrontView(spec, CENTER.front)] };
+      return {
+        views: [
+          dropEarringFrontView(spec, CENTER.front),
+          pearTopView(spec.stone, CENTER.top),
+          pearSideView({ ...spec, attach: "hook", label: productPage.views.side }, CENTER.section),
+        ],
+      };
     case "tennis":
-      return { views: [tennisFlatView(spec, CENTER.front)] };
+      return {
+        views: [
+          tennisFlatView(spec, CENTER.front),
+          tennisSettingView(spec, CENTER.top),
+          tennisSectionView(spec, CENTER.section),
+        ],
+      };
     case "pear-pendant":
-      return { views: [pearPendantFrontView(spec, CENTER.front)] };
+      return {
+        views: [
+          pearPendantFrontView(spec, CENTER.front),
+          // 12 mm uç 2:1 yan görünüşte 27 birim derinlik kalır: 4:1
+          pearSideView(
+            { ...spec, attach: "bail", scale: 2 * MM, label: productPage.views.sideZoom },
+            CENTER.top,
+          ),
+          chainLinkView(spec.chain, [CENTER.section[0], CENTER.section[1] - 20]),
+        ],
+      };
     case "filigree":
-      return { views: [filigreeFrontView(spec, CENTER.front)] };
+      return {
+        views: [
+          filigreeFrontView(spec, CENTER.front),
+          filigreeDetailView(spec, CENTER.front, CENTER.detail),
+        ],
+        stone: crownMark(spec.innerDiameter, spec.stone),
+      };
   }
 }
 
@@ -93,7 +135,12 @@ export function titleCells(product: Product) {
   ];
 }
 
-/** Mobilde levha pencereleri (§15): tektaş ön görünüş + lup, ardından üst görünüş + kesit. */
+/**
+ * Mobilde levha pencereleri (§15, K-079): önce üstteki görünüş (taşlı yüzükte lupla), sonra
+ * alttaki görünüşler. Alttakiler tek pencerede ancak ölçek ≈ 0.6'nın altına düşmüyorsa; yoksa
+ * etiketler (sabit boyutlu HTML) birbirine biner ve her görünüş kendi penceresini alır (K-087).
+ * Kutular levha biriminde [x, y, en, boy].
+ */
 export function plateCrops(spec: DrawingSpec): [number, number, number, number][] {
   switch (spec.kind) {
     case "solitaire":
@@ -101,14 +148,34 @@ export function plateCrops(spec: DrawingSpec): [number, number, number, number][
         [230, 90, 540, 370],
         [110, 620, 590, 290],
       ];
-    // Tel notu halkanın sağında (≈ x 714'e kadar): pencere sağa genişler
-    case "filigree":
-      return [[218, 135, 516, 390]];
-    // Düz açılım yatay ve alçak (y ≈ 240–435): pencere de alçak
+    case "twist":
+      return [
+        [230, 170, 380, 310],
+        [40, 680, 380, 200],
+        [450, 640, 260, 270],
+      ];
+    case "drop-earring":
+      return [
+        [230, 190, 340, 330],
+        [90, 640, 580, 300],
+      ];
+    // Düz açılım yatay ve alçak: pencere de alçak
     case "tennis":
-      return [[190, 220, 380, 230]];
-    default:
-      return [[200, 160, 450, 340]];
+      return [
+        [190, 220, 380, 230],
+        [70, 680, 290, 230],
+        [470, 650, 250, 220],
+      ];
+    case "pear-pendant":
+      return [
+        [200, 180, 400, 300],
+        [120, 520, 580, 430],
+      ];
+    case "filigree":
+      return [
+        [230, 90, 540, 400],
+        [215, 560, 370, 400],
+      ];
   }
 }
 

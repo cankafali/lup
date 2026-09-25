@@ -99,11 +99,13 @@ export function ringFrontBounds(
  * Levhadaki ön görünüş (§11.2 A): eksenler + iç çap, bant kalınlığı (dışarı çıkan ok),
  * toplam yükseklik ve (taş varsa) taş çapı.
  * `band` motifi (burma, telkari) bu görünüşün üstüne ayrı geometriyle eklenir.
+ * Bandın altındaki kesit işareti "A · A" varsayılan olarak taşlı yüzüklerde; `sectionMarks` ile zorlanır.
  */
 export function ringFrontView(
   spec: { innerDiameter: number; band: number; stone?: number },
   center: Pt,
   extra?: React.ReactNode,
+  sectionMarks = Boolean(spec.stone),
 ): PlateView {
   const [cx, cy] = center;
   const rIn = (spec.innerDiameter / 2) * MM;
@@ -159,7 +161,7 @@ export function ringFrontView(
     ],
     notes: [
       { at: [cx, bottom + 44], text: productPage.views.front, align: "center" },
-      ...(p
+      ...(sectionMarks
         ? [
             {
               at: [cx - 22, bottom + 14] as Pt,

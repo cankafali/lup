@@ -550,3 +550,118 @@
 - **Karar:** Levhanın sağ üstündeki blok `top: min(48px, 12.125cqw − 48px)`: lupun üst kenarı (levha y 97 = genişliğin %12.125'i) eksi blok yüksekliği (38px) ve ara (10px). 1440'ta 48px (değişmedi), 1280'de 40, 768'de 35, 1024'te 22px. Lupla arası her genişlikte 8–14px.
 - **Gerekçe:** Blok sabit 48px'teydi, lup levhayla ölçeklenip yukarı çıkıyordu. Levhanın daraldığı 768–1280 aralığında son satır ("ÖLÇÜLER mm") lup halkasına değiyordu.
 - **Geri alma:** `TechnicalPlate.tsx`, `data-plate-meta` üzerindeki `style`.
+
+### K-085 · 2026-09-25 · Burma levhası: bant yüzeyi açılımı ve tel kesiti
+
+- **Karar:** Üst görünüş yerine bant yüzeyi açılımı (§11.2 `twist`), 6:1:
+  - orta çevre (π × 20.0 = 62.8 mm) boyunca düz şerit;
+  - iki telin burgu sınırları S eğrisi;
+  - 2.5 tur çiziliyor, gerisi su yolundaki gibi kırılma çizgisi ve "···";
+  - ölçüler: tur adımı 3.9, şerit eni 1.8, "62.8 · 16 × 3.9".
+
+  Sağ altta A-A kesiti 20:1: kesikli zarf (Ø 1.8) içinde yan yana iki tel (Ø 0.9), ayrı parça oldukları için taramaları ters yönde. Ön görünüşe "A · A" işareti eklendi. Açılım, sol ölçü etiketi levha kenarına yaslanmasın diye 25 birim sağda.
+- **Gerekçe:** Şartname açılımı istiyor ama ölçek vermiyor. 1.8 mm'lik şerit 2:1'de 14 birim kalıp çizgiler seçilemiyor. Tel 10:1'de 36 birim, tarama okunmuyor. Kesit görünüşü "en az 3 ölçü, kesit taraması şart" kuralı için eklendi.
+- **Geri alma:** `TwistViews.tsx`, `TechnicalPlate.tsx` → `plateFor`.
+
+### K-086 · 2026-09-25 · Yeni görünüşler için temsili ölçüler; damla kancası önden düz
+
+- **Karar:** `drawingSpec`'e temsili değerler eklendi (K-044 gibi):
+  - damla taş derinliği 3.2, armut 3.4;
+  - su yolu yuva yüksekliği 2.2;
+  - zincir halkası 1.6 × 1.2, tel Ø 0.3.
+
+  Kodda sabit olanlar:
+  - kutu duvarı 0.3, tabanı 0.4, taban deliği Ø 1.0;
+  - tırnak r 0.28;
+  - menteşe dili 0.3 × 0.9;
+  - menteşe boşluğu 0.2.
+
+  Damlanın ön görünüşünde kanca artık tek düz tel. Kıvrımı görüş doğrultusunda olduğu için profili yan görünüşe taşındı.
+- **Gerekçe:** Şartname bu parçalar için yalnızca boy/karat veriyor. Kancanın önden kıvrık çizilmesi teknik olarak yanlıştı; yan görünüş eklenince iki görünüş çelişecekti. **Gerçek parçalar ölçülünce güncellenmeli.**
+- **Geri alma:** `products.ts`, `TennisViews.tsx` sabitleri, `DropEarringFront.tsx`.
+
+### K-087 · 2026-09-25 · Mobil levha pencereleri: geniş görünüşler ayrı pencerede, başlık aralığı 52
+
+- **Karar:** Alttaki görünüşler, tek pencerede levha ≈ 0.6 ölçeğin altına düşmüyorsa birlikte (tektaş, damla, armut, telkari), düşüyorsa her biri kendi penceresinde (burma, su yolu: 3 pencere). Altında ölçü etiketi olan görünüşlerde ölçü çizgisinden görünüş başlığına 44 yerine 52 birim (`TITLE_GAP`). Masaüstünde fark ≈ 8px.
+- **Gerekçe:** Levha etiketleri sabit boyutlu HTML. Levha küçüldükçe etiketler birbirine yaklaşıyor. Otomatik ölçümde tektaşın alt penceresinde "Ø 5.1" ile "ÜST GÖRÜNÜŞ" Aşama 6'dan beri çakışıyormuş. Şimdi 390, 768, 1024, 1440'ta altı levhada kesilen ya da çakışan etiket yok.
+- **Geri alma:** `plateCrops`, `types.ts` → `TITLE_GAP`.
+
+### K-088 · 2026-09-25 · Damla ve armut: faset diyagramı, yan görünüş, zincir halkası
+
+- **Karar:**
+  - Damla:
+    - ön görünüş;
+    - üst görünüş 6:1: armut faset diyagramı (kontur, 8 köşeli tabla, 8 faset);
+    - yan görünüş 2:1: taç önde, köşk arkada, rundisti saran yuva, halka ve kancanın profili; ölçüler taş derinliği ve kanca derinliği.
+  - Armut:
+    - ön görünüş;
+    - yan görünüş 4:1, başlıkta ölçek ("YAN GÖRÜNÜŞ — 4:1");
+    - zincir halkası detayı 20:1: ortadaki halka önden, komşuları yandan ve deliğinden geçerek; ölçüler boy, en, tel çapı.
+- **Gerekçe:** §11.2 `drop-earring` ("üst görünüş = armut faset diyagramı", "kanca profili") ve `pear-pendant` ("ön + yan görünüş, zincir halkası"). 12 mm'lik uç 2:1'de yandan 27 birim derinlikte kalıyordu.
+- **Geri alma:** `PearViews.tsx`, `ChainLink.tsx`.
+
+### K-089 · 2026-09-25 · Sayfa geçişi doğrudan `document.startViewTransition` ile
+
+- **Karar:** Vitrin ya da şerit hücresine tıklanınca (`PartLink`, `lib/partTransition.ts`):
+  - `document.startViewTransition({ update, types: ["part-open"] })` çağrılır; fotoğrafa `part-hold` adı yalnızca geçiş boyunca verilir;
+  - güncelleme `router.push` ile başlar, yeni sayfa commit olunca (`MotionReady` yerleşim efekti, `pageReady`) biter;
+  - animasyon: sayfanın geri kalanı 240 ms'de söner, fotoğraf yerinde kalır, yeni sayfa 240 ms sonra gelir ve levha çizilir;
+  - Nav iki sayfada aynı olduğu için yerinde durur (`site-header`);
+  - yeni sayfa 3.5 sn'de gelmezse geçiş atlanır, gezinme sürer.
+  - View Transitions yoksa içerik sönüp yeni sayfada yeniden yanar. Reduced motion'da geçiş yok. Geri linki geçişsiz.
+  - Lup, yeni sayfada klon yenilenene kadar yalnız dış halka olarak kalır (eski sayfayı büyütmesin).
+- **Gerekçe:** §11.5. Önce Next 16'nın önerdiği React `<ViewTransition>` + `Link transitionTypes` denendi, ama `startViewTransition` hiç çağrılmadı. Commit uygun şeritteydi, ama silinen sayfa alt ağacında ViewTransition bayrağı görünmedi; kök neden bulunamadı. Şartname zaten `document.startViewTransition`'ı adıyla anıyor.
+- **Geri alma:** `TrayCell.tsx`'te `PartLink` yerine `Link`; `globals.css`'teki geçiş kuralları.
+
+### K-090 · 2026-09-25 · Diğer parçalar şeridi
+
+- **Karar:**
+  - Yerleşim:
+    - mevcut parça hariç 5 parça doğal sırada;
+    - hücre `TrayCell compact` (240px, 4:5): no, damga, ölçü (9px) ve ad; veri satırı, "İNCELE" ve telkari notu yok;
+    - şerit ekran kenarına kadar kayar, ilk hücre içerik kabının kenarıyla hizalı başlar; kaydırma çubuğu gizli.
+  - Kaydırma:
+    - yerel `overflow-x: auto` + `scroll-snap-type: x mandatory`;
+    - masaüstünde fareyle sürükleme: 4px eşik, bırakınca en yakın hücreye yumuşak oturma, sürükleme sonrası tıklama linki açmaz;
+    - Lenis yatay hareketlere karışmaz (`data-lenis-prevent-horizontal`).
+  - Lup: klon iç kaydırmayı `data-loupe-scroll` ile izler.
+- **Gerekçe:** §11.4. Trackpad'in yatay hareketlerinde deltaY sıfır olmadığı için Lenis onları engelliyordu. Lup klonu kopyalanırken iç kaydırma konumu taşınmıyor; yoksa kaymış şeritte lup yanlış hücreyi büyütürdü. 1440'ta 5 × 240 = 1200 içerik genişliğine sığar, kaydırma yalnızca daha dar ekranlarda gerekir.
+- **Geri alma:** `OtherParts.tsx`, `DragScroll.tsx`, `useLoupe.ts` → `onInnerScroll`.
+
+### K-091 · 2026-09-25 · Telkari levhası: detay B ve lup
+
+- **Karar:**
+  - Ön görünüş:
+    - sağ altta, 48.75°'deki kıvrım halkasında "B" dairesi;
+    - kesit görünüşü olmadığı için "A · A" işareti kaldırıldı;
+    - sağ yandaki "TELKARİ · TEL Ø 0.3" notu kaldırıldı.
+  - Detay B (8:1, daire içinde): dairenin içi hesapla kırpılır; tel çift çizgiyle kalınlığıyla (Ø 0.3) görünür. Ölçüler tel çapı ve halka dış çapı; tel çapı notun yerine detayda.
+  - Tektaş gibi sağ üstte lup (`telkari-makro.jpg`) ve taş işareti.
+- **Gerekçe:** §11.2 `filigree` ("4× büyütülmüş detay, daire içinde, DETAY B, tel Ø 0.3"). Telkari taşlı bir yüzük; `macro` görseli veride vardı ama kullanılmıyordu.
+- **Geri alma:** `FiligreeFront.tsx`, `plateFor` → `filigree`.
+
+### K-092 · 2026-09-25 · Su yolu levhası: yuva detayı ve kesit
+
+- **Karar:**
+  - Düz açılım (değişmedi) + ortadaki yuvada "A" işaretleri.
+  - Yuva detayı 10:1:
+    - kutu yuva, yuvarlak pırlanta faset diyagramı ve 4 tırnak;
+    - sağda menteşe dili ve komşu halkanın başı (kırılma çizgisiyle), dillerin girdiği yuvalar kesikli.
+  - A-A kesiti 10:1:
+    - duvarlar ve delikli taban taramalı;
+    - taş kesit düzleminde profil olarak (taranmaz);
+    - tırnaklar düzlemin arkasında görünür kenar.
+- **Gerekçe:** §11.2 `tennis` ("yuva detayı büyütülmüş"). Kesit, "kesit taraması şart" kuralı için.
+- **Geri alma:** `TennisViews.tsx`.
+
+### K-093 · 2026-09-25 · Ortak tarama modülü
+
+- **Karar:** Kesit taraması `drawings/hatch.ts`'te toplandı: dışbükey çokgen ve daire kırpma (hesapla, K-049), çoklu çizgi kırpma (detay B). 45° çizgiler levhanın ortak ızgarasına oturuyor; aynı parçanın komşu bölgeleri hizalı taranıyor. Bant kesiti bu modüle taşındı.
+- **Gerekçe:** Burma, su yolu ve telkari aynı kırpmaya ihtiyaç duydu.
+- **Geri alma:** Gerekmez.
+
+### K-094 · 2026-09-25 · Mağaza krokisi yapılmadı
+
+- **Karar:** §10.5'teki isteğe bağlı çizgi kroki eklenmedi.
+- **Gerekçe:** Kroki dükkânı cadde üzerinde işaretliyor. "Kalpakçılar Cd. No. 12"nin gerçek konumu bilinmiyor (adres ve telefon temsili). Yanlış yeri gösteren bir kroki ziyaretçiyi yanıltır. Kuyumcudan konum alınınca eklenebilir.
+- **Geri alma:** —

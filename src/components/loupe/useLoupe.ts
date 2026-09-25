@@ -7,8 +7,10 @@ import { LOUPE } from "@/lib/tokens";
 import {
   applyHires,
   cloneContent,
+  collectScroll,
   collectSync,
   measureSticky,
+  type ScrollPair,
   type StickyClone,
   type SyncPair,
 } from "./cloneContent";
@@ -70,6 +72,7 @@ function createLoupe(
   let hoverIdle = false; // etkileşimli öğe, kapalı alan ya da kenar boşluğu üstünde
   let touchActive = false;
   let failed = false;
+  let stale = false; // rota değişti, klon henüz yenilenmedi
   let hires = false;
   let dirty = true;
   let lastMove = 0;
@@ -81,6 +84,7 @@ function createLoupe(
   let clone: HTMLElement | null = null;
   let sticky: StickyClone[] = [];
   let synced: SyncPair[] = [];
+  let scrollers: ScrollPair[] = [];
   let holdTimer: number | undefined;
   let holdStart: { x: number; y: number } | null = null;
 
@@ -100,7 +104,8 @@ function createLoupe(
     let next: State;
     if (!present) next = "off";
     else if (mode === "touch") next = touchActive ? "active" : "off";
-    else if (failed || hoverIdle || performance.now() - lastMove > LOUPE.idleMs) next = "idle";
+    else if (failed || stale || hoverIdle || performance.now() - lastMove > LOUPE.idleMs)
+      next = "idle";
     else next = "active";
     if (next === state) return;
     state = next;
@@ -126,8 +131,10 @@ function createLoupe(
       if (hires) applyHires(next);
       sticky = measureSticky(source, next, stage);
       synced = collectSync(source, next);
+      scrollers = collectScroll(source, next);
       clone = next;
       failed = false;
+      stale = false;
     } catch (err) {
       // Klon yoksa lup yalnızca dış halka olarak imleç süsü olur (§9.7)
       console.error("Lup: klon oluşturulamadı", err);
@@ -135,6 +142,7 @@ function createLoupe(
       clone = null;
       sticky = [];
       synced = [];
+      scrollers = [];
       failed = true;
     }
     root.dataset.ready = failed ? "ring" : "clone";
@@ -156,6 +164,12 @@ function createLoupe(
       cancelIdle = whenIdle(build);
     });
   const refresh = debounce(scheduleBuild, REFRESH_MS);
+  // Yeni sayfa: eski klon yanlış içeriği büyütmesin; yenilenene kadar yalnızca dış halka
+  const invalidate = () => {
+    stale = true;
+    evaluate();
+    scheduleBuild();
+  };
 
   const measureMargins = () => {
     const cs = getComputedStyle(doc);
@@ -204,6 +218,13 @@ function createLoupe(
     if (mode !== "mouse" || !present) return;
     lastMove = performance.now();
     evaluate();
+  };
+  // İç kaydırma (yatay şerit): olay kabarcıklanmaz, yakalama aşamasında dinlenir
+  const onInnerScroll = (e: Event) => {
+    const pair = scrollers.find((p) => p.live === e.target);
+    if (!pair) return;
+    pair.copy.scrollLeft = pair.live.scrollLeft;
+    dirty = true;
   };
 
   // --- Dokunmatik (§9.6) -----------------------------------------------------
@@ -335,6 +356,7 @@ function createLoupe(
   window.addEventListener("pointerup", onPointerEnd, { passive: true });
   window.addEventListener("pointercancel", onPointerEnd, { passive: true });
   window.addEventListener("scroll", onScroll, { passive: true });
+  document.addEventListener("scroll", onInnerScroll, { capture: true, passive: true });
   window.addEventListener("blur", onLeave);
   doc.addEventListener("pointerleave", onLeave);
   document.addEventListener("touchmove", onNativeTouchMove, { passive: false });
@@ -342,6 +364,7 @@ function createLoupe(
 
   return {
     scheduleBuild,
+    invalidate,
     destroy() {
       destroyed = true;
       cancelIdle();
@@ -358,6 +381,7 @@ function createLoupe(
       window.removeEventListener("pointerup", onPointerEnd);
       window.removeEventListener("pointercancel", onPointerEnd);
       window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("scroll", onInnerScroll, { capture: true });
       window.removeEventListener("blur", onLeave);
       doc.removeEventListener("pointerleave", onLeave);
       document.removeEventListener("touchmove", onNativeTouchMove);
@@ -392,7 +416,11 @@ export function useLoupe({ root, ring, stage }: LoupeRefs) {
   }, [root, ring, stage]);
 
   // İlk yükleme ve her rota değişiminde yeniden klonla (§9.5)
+  const first = useRef(true);
   useEffect(() => {
-    loupe.current?.scheduleBuild();
+    if (first.current) {
+      first.current = false;
+      loupe.current?.scheduleBuild();
+    } else loupe.current?.invalidate();
   }, [pathname]);
 }
