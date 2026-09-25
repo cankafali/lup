@@ -29,8 +29,15 @@ export const $$ = <T extends Element = HTMLElement>(root: ParentNode, sel: strin
 type At = gsap.Position;
 
 /**
+ * Ölçmeden gizlenmiş çizgi: DrawSVG'nin "0%" hali gibi görünmez, ama yol uzunluğu ve ekran
+ * dönüşümü okunmaz (non-scaling-stroke'ta her şekil için zorlanmış yerleşim demekti, K-096).
+ */
+export const UNDRAWN = { strokeDasharray: "0 100000" };
+
+/**
  * Ölçü oku çizimi (§8.3): çizgi dashoffset ile çizilir, çentikler (ve uzatma çizgileri)
  * çizgi bitince 120 ms'de belirir, etiket 80 ms sonra gelir.
+ * `lazy`: başlangıç hali ölçümsüz yazılır, çizim kendi anında başlar (çok sayıda ölçü: levha).
  */
 export function drawDimension(
   tl: gsap.core.Timeline,
@@ -39,24 +46,35 @@ export function drawDimension(
   duration: number = DURATION.base,
   /** Çentik ve etiket sürelerinin çarpanı (scrub zaman çizelgesinde küçülür). */
   k = 1,
+  lazy = false,
 ) {
   const line = $(dim, "[data-dim-line]");
   const marks = $$(dim, "[data-dim-ticks], [data-dim-extension]");
   const label = $(dim, "[data-dim-label]");
+  const immediateRender = !lazy;
+  if (lazy) {
+    if (line) gsap.set(line, UNDRAWN);
+    gsap.set([...marks, label].filter(Boolean), { opacity: 0 });
+  }
   if (line)
     tl.fromTo(
       line,
       { drawSVG: "0%" },
-      { drawSVG: "100%", duration, ease: EASE.gsapDraw, immediateRender: true },
+      { drawSVG: "100%", duration, ease: EASE.gsapDraw, immediateRender },
       at,
     );
   if (marks.length)
-    tl.fromTo(marks, { opacity: 0 }, { opacity: 1, duration: 0.12 * k, ease: "none" }, ">");
+    tl.fromTo(
+      marks,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.12 * k, ease: "none", immediateRender },
+      ">",
+    );
   if (label)
     tl.fromTo(
       label,
       { opacity: 0 },
-      { opacity: 1, duration: 0.24 * k, ease: "none" },
+      { opacity: 1, duration: 0.24 * k, ease: "none", immediateRender },
       `<${0.08 * k}`,
     );
 }

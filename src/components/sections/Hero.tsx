@@ -34,7 +34,7 @@ export function Hero() {
       className="h-svh max-h-[1000px] min-h-[760px] overflow-hidden max-md:min-h-[600px]"
     >
       <HeroMotion />
-      <div data-hero-photo className="absolute inset-0">
+      <div data-hero-photo data-intro-keep className="absolute inset-0">
         <PhotoOverlay
           src={hero.image.src}
           alt={hero.image.alt}
@@ -138,7 +138,8 @@ export function Hero() {
         <HeroGuide fit={{ w: IMG[0], h: IMG[1] }} stone={STONE} />
       </div>
 
-      <div className="absolute inset-x-0 bottom-0">
+      {/* Başlık ve not ilk boyamada CSS ile girer (K-095) */}
+      <div data-intro-keep className="absolute inset-x-0 bottom-0">
         <div className="relative container-lup pb-14 max-md:pb-8">
           <Headline
             as="h1"

@@ -5,7 +5,7 @@
   --color-paper: #efebe3;
   --color-graphite: #161514;
   --color-lead: #8a857c;
-  --color-stamp: #c8321e;
+  --color-stamp: #c7311d; /* şartname #C8321E; kâğıtla 4.49 → 4.55:1, AA (K-098) */
   --color-line: rgb(22 21 20 / 0.2);
   --color-line-strong: rgb(22 21 20 / 0.35);
   --color-grid: rgb(22 21 20 / 0.045);

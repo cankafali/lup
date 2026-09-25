@@ -10,25 +10,28 @@ import { useMotion } from "./useMotion";
  * (0.92 → 1). Mesaj: odak mağazaya geçer.
  */
 export function MagazaMotion() {
-  const anchor = useMotion((root) => {
-    sectionHeading(root);
+  const anchor = useMotion(
+    (root) => {
+      sectionHeading(root);
 
-    const block = $(root, "[data-compare-block]");
-    const site = $(root, '[data-compare="site"]');
-    const store = $(root, '[data-compare="store"]');
-    if (!block || !site || !store) return;
+      const block = $(root, "[data-compare-block]");
+      const site = $(root, '[data-compare="site"]');
+      const store = $(root, '[data-compare="store"]');
+      if (!block || !site || !store) return;
 
-    gsap.set([site, store], { transformOrigin: "0% 100%" });
-    gsap
-      .timeline({
-        scrollTrigger: { trigger: block, start: "top 70%", once: true },
-        defaults: { ease: EASE.gsapLup, duration: 0.9 },
-        onComplete: onDone,
-      })
-      .fromTo(site, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "none" }, 0)
-      .to(site, { scale: 0.92 }, 0.3)
-      .fromTo(store, { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1 }, 0.3);
-  });
+      gsap.set([site, store], { transformOrigin: "0% 100%" });
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: block, start: "top 70%", once: true },
+          defaults: { ease: EASE.gsapLup, duration: 0.9 },
+          onComplete: onDone,
+        })
+        .fromTo(site, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "none" }, 0)
+        .to(site, { scale: 0.92 }, 0.3)
+        .fromTo(store, { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1 }, 0.3);
+    },
+    { defer: true },
+  );
 
   return <span ref={anchor} hidden />;
 }

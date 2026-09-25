@@ -37,7 +37,9 @@ export function NavMenu({ className }: { className?: string }) {
       lenis?.start();
       window.removeEventListener("keydown", onKey);
       window.removeEventListener(ANCHOR_EVENT, onAnchor);
-      trigger?.focus();
+      // Bölüme gidildiyse odak orada kalır (anchor işleyicisi taşıdı); yoksa düğmeye döner
+      const active = document.activeElement;
+      if (!active || active === document.body) trigger?.focus();
     };
   }, [open, lenis]);
 

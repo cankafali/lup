@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { productPage } from "@/content/copy";
@@ -18,10 +18,20 @@ export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: PageProps<"/parca/[slug]">): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps<"/parca/[slug]">,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const product = getProduct((await params).slug);
   if (!product) return {};
-  return { title: `${product.name} — No. ${product.certNo}`, description: product.description };
+  const title = `${product.name} — No. ${product.certNo}`;
+  // Alt segmentteki openGraph üsttekinin yerine geçer: paylaşım görseli ve site adı taşınır
+  const { openGraph } = await parent;
+  return {
+    title,
+    description: product.description,
+    openGraph: { ...openGraph, title, description: product.description },
+  };
 }
 
 /** Ürün detay (§11): solda teknik levha, sağda sertifika. */
@@ -30,7 +40,7 @@ export default async function ProductPage({ params }: PageProps<"/parca/[slug]">
   if (!product) notFound();
 
   return (
-    <main data-intro className="pt-24 max-md:pt-16">
+    <main id="icerik" tabIndex={-1} data-intro className="pt-24 max-md:pt-16">
       <PlateMotion />
       <div className="container-lup flex items-baseline justify-between py-4">
         <Link
@@ -44,8 +54,8 @@ export default async function ProductPage({ params }: PageProps<"/parca/[slug]">
         </MonoLabel>
       </div>
 
-      {/* Mobil (§15): önce sertifika başlığı */}
-      <div className="container-lup md:hidden">
+      {/* Mobil (§15): önce sertifika başlığı; ilk boyamada hazır, LCP JS'i beklemez (K-097) */}
+      <div data-intro-keep className="container-lup md:hidden">
         <Certificate product={product} part="head" />
       </div>
 
@@ -82,7 +92,10 @@ export default async function ProductPage({ params }: PageProps<"/parca/[slug]">
       </div>
 
       {/* Mobil: buton alt kenara sabit (§15), güvenli alan boşluğuyla */}
-      <div className="sticky bottom-0 z-10 mt-8 bg-paper pt-3 pb-[max(12px,env(safe-area-inset-bottom))] md:hidden">
+      <div
+        data-intro-keep
+        className="sticky bottom-0 z-10 mt-8 bg-paper pt-3 pb-[max(12px,env(safe-area-inset-bottom))] md:hidden"
+      >
         <div className="container-lup">
           <CertificateCta product={product} />
         </div>

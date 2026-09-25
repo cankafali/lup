@@ -30,6 +30,10 @@
     outline: 2px solid var(--color-graphite);
     outline-offset: 3px;
   }
+  /* Programla odaklanan bölümler (atlama linki, bölüm linkleri) çerçeve almaz */
+  [tabindex="-1"]:focus {
+    outline: none;
+  }
 
   /* Lup imleci (§9.4): yalnızca JS lupu kurduğunda (`has-loupe`) ve ince imleçte.
      Etkileşimli öğelerde sistem imleci geri gelir; tamamı link olan tepsi hücreleri hariç (K-056). */
@@ -51,9 +55,65 @@
   }
 
   /* Giriş animasyonu olan bölgeler, animasyon kurulana kadar gizli (K-064). Yalnızca betik
-     `js-anim` eklediyse: JS kapalı ya da reduced motion'da içerik hep görünür. */
-  html.js-anim:not(.anim-ready) [data-intro] {
+     `js-anim` eklediyse: JS kapalı ya da reduced motion'da içerik hep görünür.
+     `data-intro-keep` hariç: hero fotoğrafı, başlığı ve alt notu ilk boyamada CSS ile girer,
+     LCP JS'i beklemez (K-095). Fotoğrafın üstündeki bindirmeler yine JS'le çizilir. */
+  html.js-anim:not(.anim-ready)
+    :is([data-intro] > :not([data-intro-keep]), [data-intro-keep] [data-photo-frame]) {
     opacity: 0;
+  }
+  /* Klonda (id'siz) tekrar oynamasın diye #lup-content ile sınırlı. Süreler §10.1 sırasıyla. */
+  html.js-anim #lup-content [data-intro-keep] {
+    & [data-photo-inner] > img {
+      animation: intro-photo var(--duration-slow) var(--ease-lup) backwards;
+    }
+    /* Maske süre boyunca sabit (her karede boyanmasın); satır yalnızca transform ile kayar */
+    & h1 [data-headline-mask] {
+      animation: intro-mask 0.9s step-end 0.3s backwards;
+    }
+    & h1 [data-headline-line] {
+      animation: intro-line 0.9s var(--ease-lup) 0.3s backwards;
+    }
+    & h1 [data-headline-mask]:nth-of-type(2),
+    & h1 [data-headline-mask]:nth-of-type(2) [data-headline-line] {
+      animation-delay: 0.45s;
+    }
+    /* Mobilde ilk satır ilk boyamada hazır: ekrandaki en büyük metin, LCP onu bekler (§17, K-097) */
+    @media (width < 48rem) {
+      & h1 [data-headline-mask]:nth-of-type(1),
+      & h1 [data-headline-mask]:nth-of-type(1) [data-headline-line] {
+        animation: none;
+      }
+    }
+    /* Masaüstünde 1.4 s (§10.1); mobilde başlığın hemen altında, onunla birlikte */
+    & [data-hero-note] {
+      animation: intro-fade 0.4s linear 1.4s backwards;
+      @media (width < 48rem) {
+        animation-delay: 0.6s;
+      }
+    }
+  }
+  @keyframes intro-photo {
+    from {
+      opacity: 0;
+      transform: scale(1.04);
+    }
+  }
+  @keyframes intro-mask {
+    from,
+    to {
+      clip-path: inset(-60% -10% 0% -10%);
+    }
+  }
+  @keyframes intro-line {
+    from {
+      transform: translateY(100%);
+    }
+  }
+  @keyframes intro-fade {
+    from {
+      opacity: 0;
+    }
   }
 
   /* Dokunmatik lup açıkken uzun basma menüsü ve metin seçimi çıkmasın (§9.6). */

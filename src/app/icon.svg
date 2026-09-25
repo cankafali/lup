@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Lup nişanı (§18): kâğıt kare, 1px graphite daire, ortada artı -->
+  <rect width="32" height="32" fill="#EFEBE3"/>
+  <circle cx="16" cy="16" r="11.5" fill="none" stroke="#161514" stroke-width="1"/>
+  <path d="M16 11.5v9M11.5 16h9" stroke="#161514" stroke-width="1"/>
+</svg>

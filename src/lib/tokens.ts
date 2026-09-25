@@ -30,3 +30,13 @@ export const DISPLAY_REF = { xl: 150, l: 104, m: 76, s: 56 } as const;
 
 /** Referans tuval genişliği (px). Figma koordinatları bu genişliğe göredir. */
 export const CANVAS_REF = 1440;
+
+/** tokens.css'teki renklerle aynı; CSS değişkeni okunamayan yerler için (OG görseli, §18). */
+export const COLOR = {
+  paper: "#efebe3",
+  graphite: "#161514",
+  lead: "#8a857c",
+  stamp: "#c7311d",
+  /** Lup dış halkası: graphite %25 (§8.7) */
+  ring: "rgba(22, 21, 20, 0.25)",
+} as const;

@@ -2,16 +2,7 @@
 
 import { gsap } from "@/lib/gsap";
 import { DURATION, EASE } from "@/lib/tokens";
-import {
-  $,
-  $$,
-  clearDraw,
-  drawCallout,
-  drawDimension,
-  onDone,
-  revealHeadline,
-  syncWithLoupe,
-} from "./helpers";
+import { $, $$, clearDraw, drawCallout, drawDimension, onDone, syncWithLoupe } from "./helpers";
 import { introTime } from "./intro";
 import { useMotion } from "./useMotion";
 
@@ -23,7 +14,6 @@ export function HeroMotion() {
   const anchor = useMotion((root) => {
     const photo = $(root, "[data-hero-photo]");
     const layer = $(root, "[data-hero-lens-layer]");
-    const heading = $(root, "h1");
     const stone = $(root, '[data-callout="stone"] [data-callout-dot]');
     const lens = $(root, "[data-hero-lens] [data-lens]");
     const caption = $(root, "[data-hero-caption]");
@@ -31,7 +21,7 @@ export function HeroMotion() {
     const band = $(root, '[data-callout="band"]');
     const mark = $(root, "[data-hero-mark]");
     const dims = $$(root, "[data-hero-photo] [data-dimension]");
-    const meta = $$(root, "[data-hero-meta], [data-hero-note]");
+    const meta = $(root, "[data-hero-meta]");
 
     introTime(); // girişin saati burada başlar
     const tl = gsap.timeline({
@@ -42,15 +32,8 @@ export function HeroMotion() {
       },
     });
 
-    // 1. 0.0 — fotoğraf
-    tl.fromTo(
-      photo,
-      { scale: 1.04, opacity: 0 },
-      { scale: 1, opacity: 1, duration: DURATION.slow },
-      0,
-    );
-    // 2–3. 0.3 / 0.45 — "Yakından", "bakın." harf maskesiyle
-    if (heading) revealHeadline(tl, heading, 0.3, 0.15);
+    // 1. 0.0 — fotoğraf: CSS ile ilk boyamada girer (globals.css `intro-photo`, K-095)
+    // 2–3. 0.3 / 0.45 — "Yakından", "bakın." harf maskesiyle: CSS (K-095)
     // 4. 0.7 — taş işareti
     tl.fromTo(stone, { scale: 0 }, { scale: 1, duration: DURATION.fast }, 0.7);
     // 5. 0.8 — kılavuz çizgi: HeroGuide
@@ -72,7 +55,7 @@ export function HeroMotion() {
     );
     if (band) drawCallout(tl, band, 1.3);
     tl.fromTo(mark, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "none" }, 1.3);
-    // 8. 1.4 — sağ alt metin ve koordinat satırı
+    // 8. 1.4 — koordinat satırı (sağ alt metin CSS ile, K-095)
     tl.fromTo(meta, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "none" }, 1.4);
 
     // Çıkış: fotoğraf (ve ona kilitli lup katmanı) parallax; başlık normal akar (§10.1)

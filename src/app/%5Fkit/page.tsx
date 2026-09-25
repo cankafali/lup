@@ -23,7 +23,7 @@ const COLORS = [
   ["paper", "bg-paper", "#EFEBE3"],
   ["graphite", "bg-graphite", "#161514"],
   ["lead", "bg-lead", "#8A857C"],
-  ["stamp", "bg-stamp", "#C8321E"],
+  ["stamp", "bg-stamp", "#C7311D"],
   ["line", "bg-line", "graphite %20"],
   ["line-strong", "bg-line-strong", "graphite %35"],
   ["grid", "bg-grid", "graphite %4.5"],

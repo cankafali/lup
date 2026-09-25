@@ -18,6 +18,7 @@ export function PlateWindow({ crop, children, className }: PlateWindowProps) {
   const [W] = PLATE;
   return (
     <div
+      data-plate-window
       className={clsx("relative w-full overflow-hidden", className)}
       style={{ aspectRatio: `${w} / ${h}` }}
     >

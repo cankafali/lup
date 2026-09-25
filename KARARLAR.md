@@ -665,3 +665,92 @@
 - **Karar:** §10.5'teki isteğe bağlı çizgi kroki eklenmedi.
 - **Gerekçe:** Kroki dükkânı cadde üzerinde işaretliyor. "Kalpakçılar Cd. No. 12"nin gerçek konumu bilinmiyor (adres ve telefon temsili). Yanlış yeri gösteren bir kroki ziyaretçiyi yanıltır. Kuyumcudan konum alınınca eklenebilir.
 - **Geri alma:** —
+
+### K-095 · 2026-09-25 · Hero girişinin LCP'ye giren kısmı CSS ile, ilk boyamada
+
+- **Karar:**
+  - Hero fotoğrafı (0 → 1 opaklık, 1.04 → 1 ölçek), başlık satırlarının maske açılışı (0.3/0.45 sn) ve alt not (masaüstünde 1.4 sn, mobilde başlıkla birlikte 0.6 sn) CSS animasyonuyla, ilk boyamada başlıyor.
+  - Bu öğeler `data-intro-keep` ile ön gizlemenin (K-064) dışında; fotoğrafın üstündeki bindirmeler JS'e kadar gizli.
+  - Taş işareti, kılavuz çizgi, lup ve ölçüler yine GSAP zaman çizelgesinde.
+  - Animasyonlar `#lup-content` ile sınırlı, lup klonunda yeniden oynamıyor.
+- **Gerekçe:** §17 LCP < 2.5 sn. Önce hero'nun tamamı hidrasyonu bekliyordu; LCP (hero metni) 4.4 sn'ydi. Chrome ekranı kaplayan görseli "arka plan" sayıp LCP adayı yapmıyor, bu yüzden LCP hero'daki en büyük metin.
+- **Geri alma:** `globals.css` → `intro-*`; `HeroMotion` fotoğraf ve başlık adımları.
+
+### K-096 · 2026-09-25 · Açılış iş yükü
+
+- **Karar:**
+  - Görünümün altındaki bölümlerin (Vitrin, 10×, Atölye, Mağaza) animasyon kurulumu ilk yüklemede boşta çalışıyor (`useMotion(…, { defer: true })`). Adreste çapa varsa ya da sayfa içi gezinmede hemen kuruluyor.
+  - Bölümler `<Suspense>` sınırlarında: hidrasyon parçalara bölünüyor.
+  - Dokunmatik birincil cihazda lup klonu ilk dokunuşta kuruluyor.
+  - `ScrollTrigger.refresh()` yalnız fontlar `load`'dan sonra gelirse (ScrollTrigger `load`'da zaten kendisi yeniliyor).
+  - `FitText` genişliği canvas `measureText` ile ölçüyor (DOM yerleşimi zorlanmıyor).
+  - Levha çizimi:
+    - yalnız görünen levhalar;
+    - mobil pencerede yalnız pencereyle kesişen şekiller;
+    - aşağıdaki pencereler ekrana girince;
+    - başlangıç hali ölçümsüz (`stroke-dasharray: 0 100000`), tweens kendi anında başlıyor.
+- **Gerekçe:** §17 TBT < 200 ms. Ölçüm DrawSVG'nin `non-scaling-stroke` çizgilerde şekil başına ekran dönüşümü okuduğunu gösterdi; üç tam levhada bu tek bir 1 sn'lik görev demekti. Ürün sayfası mobil Performance 56–58'den 83–88'e çıktı.
+- **Geri alma:** İlgili dosyalar: `useMotion.ts`, `PlateMotion.tsx`, `helpers.ts` (`UNDRAWN`, `drawDimension` `lazy`), `FitText.tsx`, `useLoupe.ts` (`deferred`), `page.tsx` (Suspense).
+
+### K-097 · 2026-09-25 · Mobilde LCP öğeleri ilk boyamada hazır
+
+- **Karar:** Mobilde (< 768):
+  - hero başlığının ilk satırı ("Yakından") maske açılışı olmadan ilk boyamada var; "bakın." açılışla geliyor;
+  - ürün sayfasında sertifika başlığı (no, ad, alt başlık) ve yapışık WhatsApp butonu ilk boyamada; sertifika gövdesi açılışla geliyor.
+
+  Masaüstünde değişiklik yok.
+- **Gerekçe:** LCP, sayfadaki en büyük metnin boyandığı an. Maskeyle gelen başlık LCP'yi animasyon süresi kadar geciktiriyor ve Lighthouse o ana kadar çalışan JS'i de LCP'ye katıyor.
+- **Geri alma:** `globals.css` (`@media (width < 48rem)` bloğu), `page.tsx`'te `data-intro-keep`, `PlateMotion` sertifika filtresi.
+
+### K-098 · 2026-09-25 · Damga kırmızısı #C8321E → #C7311D
+
+- **Karar:** `--color-stamp` bir birim koyulaştı.
+- **Gerekçe:** Kâğıt üzerinde #C8321E 4.49:1; §16'nın varsaydığı ≈ 4.7 değil. "RANDEVU AL" / "MAĞAZADA 1:1 GÖRÜN" buton metni (kâğıt, kırmızı üstünde) WCAG AA'nın 4.5:1 sınırının altındaydı. #C7311D 4.55:1; fark gözle seçilmiyor.
+- **Geri alma:** `tokens.css`, `tokens.ts`.
+
+### K-099 · 2026-09-25 · Klavye: atlama linki ve bölüm linklerinde odak
+
+- **Karar:**
+  - "İçeriğe geç" `#lup-content`'in ilk öğesi, odakta görünür.
+  - Aynı sayfadaki bölüm linkleri (Lenis) kaydırmayla birlikte odağı hedefe taşıyor (gerekirse `tabindex="-1"`, programla odaklanan öğede çerçeve yok).
+  - Mobil menü, bölüme gidildiyse odağı düğmeye geri çekmiyor.
+- **Gerekçe:** §16. Lenis varsayılan kaydırmayı engellediği için tarayıcı odağı taşımıyordu; klavyeyle gelen kişi Nav'da kalıyordu.
+- **Geri alma:** `lib/lenis.tsx`, `NavMenu.tsx`, `layout.tsx`.
+
+### K-100 · 2026-09-25 · SEO ve paylaşım
+
+- **Karar:**
+  - `metadataBase` Vercel ortamından: yayında alan adı, önizlemede dal ya da dağıtım adresi, yerelde localhost.
+  - Paylaşım görseli `opengraph-image.tsx`: kâğıt zemin, kesim izleri, lup dairesinde `lup-detay.jpg`, altta "SÖNMEZ — SİTEDE 10×. MAĞAZADA 1:1." (Geist Mono Medium); derlemede bir kez üretiliyor.
+  - Twitter `summary_large_image`.
+  - Ürün sayfası başlık ve açıklamasını paylaşıma da veriyor, görseli üstten devralıyor.
+  - Ana sayfada `JewelryStore` JSON-LD; ürünlerde `Product` yok.
+  - `icon.svg`: kâğıt kare, 1px daire, artı. Statik dosya CSS değişkeni okuyamıyor; renk değerleri token'larla aynı.
+  - OG görseli için `tokens.ts`'e `COLOR` eklendi.
+- **Gerekçe:** §18. `robots: noindex, nofollow` önceki aşamalardan açık.
+- **Geri alma:** Gerekmez.
+
+### K-101 · 2026-09-25 · Kurşun gri kontrastı (karar bekliyor)
+
+- **Durum:** `--color-lead` (#8A857C) kâğıt üzerinde 3.08:1. §16 ≈ 3.4 varsayıyordu; WCAG AA küçük metin için 4.5:1 istiyor. Lighthouse'ta takılan öğeler:
+  - 9–10px Mono etiketler (ör. "TEMSİLİ GÖRSEL", "ÖLÇEK 1:1 — LEVHA");
+  - Atölye adımlarının 16px açıklamaları.
+
+  Erişilebilirlik puanı yine de 96 (hedef ≥ 95).
+- **Seçenek:** #6E6A62 (4.53:1) AA'yı geçer ama ikincil metni belirgin koyulaştırır. Tasarımcı/kuyumcu kararı; değiştirilmedi.
+
+### K-102 · 2026-09-25 · Yerel Lighthouse ölçümleri ve bütçe
+
+- **Durum** (mobil, benzetimli, yerel üretim derlemesi):
+
+  | Sayfa | Performance | Accessibility |
+  |---|---|---|
+  | Ana sayfa | 79–84 | 96 |
+  | Ürün sayfaları | 83–88 | 96 |
+
+  CLS 0. TBT 300–390 ms. JS ilk yük 205KB aktarım: framework ~133KB, bizim kod ~71KB; bütçe 180KB.
+- **Not:**
+  - Yerelde (`localhost`) JS ilk boyamadan önce çalıştığı için Lighthouse LCP'ye hidrasyonu da katıyor (gözlenen LCP = FCP = 245 ms iken benzetim 3.7 sn). Animasyon kapalıyken de aynı; kodla değil gerçek ağda ölçülmeli (§17: Vercel önizlemesi).
+  - SEO 63: bilinçli `noindex`.
+  - Kalan kaldıraç: GSAP'ı hidrasyondan sonra dinamik yüklemek (~45KB).
+- **Geri alma:** —

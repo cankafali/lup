@@ -73,6 +73,9 @@ function createLoupe(
   let touchActive = false;
   let failed = false;
   let stale = false; // rota değişti, klon henüz yenilenmedi
+  // Dokunmatik birincil cihazda lup yalnızca basılı tutunca açılır: klon ilk dokunuşta kurulur,
+  // açılışta sayfanın ikinci kopyası yerleşim görmesin (§17, K-096)
+  let deferred = window.matchMedia("(pointer: coarse)").matches;
   let hires = false;
   let dirty = true;
   let lastMove = 0;
@@ -159,7 +162,7 @@ function createLoupe(
   let cancelIdle = () => {};
   const scheduleBuild = () =>
     ready.then(() => {
-      if (destroyed) return;
+      if (destroyed || deferred) return;
       cancelIdle();
       cancelIdle = whenIdle(build);
     });
@@ -187,6 +190,11 @@ function createLoupe(
 
   const onPointerMove = (e: PointerEvent) => {
     if (e.pointerType === "touch") return onTouchMove(e);
+    // Dokunmatik cihaza fare bağlandı: ertelenen klonu şimdi kur
+    if (deferred) {
+      deferred = false;
+      scheduleBuild();
+    }
     setMode("mouse");
     target.x = e.clientX;
     target.y = e.clientY;
@@ -236,6 +244,10 @@ function createLoupe(
 
   const onPointerDown = (e: PointerEvent) => {
     if (e.pointerType !== "touch") return;
+    if (deferred) {
+      deferred = false;
+      build();
+    }
     cancelHold();
     holdStart = { x: e.clientX, y: e.clientY };
     holdTimer = window.setTimeout(() => {

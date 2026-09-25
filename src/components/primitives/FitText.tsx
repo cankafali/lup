@@ -11,11 +11,14 @@ type FitTextProps = {
 
 /** Ölçüm için kullanılan sabit boyut (px); yalnızca oran hesabına girer. */
 const PROBE = 100;
+/** Negatif harf aralığının son harften taşmasını dengeleyen sağ boşluk (em); span'deki pr ile aynı. */
+const PAD_EM = 0.05;
 
 /**
  * Metni kapsayıcının genişliğine tam sığdırır (§10.6 wordmark). Sunucuda tahmini boyutla
- * görünür gelir (JS kapalıyken de okunur), boyamadan önce ölçülüp düzeltilir; kapsayıcı
- * genişliği ya da fontlar değişince yeniden ölçülür.
+ * görünür gelir (JS kapalıyken de okunur), boyamadan önce düzeltilir; kapsayıcı genişliği ya da
+ * fontlar değişince yeniden hesaplanır. Doğal genişlik canvas ile ölçülür, kapsayıcı genişliği
+ * ResizeObserver'dan gelir: DOM yerleşimi hiç zorlanmaz (§17, K-096).
  */
 export function FitText({ children, estimate, className }: FitTextProps) {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -25,23 +28,34 @@ export function FitText({ children, estimate, className }: FitTextProps) {
     const box = boxRef.current;
     const text = textRef.current;
     if (!box || !text) return;
-    let lastWidth = -1;
+    const ctx = document.createElement("canvas").getContext("2d");
+    let width = -1;
 
-    const fit = (force = false) => {
-      const target = box.clientWidth;
-      if (!force && target === lastWidth) return;
-      lastWidth = target;
-      text.style.fontSize = `${PROBE}px`;
-      const natural = text.getBoundingClientRect().width;
-      if (natural > 0) text.style.fontSize = `${(PROBE * target) / natural}px`;
+    /** PROBE px'teki genişlik: glifler + harf aralığı + sağ boşluk. */
+    const natural = () => {
+      if (!ctx) return 0;
+      const cs = getComputedStyle(text);
+      const size = parseFloat(cs.fontSize) || PROBE;
+      const spacing = (parseFloat(cs.letterSpacing) || 0) / size;
+      ctx.font = `${cs.fontWeight} ${PROBE}px ${cs.fontFamily}`;
+      const glyphs = ctx.measureText(children).width;
+      return glyphs + spacing * PROBE * [...children].length + PAD_EM * PROBE;
+    };
+    const fit = () => {
+      const n = natural();
+      if (width > 0 && n > 0) text.style.fontSize = `${(PROBE * width) / n}px`;
     };
 
-    fit(true);
-    const ro = new ResizeObserver(() => fit());
+    const ro = new ResizeObserver(([entry]) => {
+      const next = entry?.contentRect.width ?? -1;
+      if (next === width) return;
+      width = next;
+      fit();
+    });
     ro.observe(box);
-    document.fonts?.ready.then(() => fit(true));
+    void document.fonts?.ready.then(fit);
     return () => ro.disconnect();
-  }, []);
+  }, [children]);
 
   return (
     <div ref={boxRef} className={className}>

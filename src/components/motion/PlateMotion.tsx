@@ -1,12 +1,14 @@
 "use client";
 
-import { gsap } from "@/lib/gsap";
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { DURATION, EASE } from "@/lib/tokens";
-import { $, $$, clearDraw, drawDimension, onDone } from "./helpers";
+import { $, $$, clearDraw, drawDimension, onDone, UNDRAWN } from "./helpers";
 import { useMotion } from "./useMotion";
 
 const SHAPES = "path, circle, rect, line, polygon, polyline, ellipse";
-const DRAW = { ease: EASE.gsapDraw, immediateRender: true };
+// Başlangıç hali ölçümsüz yazılır (UNDRAWN); her tween kendi anında başlar ve DrawSVG okumalarını
+// o karede toplu yapar: kurulumda şekil başına zorlanmış yerleşim yok (§17, K-096)
+const DRAW = { ease: EASE.gsapDraw, immediateRender: false };
 
 /** `data-draw` grubundaki (ya da kendisi işaretli) çizim öğeleri. */
 function shapes(svg: Element, kind: string) {
@@ -15,56 +17,101 @@ function shapes(svg: Element, kind: string) {
   );
 }
 
-/** Levha çizimi (§11.2, toplam ≈ 1.8 s): eksenler → dış konturlar → iç detay → ölçüler → etiketler. */
-function drawPlate(tl: gsap.core.Timeline, plate: Element) {
+type PlateParts = {
+  axis: SVGElement[];
+  outline: SVGElement[];
+  detail: SVGElement[];
+  dims: HTMLElement[];
+  dot: HTMLElement | null;
+  lens: HTMLElement | null;
+  guide: SVGElement | null;
+  notes: HTMLElement[];
+};
+
+/**
+ * Çizilecek öğeleri toplar (yalnızca okuma). `box` verilirse (mobil pencere) yalnızca pencereyle
+ * kesişenler: pencerenin dışındaki şekiller için yol uzunluğu ölçülmez (§17, K-096).
+ * Tüm okumalar yazmalardan önce: DrawSVG her şekilde okuyup yazdığı için karışık sıra her
+ * şekilde yeniden stil/yerleşim hesaplatıyordu.
+ */
+function collect(plate: Element, box: DOMRect | null): PlateParts | null {
   const svg = $(plate, "svg");
-  if (!svg) return;
+  if (!svg) return null;
+  const inside = <T extends Element>(el: T) => {
+    if (!box) return true;
+    const r = el.getBoundingClientRect();
+    return r.right > box.left && r.left < box.right && r.bottom > box.top && r.top < box.bottom;
+  };
+  const keep = <T extends Element>(el: T | null) => (el && inside(el) ? el : null);
+  return {
+    axis: shapes(svg, "axis").filter(inside),
+    outline: shapes(svg, "outline").filter(inside),
+    detail: shapes(svg, "detail").filter(inside),
+    dims: $$(plate, "[data-dimension]").filter(inside),
+    dot: keep($(plate, "[data-callout-dot]")),
+    lens: keep($(plate, "[data-lens]")),
+    guide: keep($<SVGElement>(svg, "[data-plate-guide]")),
+    notes: $$(plate, "[data-plate-note], [data-plate-meta]").filter(inside),
+  };
+}
+
+/** Levha çizimi (§11.2, toplam ≈ 1.8 s): eksenler → dış konturlar → iç detay → ölçüler → etiketler. */
+function drawPlate(tl: gsap.core.Timeline, p: PlateParts) {
+  gsap.set([...p.axis, ...p.outline, ...p.detail, p.guide].filter(Boolean), UNDRAWN);
+  gsap.set([p.dot, p.lens, ...p.notes].filter(Boolean), { opacity: 0 });
   tl.fromTo(
-    shapes(svg, "axis"),
+    p.axis,
     { drawSVG: "0%" },
     { drawSVG: "100%", duration: 0.35, stagger: 0.03, ...DRAW },
     0,
   )
     .fromTo(
-      shapes(svg, "outline"),
+      p.outline,
       { drawSVG: "0%" },
       { drawSVG: "100%", duration: 0.5, stagger: 0.05, ...DRAW },
       0.2,
     )
     .fromTo(
-      shapes(svg, "detail"),
+      p.detail,
       { drawSVG: "0%" },
       { drawSVG: "100%", duration: 0.35, stagger: { amount: 0.4 }, ...DRAW },
       0.6,
     );
-  $$(plate, "[data-dimension]").forEach((d, i) => drawDimension(tl, d, 1.0 + i * 0.05, 0.35, 0.6));
-
-  const dot = $(plate, "[data-callout-dot]");
-  const lens = $(plate, "[data-lens]");
-  const guide = $(svg, "[data-plate-guide]");
-  if (dot)
-    tl.fromTo(dot, { scale: 0 }, { scale: 1, duration: DURATION.fast, ease: EASE.gsapLup }, 1.0);
-  if (lens)
+  p.dims.forEach((d, i) => drawDimension(tl, d, 1.0 + i * 0.05, 0.35, 0.6, true));
+  if (p.dot)
     tl.fromTo(
-      lens,
-      { clipPath: "circle(0% at 50% 50%)" },
-      { clipPath: "circle(50% at 50% 50%)", duration: 0.5, ease: EASE.gsapLup },
+      p.dot,
+      { scale: 0, opacity: 1 },
+      { scale: 1, duration: DURATION.fast, ease: EASE.gsapLup, immediateRender: false },
+      1.0,
+    );
+  if (p.lens)
+    tl.fromTo(
+      p.lens,
+      { clipPath: "circle(0% at 50% 50%)", opacity: 1 },
+      {
+        clipPath: "circle(50% at 50% 50%)",
+        duration: 0.5,
+        ease: EASE.gsapLup,
+        immediateRender: false,
+      },
       1.05,
     );
   // Kılavuz: taştan lupa doğru
-  if (guide)
+  if (p.guide)
     tl.fromTo(
-      guide,
+      p.guide,
       { drawSVG: "100% 100%" },
       { drawSVG: "0% 100%", duration: 0.4, ...DRAW },
       1.15,
     );
-  tl.fromTo(
-    $$(plate, "[data-plate-note], [data-plate-meta]"),
-    { opacity: 0 },
-    { opacity: 1, duration: 0.3, ease: "none" },
-    1.5,
-  );
+  if (p.notes.length)
+    tl.fromTo(
+      p.notes,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.3, ease: "none", immediateRender: false },
+      1.5,
+    );
 }
 
 /** Sertifika (§11.3): satırlar sırayla soldan maskeyle (stagger 0.05), damgalar en sonda. */
@@ -95,20 +142,55 @@ function revealCertificate(tl: gsap.core.Timeline, cert: Element, at: number) {
 
 /**
  * Ürün sayfası girişi: levha çizilir, sertifika levhadan 0.4 s sonra gelir.
- * Mobilde levha pencerelere, sertifika baş/gövde parçalarına bölünmüş olabilir (§15); hepsi aynı anda.
+ * Mobilde levha pencerelere bölünür (§15): açılışta ekrandaki pencere girişte, aşağıdakiler
+ * ekrana girince çizilir (o zamana dek gizli). Sertifika gövdesi girişle birlikte.
  */
 export function PlateMotion() {
   const anchor = useMotion((root) => {
-    const certs = $$(root, "[data-certificate]");
+    // Yalnızca görünen levhalar (mobilde masaüstü levhası, masaüstünde pencereler display:none)
+    const plates = $$(root, "[data-plate]").filter((p) => p.getClientRects().length > 0);
+    // İlk boyamada hazır gelen (data-intro-keep: mobil sertifika başlığı) açılmaz
+    const certs = $$(root, "[data-certificate]").filter(
+      (c) => c.getClientRects().length > 0 && !c.closest("[data-intro-keep]"),
+    );
+    const boxes = plates.map((p) => p.closest<HTMLElement>("[data-plate-window]"));
+    const rects = boxes.map((box) => box?.getBoundingClientRect() ?? null);
+    const now = rects.map((r) => !r || r.top < window.innerHeight);
+    // Okumalar önce (collect), yazmalar sonra (drawPlate)
+    const parts = plates.map((plate, i) => (now[i] ? collect(plate, rects[i] ?? null) : null));
+
     const tl = gsap.timeline({
       onComplete: () => {
-        clearDraw(root);
+        plates.forEach((plate, i) => now[i] && clearDraw(plate));
         certs.forEach((c) => gsap.set($$(c, "[style*='clip-path']"), { clearProps: "clipPath" }));
         onDone();
       },
     });
-    $$(root, "[data-plate]").forEach((plate) => drawPlate(tl, plate));
+    parts.forEach((p) => p && drawPlate(tl, p));
     certs.forEach((cert) => revealCertificate(tl, cert, 0.4));
+
+    plates.forEach((plate, i) => {
+      const box = boxes[i];
+      if (now[i] || !box) return;
+      gsap.set(plate, { visibility: "hidden" });
+      ScrollTrigger.create({
+        trigger: box,
+        start: "top 85%",
+        once: true,
+        onEnter: () => {
+          const p = collect(plate, box.getBoundingClientRect());
+          if (!p) return;
+          const t = gsap.timeline({
+            onComplete: () => {
+              clearDraw(plate);
+              onDone();
+            },
+          });
+          drawPlate(t, p);
+          gsap.set(plate, { clearProps: "visibility" });
+        },
+      });
+    });
   });
 
   return <span ref={anchor} hidden />;

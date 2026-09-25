@@ -49,6 +49,11 @@ function onAnchorClick(e: MouseEvent) {
     duration: 1.2,
     force: true,
   });
+  // Klavyeyle gelen de oraya gitsin (§16): sonraki Tab bölümün içinden devam eder
+  if (target instanceof HTMLElement) {
+    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+    target.focus({ preventScroll: true });
+  }
 }
 
 /** Yumuşak kaydırma (§14.1): GSAP ticker'a bağlı, her kaydırmada ScrollTrigger güncellenir. */

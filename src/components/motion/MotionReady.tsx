@@ -22,12 +22,22 @@ export function MotionReady() {
     pageReady(pathname);
   }, [pathname]);
 
+  // ScrollTrigger görseller yüklenince (load) kendisi yeniler; fontlar ondan sonra gelirse bir
+  // kez daha. Her yenileme tüm tetikleyicileri ölçer: gereksizi uzun görev üretiyordu (§17)
   useEffect(() => {
-    const refresh = () => ScrollTrigger.refresh();
-    document.fonts?.ready.then(refresh);
-    if (document.readyState === "complete") refresh();
-    else window.addEventListener("load", refresh, { once: true });
-    return () => window.removeEventListener("load", refresh);
+    let alive = true;
+    const afterLoad = () => {
+      if (document.fonts?.status !== "loading") return;
+      void document.fonts.ready.then(() => {
+        if (alive) ScrollTrigger.refresh();
+      });
+    };
+    if (document.readyState === "complete") afterLoad();
+    else window.addEventListener("load", afterLoad, { once: true });
+    return () => {
+      alive = false;
+      window.removeEventListener("load", afterLoad);
+    };
   }, []);
 
   return null;

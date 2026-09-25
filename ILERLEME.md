@@ -10,7 +10,7 @@
 | 5 — Animasyonlar | 2026-09-24 | 2026-09-24 | Tamam |
 | 6 — Mobil ve tablet | 2026-09-24 | 2026-09-24 | Tamam |
 | 7 — Kalan çizim tipleri ve cilalar | 2026-09-25 | 2026-09-25 | Tamam |
-| 8 — Erişilebilirlik, performans, SEO, deploy | — | — | — |
+| 8 — Erişilebilirlik, performans, SEO, deploy | 2026-09-25 | — | Sürüyor (yayın bekliyor) |
 
 ---
 
@@ -282,4 +282,55 @@
   - Lighthouse.
 - Yeni görünüşlerin ölçüleri temsili (K-086): gerçek parçalar ölçülünce `products.ts` güncellenmeli.
 - Kroki için dükkânın gerçek konumu gerekiyor (K-094).
+- Figma karşılaştırması: Figma MCP kotası açılınca.
+
+## Aşama 8 — Erişilebilirlik, performans, SEO, deploy
+
+**Yapılanlar**
+
+- Erişilebilirlik (§16, K-099):
+  - "İçeriğe geç";
+  - bölüm linklerinde odak;
+  - buton kırmızısı AA (K-098).
+- Performans (§17):
+  - hero girişinin LCP'ye giren kısmı CSS'le (K-095);
+  - açılış iş yükü (K-096);
+  - mobil LCP öğeleri (K-097).
+- SEO (§18, K-100):
+  - `metadataBase`, paylaşım görseli, Twitter kartı;
+  - ürün sayfası paylaşım etiketleri;
+  - `JewelryStore` JSON-LD;
+  - favicon;
+  - `noindex, nofollow` açık.
+
+**Kabul** (yerel üretim derlemesi, mobil Lighthouse 12 benzetimli + CDP denetimleri)
+
+- [x] Accessibility 96 (hedef ≥ 95); tek takılan denetim kurşun gri kontrastı (K-101, karar bekliyor).
+- [ ] Performance ≥ 90 yerelde tutmuyor: ana sayfa 79–84, ürün 83–88 (K-102). Vercel önizlemesinde ölçülecek.
+- [x] CLS 0.
+- [x] Yapı:
+  - `lang="tr"`, header > nav, tek main, footer;
+  - tek H1, bölüm başlıkları H2;
+  - adsız link/buton ve alt metinsiz görsel yok;
+  - dekoratif SVG'ler gizli;
+  - lup `aria-hidden`, klon `inert`.
+- [x] Klavye:
+  - ilk Tab "İçeriğe geç" (görünür çerçeve), Enter ile odak ana içerikte;
+  - Nav bölüm linki kaydırıp odağı bölüme taşıyor.
+- [x] Hareket regresyonu:
+  - hızlı kaydırmada tüm girişler, pin konumu, reduced motion;
+  - sayfa geçişleri, şerit, mobil menü;
+  - levha çizimi (mobil pencereler ekrana girince).
+- [x] §20 taraması:
+  - gölge, gradyan zemin, koyu zemin, altın rengi, yuvarlak kart köşesi yok;
+  - fiyat ve satış dili, yer tutucu, TODO yok;
+  - `noindex` açık.
+- [ ] Vercel'e yayın ve önizleme linki: izin bekliyor.
+- [ ] Gerçek cihaz testi (hero, basılı tutunca lup, WhatsApp): yayından sonra.
+
+**Açık kalanlar**
+
+- Yayın: Vercel hesabıyla giriş kullanıcı tarafından yapılmalı.
+- Kurşun gri kararı (K-101).
+- JS bütçesi 205KB / 180KB: GSAP'ı hidrasyondan sonra yüklemek (K-102).
 - Figma karşılaştırması: Figma MCP kotası açılınca.

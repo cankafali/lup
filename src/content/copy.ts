@@ -18,6 +18,8 @@ export const nav = {
   brand: upper(site.brand),
   brandSub: `KUYUMCULUK — ${site.founded}`,
   label: "Ana menü",
+  /** Klavye için ilk link (§16) */
+  skip: "İçeriğe geç",
   // Ürün sayfasından da çalışsın diye kök yolla.
   links: [
     { no: "01", label: "VİTRİN", title: "Vitrin", href: "/#vitrin" },
@@ -219,4 +221,10 @@ export const certificate = {
     "Sipariş üzerine": `SİPARİŞ ÜZERİNE · ${upper(site.address.area)}`,
   },
   note: "GÖRSELLER VE DEĞERLER TEMSİLİDİR. PARÇANIN KENDİSİ MAĞAZADADIR.",
+};
+
+/** Paylaşım görseli (§18). */
+export const og = {
+  line: `${upper(site.brand)} — ${upper(site.tagline)}`,
+  alt: `${site.brandFull}: lup dairesi içinde pırlantanın makro görüntüsü, altında "${site.tagline}"`,
 };
