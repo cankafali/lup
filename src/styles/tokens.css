@@ -4,7 +4,9 @@
   /* Renk */
   --color-paper: #efebe3;
   --color-graphite: #161514;
-  --color-lead: #8a857c;
+  /* Kurşun gri ikiye ayrıldı (K-101): metin kâğıtla 4.53:1 (AA); çizim şartnamedeki ton */
+  --color-lead: #6e6a62; /* metin: etiket, veri satırı, açıklama */
+  --color-lead-line: #8a857c; /* metin olmayan: uzatma çizgisi, eksen, ikon */
   --color-stamp: #c7311d; /* şartname #C8321E; kâğıtla 4.49 → 4.55:1, AA (K-098) */
   --color-line: rgb(22 21 20 / 0.2);
   --color-line-strong: rgb(22 21 20 / 0.35);

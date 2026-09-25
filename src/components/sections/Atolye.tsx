@@ -5,7 +5,7 @@ import { Callout } from "@/components/primitives/Callout";
 import { Headline, type HeadlineLine } from "@/components/primitives/Headline";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { PhotoOverlay } from "@/components/primitives/PhotoOverlay";
-import { AtolyeMotion } from "@/components/motion/AtolyeMotion";
+import { AtolyeMotion } from "@/components/motion/lazy";
 import type { Pt, Side, ViewBox } from "@/lib/overlay";
 
 // Bindirme koordinatları atolye.jpg'nin piksel uzayında (§10.4).

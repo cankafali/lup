@@ -15,6 +15,7 @@ import {
   type SyncPair,
 } from "./cloneContent";
 import { markHintSeen } from "./hint";
+import { setLoupeRefresh } from "./refresh";
 
 /** Üzerindeyken sistem imleci geri gelir, lup dış halkaya küçülür (§9.4). */
 const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, summary, label';
@@ -28,11 +29,8 @@ const RESIZE_MS = 150; // §9.5
 type State = "off" | "idle" | "active";
 type Mode = "mouse" | "touch";
 
-/** Klonu tazeleme isteği (§9.5): animasyon bitişleri, saat, ölçüm sonrası. */
-let requestRefresh: () => void = () => {};
-export function refreshLoupe() {
-  requestRefresh();
-}
+// Tazeleme isteği (refreshLoupe) loupe/refresh.ts'te; bu örnek işleyicisini kaydeder
+export { refreshLoupe } from "./refresh";
 
 function debounce(fn: () => void, ms: number) {
   let t: number | undefined;
@@ -360,7 +358,7 @@ function createLoupe(
   doc.classList.add("has-loupe");
   measureMargins();
   resizeObserver.observe(source);
-  requestRefresh = refresh;
+  setLoupeRefresh(refresh);
   gsap.ticker.add(tick);
 
   window.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -385,7 +383,7 @@ function createLoupe(
       onResize.cancel();
       resizeObserver.disconnect();
       gsap.ticker.remove(tick);
-      requestRefresh = () => {};
+      setLoupeRefresh(() => {});
       doc.classList.remove("has-loupe");
       delete doc.dataset.loupeTouch;
       window.removeEventListener("pointermove", onPointerMove);

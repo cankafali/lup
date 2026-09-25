@@ -5,7 +5,7 @@ import { DimensionLine } from "@/components/primitives/DimensionLine";
 import { Headline, type HeadlineLine } from "@/components/primitives/Headline";
 import { Lens } from "@/components/primitives/Lens";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
-import { MakroMotion } from "@/components/motion/MakroMotion";
+import { MakroMotion } from "@/components/motion/lazy";
 import { pct, type Pt, type ViewBox } from "@/lib/overlay";
 
 /** Bölüm koordinat uzayı (§10.3): 1440×900 tuval; genişliğe göre ölçeklenir, 1440'ta birebir. */

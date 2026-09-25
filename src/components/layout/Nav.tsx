@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { nav } from "@/content/copy";
-import { NavMotion } from "@/components/motion/NavMotion";
+import { NavMotion } from "@/components/motion/lazy";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { NavMenu } from "./NavMenu";
 

@@ -2,7 +2,10 @@
 
 import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
+// Bölüm animasyonlarının scrollTrigger ayarları için (yalnızca motion/lazy paketinde)
+import "@/lib/scroll";
 import { DESKTOP, MOTION, WIDE } from "./helpers";
+import { isFirstLoad } from "./intro";
 
 /** desktop: ≥ 768 (tablet dahil) · wide: ≥ 1024 */
 type Conditions = { motion: boolean; desktop: boolean; wide: boolean };
@@ -46,7 +49,7 @@ export function useMotion(setup: Setup, { defer = false }: Options = {}) {
     };
     // Yalnızca ilk yüklemede ve çapasız adreste: sayfa içi gezinmede (ör. /#vitrin) bölüm hemen
     // görünür olabilir; kurulum gecikirse içerik bir an görünüp gizlenirdi
-    const later = defer && document.readyState !== "complete" && !location.hash;
+    const later = defer && isFirstLoad() && !location.hash;
     const cancel = later ? whenIdle(run) : (run(), undefined);
     return () => {
       cancel?.();

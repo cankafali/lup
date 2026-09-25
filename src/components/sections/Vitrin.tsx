@@ -4,7 +4,7 @@ import { PlateFrame } from "@/components/layout/PlateFrame";
 import { Button } from "@/components/primitives/Button";
 import { Headline, type HeadlineLine } from "@/components/primitives/Headline";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
-import { VitrinMotion } from "@/components/motion/VitrinMotion";
+import { VitrinMotion } from "@/components/motion/lazy";
 import { TrayCell } from "./TrayCell";
 
 /** İkinci satır 3. kolondan (mobilde 2.) başlar ve 34px bindirir. */

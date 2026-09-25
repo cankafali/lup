@@ -1,8 +1,10 @@
 "use client";
 
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
+import { ScrollTrigger } from "@/lib/scroll";
 import { DURATION, EASE } from "@/lib/tokens";
 import { $, $$, clearDraw, drawDimension, onDone, UNDRAWN } from "./helpers";
+import { introReady } from "./intro";
 import { useMotion } from "./useMotion";
 
 const SHAPES = "path, circle, rect, line, polygon, polyline, ellipse";
@@ -191,6 +193,8 @@ export function PlateMotion() {
         },
       });
     });
+    // Başlangıç durumları kuruldu: giriş gizlemesi kalkabilir (K-103)
+    introReady();
   });
 
   return <span ref={anchor} hidden />;

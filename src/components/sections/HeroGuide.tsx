@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { refreshLoupe } from "@/components/loupe/useLoupe";
+import { refreshLoupe } from "@/components/loupe/refresh";
 import { MOTION, onDone } from "@/components/motion/helpers";
 import { introTime } from "@/components/motion/intro";
 import { gsap, useGSAP } from "@/lib/gsap";
+// DrawSVG kaydı (bu bileşen motion/lazy paketinde)
+import "@/lib/scroll";
 import { coverPoint, type CoverFit, type Pt } from "@/lib/overlay";
 import { DURATION, EASE } from "@/lib/tokens";
 

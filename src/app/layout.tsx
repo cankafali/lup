@@ -5,7 +5,7 @@ import { Instrument_Serif } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { GridLines } from "@/components/layout/GridLines";
 import { Nav } from "@/components/layout/Nav";
-import { Loupe } from "@/components/loupe/Loupe";
+import { Loupe } from "@/components/loupe/lazy";
 import { INTRO_SCRIPT } from "@/components/motion/introScript";
 import { MotionReady } from "@/components/motion/MotionReady";
 import { nav } from "@/content/copy";

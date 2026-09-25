@@ -9,8 +9,8 @@ import { Lens } from "@/components/primitives/Lens";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { PhotoOverlay } from "@/components/primitives/PhotoOverlay";
 import { pct, type Pt, type ViewBox } from "@/lib/overlay";
-import { HeroMotion } from "@/components/motion/HeroMotion";
-import { HeroGuide } from "./HeroGuide";
+import { HeroMotion } from "@/components/motion/lazy";
+import { HeroGuide } from "@/components/motion/lazy";
 
 // Bindirme koordinatları hero-tektas.jpg'nin piksel uzayında (§10.1).
 const IMG: ViewBox = [hero.image.w, hero.image.h];

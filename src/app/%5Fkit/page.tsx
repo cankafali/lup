@@ -22,7 +22,8 @@ const CELL: readonly [number, number] = [440, 550];
 const COLORS = [
   ["paper", "bg-paper", "#EFEBE3"],
   ["graphite", "bg-graphite", "#161514"],
-  ["lead", "bg-lead", "#8A857C"],
+  ["lead", "bg-lead", "#6E6A62 · metin"],
+  ["lead-line", "bg-lead-line", "#8A857C · çizim"],
   ["stamp", "bg-stamp", "#C7311D"],
   ["line", "bg-line", "graphite %20"],
   ["line-strong", "bg-line-strong", "graphite %35"],

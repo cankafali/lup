@@ -2,7 +2,6 @@
 
 import Lenis from "lenis";
 import { createContext, useContext, useEffect, useSyncExternalStore } from "react";
-import { gsap, ScrollTrigger } from "./gsap";
 
 // Lenis örneği modül düzeyinde tutulur; bileşenler useLenis ile okur (efekt içinde setState yok).
 let instance: Lenis | null = null;
@@ -56,7 +55,7 @@ function onAnchorClick(e: MouseEvent) {
   }
 }
 
-/** Yumuşak kaydırma (§14.1): GSAP ticker'a bağlı, her kaydırmada ScrollTrigger güncellenir. */
+/** Yumuşak kaydırma (§14.1): GSAP ticker'a bağlı (yüklenene dek kendi karesinde), her kaydırmada ScrollTrigger güncellenir. */
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const lenis = useSyncExternalStore(
     subscribe,
@@ -67,15 +66,31 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const l = new Lenis({ duration: reduce ? 0 : 1.1, smoothWheel: !reduce, syncTouch: false });
-    l.on("scroll", ScrollTrigger.update);
-    const tick = (t: number) => l.raf(t * 1000);
-    gsap.ticker.add(tick);
-    gsap.ticker.lagSmoothing(0);
+    // GSAP ve ScrollTrigger hidrasyondan sonra ayrı pakette gelir (K-103). O zamana dek Lenis kendi
+    // karesinde; gelince GSAP ticker'ında, ScrollTrigger ile aynı saatte (§14.1)
+    let alive = true;
+    let raf = requestAnimationFrame(function loop(t) {
+      l.raf(t);
+      raf = requestAnimationFrame(loop);
+    });
+    let detach = () => cancelAnimationFrame(raf);
+    void Promise.all([import("./gsap"), import("./scroll")]).then(
+      ([{ gsap }, { ScrollTrigger }]) => {
+        if (!alive) return;
+        cancelAnimationFrame(raf);
+        const tick = (t: number) => l.raf(t * 1000);
+        gsap.ticker.add(tick);
+        gsap.ticker.lagSmoothing(0);
+        l.on("scroll", ScrollTrigger.update);
+        detach = () => gsap.ticker.remove(tick);
+      },
+    );
     window.addEventListener("click", onAnchorClick, { capture: true });
     setInstance(l);
     return () => {
+      alive = false;
       window.removeEventListener("click", onAnchorClick, { capture: true });
-      gsap.ticker.remove(tick);
+      detach();
       l.destroy();
       setInstance(null);
     };

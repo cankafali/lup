@@ -1,6 +1,7 @@
 "use client";
 
-import { gsap, ScrollTrigger } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
+import { ScrollTrigger } from "@/lib/scroll";
 import { DURATION, EASE } from "@/lib/tokens";
 import { useMotion } from "./useMotion";
 

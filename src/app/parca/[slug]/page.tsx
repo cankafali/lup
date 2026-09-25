@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { productPage } from "@/content/copy";
 import { getProduct, products } from "@/content/products";
-import { PlateMotion } from "@/components/motion/PlateMotion";
+import { PlateMotion } from "@/components/motion/lazy";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { Certificate, CertificateCta } from "@/components/product/Certificate";
 import { TitleBlock } from "@/components/product/drawings/TitleBlock";

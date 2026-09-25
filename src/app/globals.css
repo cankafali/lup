@@ -124,6 +124,21 @@
   }
 }
 
+/* Durum noktası nabzı (§10.5, §11.3): açıkken / vitrindeyken; reduced motion'da sabit (K-103). */
+@layer components {
+  [data-status-dot][data-open] {
+    animation: pulse-dot 1.6s ease-in-out infinite alternate;
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+  @keyframes pulse-dot {
+    to {
+      opacity: 0.35;
+    }
+  }
+}
+
 /* Lup (§9.1). Durumlar: off (görünmez) · idle (yalnızca dış halka) · active. */
 @layer components {
   .loupe {

@@ -730,27 +730,51 @@
 - **Gerekçe:** §18. `robots: noindex, nofollow` önceki aşamalardan açık.
 - **Geri alma:** Gerekmez.
 
-### K-101 · 2026-09-25 · Kurşun gri kontrastı (karar bekliyor)
+### K-101 · 2026-09-25 · Kurşun gri kontrastı
 
 - **Durum:** `--color-lead` (#8A857C) kâğıt üzerinde 3.08:1. §16 ≈ 3.4 varsayıyordu; WCAG AA küçük metin için 4.5:1 istiyor. Lighthouse'ta takılan öğeler:
   - 9–10px Mono etiketler (ör. "TEMSİLİ GÖRSEL", "ÖLÇEK 1:1 — LEVHA");
   - Atölye adımlarının 16px açıklamaları.
 
   Erişilebilirlik puanı yine de 96 (hedef ≥ 95).
-- **Seçenek:** #6E6A62 (4.53:1) AA'yı geçer ama ikincil metni belirgin koyulaştırır. Tasarımcı/kuyumcu kararı; değiştirilmedi.
+- **Seçenek:** #6E6A62 (4.53:1) AA'yı geçer ama ikincil metni belirgin koyulaştırır.
+- **Karar (2026-09-25, kullanıcı):** Token ikiye ayrıldı:
+  - `--color-lead` #6E6A62 metinde (etiket, veri satırı, açıklama; kâğıtla 4.53:1);
+  - `--color-lead-line` #8A857C metin olmayan öğelerde (uzatma çizgisi, eksen, ikon).
+
+  Bugünkü eksen ve uzatma çizgileri §8.3–8.4'teki gibi grafitin %45/%35 opaklığıyla çiziliyor (kâğıtta bu tona yakın), onlar değişmedi. Accessibility 100.
+- **Geri alma:** `tokens.css`, `tokens.ts`.
 
 ### K-102 · 2026-09-25 · Yerel Lighthouse ölçümleri ve bütçe
 
-- **Durum** (mobil, benzetimli, yerel üretim derlemesi):
+- **Durum** (mobil, benzetimli, yerel üretim derlemesi; K-103 sonrası, 3 koşu):
 
   | Sayfa | Performance | Accessibility |
   |---|---|---|
-  | Ana sayfa | 79–84 | 96 |
-  | Ürün sayfaları | 83–88 | 96 |
+  | Ana sayfa | 81 / 90 / 90 | 100 |
+  | Tektaş | 90 / 89 / 81 | 100 |
+  | Telkari | 79–83 | 100 |
 
-  CLS 0. TBT 300–390 ms. JS ilk yük 205KB aktarım: framework ~133KB, bizim kod ~71KB; bütçe 180KB.
+  CLS 0. TBT 50–410 ms: tembel animasyon paketi ölçüm penceresine denk gelirse yükseliyor. JS ilk yük 152KB gzip (bütçe 180KB, önce ~200KB).
 - **Not:**
-  - Yerelde (`localhost`) JS ilk boyamadan önce çalıştığı için Lighthouse LCP'ye hidrasyonu da katıyor (gözlenen LCP = FCP = 245 ms iken benzetim 3.7 sn). Animasyon kapalıyken de aynı; kodla değil gerçek ağda ölçülmeli (§17: Vercel önizlemesi).
+  - Yerelde (`localhost`) JS ilk boyamadan önce çalıştığı için Lighthouse LCP'ye hidrasyonu da katıyor (gözlenen LCP = FCP ≈ 250 ms iken benzetim 3.4–3.8 sn). Animasyon kapalıyken de aynı; kodla değil gerçek ağda ölçülmeli (§17: Vercel önizlemesi).
   - SEO 63: bilinçli `noindex`.
-  - Kalan kaldıraç: GSAP'ı hidrasyondan sonra dinamik yüklemek (~45KB).
 - **Geri alma:** —
+
+### K-103 · 2026-09-25 · Animasyon ve lup kodu hidrasyondan sonra
+
+- **Karar:**
+  - Hidrasyondan sonra ayrı pakette (`next/dynamic`, `ssr: false`) gelenler:
+    - bölüm animasyonları (`motion/lazy`: Hero, Nav, Vitrin, 10×, Atölye, Mağaza, levha);
+    - hero kılavuz çizgisi;
+    - imleç lupu (`loupe/lazy`);
+    - GSAP çekirdeği, ScrollTrigger ve DrawSVG (`lib/gsap`, `lib/scroll`).
+  - Lenis GSAP gelene dek kendi `requestAnimationFrame` döngüsünde; gelince GSAP ticker'ına geçip ScrollTrigger'a bağlanıyor (aynı saat, §14.1).
+  - `refreshLoupe` küçük bir modülde (`loupe/refresh`); çağıranlar lup kodunu ilk yüke çekmiyor.
+  - Durum noktası nabzı GSAP yerine CSS animasyonu (aynı tanım: 1 → 0.35, 1.6 sn, gidip gelen; reduced motion'da sabit).
+  - Giriş gizlemesi (K-064):
+    - sahibi (HeroMotion/PlateMotion) başlangıç durumlarını kurunca `introReady()` ile kalkıyor;
+    - sayfa içi gezinmede yeniden açılıyor, sahip aynı commit'te hazırsa açılmıyor;
+    - 3 sn güvenlik zamanlayıcısı var.
+- **Gerekçe:** §17 "sayfa başına ilk yük ≤ 180 KB gzip". Ölçüm: ana sayfa 185KB (ScrollTrigger çıkınca) → 180KB (lup ve kılavuz çizgi çıkınca, bütçenin 86 bayt üstü) → 152KB (GSAP çekirdeği çıkınca). Test: hero bindirmeleri ilk `anim-ready` karesinde zaten başlangıç halinde (bir an görünüp kaybolma yok). Hareket, geçiş, şerit, menü, klavye ve lup testleri (masaüstü ve dokunmatik) yeniden geçti.
+- **Geri alma:** Bölümlerde `motion/lazy` yerine doğrudan içe aktarma; `lib/gsap`'a ScrollTrigger ve DrawSVG kaydı.

@@ -10,7 +10,7 @@
 | 5 — Animasyonlar | 2026-09-24 | 2026-09-24 | Tamam |
 | 6 — Mobil ve tablet | 2026-09-24 | 2026-09-24 | Tamam |
 | 7 — Kalan çizim tipleri ve cilalar | 2026-09-25 | 2026-09-25 | Tamam |
-| 8 — Erişilebilirlik, performans, SEO, deploy | 2026-09-25 | — | Sürüyor (yayın bekliyor) |
+| 8 — Erişilebilirlik, performans, SEO, deploy | 2026-09-25 | — | Kod tamam; yayın ve önizleme ölçümü kullanıcıda |
 
 ---
 
@@ -288,14 +288,15 @@
 
 **Yapılanlar**
 
-- Erişilebilirlik (§16, K-099):
-  - "İçeriğe geç";
-  - bölüm linklerinde odak;
-  - buton kırmızısı AA (K-098).
+- Erişilebilirlik (§16):
+  - "İçeriğe geç", bölüm linklerinde odak (K-099);
+  - buton kırmızısı AA (K-098);
+  - kurşun gri metin/çizim ayrımı (K-101).
 - Performans (§17):
   - hero girişinin LCP'ye giren kısmı CSS'le (K-095);
   - açılış iş yükü (K-096);
-  - mobil LCP öğeleri (K-097).
+  - mobil LCP öğeleri (K-097);
+  - animasyon ve lup kodu hidrasyondan sonra (K-103).
 - SEO (§18, K-100):
   - `metadataBase`, paylaşım görseli, Twitter kartı;
   - ürün sayfası paylaşım etiketleri;
@@ -305,9 +306,10 @@
 
 **Kabul** (yerel üretim derlemesi, mobil Lighthouse 12 benzetimli + CDP denetimleri)
 
-- [x] Accessibility 96 (hedef ≥ 95); tek takılan denetim kurşun gri kontrastı (K-101, karar bekliyor).
-- [ ] Performance ≥ 90 yerelde tutmuyor: ana sayfa 79–84, ürün 83–88 (K-102). Vercel önizlemesinde ölçülecek.
+- [x] Accessibility 100 (hedef ≥ 95).
+- [x] JS ilk yük 152KB gzip (bütçe ≤ 180KB).
 - [x] CLS 0.
+- [ ] Performance ≥ 90: yerelde 79–90 (K-102). LCP yerelde ölçülemiyor (`localhost` yan etkisi); Vercel önizlemesinde ölçülecek.
 - [x] Yapı:
   - `lang="tr"`, header > nav, tek main, footer;
   - tek H1, bölüm başlıkları H2;
@@ -317,20 +319,32 @@
 - [x] Klavye:
   - ilk Tab "İçeriğe geç" (görünür çerçeve), Enter ile odak ana içerikte;
   - Nav bölüm linki kaydırıp odağı bölüme taşıyor.
-- [x] Hareket regresyonu:
+- [x] Regresyon (K-103 sonrası):
   - hızlı kaydırmada tüm girişler, pin konumu, reduced motion;
-  - sayfa geçişleri, şerit, mobil menü;
-  - levha çizimi (mobil pencereler ekrana girince).
+  - hero bindirmelerinde bir an görünüp kaybolma yok;
+  - sayfa geçişleri (View Transition, şerit, desteksiz tarayıcı);
+  - şerit sürükleme, mobil menü, dokunma hedefleri;
+  - lup (masaüstü, dokunmatik basılı tutma, yapışkan aynalama);
+  - levha pencereleri.
 - [x] §20 taraması:
   - gölge, gradyan zemin, koyu zemin, altın rengi, yuvarlak kart köşesi yok;
   - fiyat ve satış dili, yer tutucu, TODO yok;
   - `noindex` açık.
-- [ ] Vercel'e yayın ve önizleme linki: izin bekliyor.
-- [ ] Gerçek cihaz testi (hero, basılı tutunca lup, WhatsApp): yayından sonra.
+- [ ] Vercel'e yayın ve önizleme linki: kullanıcı elle yapacak (aşağıda).
+- [ ] Vercel önizlemesinde mobil Lighthouse (Performance ≥ 90).
+- [ ] Gerçek cihaz testi: hero yükleniyor, basılı tutunca lup açılıyor, WhatsApp butonu uygulamayı açıyor.
+
+**Yayın (elle)**
+
+1. `npx vercel login`: hesapla giriş.
+2. Proje klasöründe `npx vercel`: önizleme dağıtımı. İlk seferde proje bağlanır; çerçeve Next.js, ayarlar varsayılan.
+3. Verilen önizleme adresini bu dosyaya yaz.
+4. Önizlemede ölçüm: [PageSpeed Insights](https://pagespeed.web.dev/) (mobil) ya da `npx lighthouse <adres> --form-factor=mobile`.
+   - Vercel önizlemeleri varsayılan olarak "Vercel Authentication" ile korunur. PageSpeed için proje ayarlarında Deployment Protection'ı önizleme süresince kapatmak ya da paylaşılabilir bağlantı kullanmak gerekebilir.
+   - Site `noindex, nofollow` olduğundan arama motorlarına girmez.
 
 **Açık kalanlar**
 
-- Yayın: Vercel hesabıyla giriş kullanıcı tarafından yapılmalı.
-- Kurşun gri kararı (K-101).
-- JS bütçesi 205KB / 180KB: GSAP'ı hidrasyondan sonra yüklemek (K-102).
-- Figma karşılaştırması: Figma MCP kotası açılınca.
+- Yayın ve önizleme ölçümü (yukarıda).
+- Figma karşılaştırması: Figma MCP Starter planın çağrı sınırında. Plan yükseltilirse ya da iki çerçeve (node 12-2 ve 6-305) PNG olarak dışa aktarılırsa yapılabilir.
+- Yeni görünüşlerin ölçüleri temsili (K-086) ve dükkân konumu (kroki, K-094): kuyumcudan bilgi gelince.

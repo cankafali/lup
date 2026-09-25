@@ -35,7 +35,10 @@ export const CANVAS_REF = 1440;
 export const COLOR = {
   paper: "#efebe3",
   graphite: "#161514",
-  lead: "#8a857c",
+  /** Metin (K-101) */
+  lead: "#6e6a62",
+  /** Metin olmayan çizim öğeleri */
+  leadLine: "#8a857c",
   stamp: "#c7311d",
   /** Lup dış halkası: graphite %25 (§8.7) */
   ring: "rgba(22, 21, 20, 0.25)",

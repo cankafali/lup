@@ -3,7 +3,7 @@
 import { gsap } from "@/lib/gsap";
 import { DURATION, EASE } from "@/lib/tokens";
 import { $, $$, clearDraw, drawCallout, drawDimension, onDone, syncWithLoupe } from "./helpers";
-import { introTime } from "./intro";
+import { introReady, introTime } from "./intro";
 import { useMotion } from "./useMotion";
 
 /**
@@ -65,6 +65,8 @@ export function HeroMotion() {
       ease: "none",
       scrollTrigger: { trigger: root, start: "top top", end: "bottom top", scrub: true },
     });
+    // Başlangıç durumları kuruldu: giriş gizlemesi kalkabilir (K-103)
+    introReady();
   });
 
   return <span ref={anchor} hidden />;

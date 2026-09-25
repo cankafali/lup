@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
-import { refreshLoupe } from "@/components/loupe/useLoupe";
+import { refreshLoupe } from "@/components/loupe/refresh";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { PulseDot } from "@/components/primitives/PulseDot";
 import { getOpenStatus } from "@/lib/openStatus";

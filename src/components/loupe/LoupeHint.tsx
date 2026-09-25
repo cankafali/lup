@@ -4,7 +4,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import clsx from "clsx";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { hintSeen, subscribeHint } from "./hint";
-import { refreshLoupe } from "./useLoupe";
+import { refreshLoupe } from "./refresh";
 
 /**
  * Dokunmatik cihazlarda ilk ziyaret ipucu (§9.6). Lup bir kez açılınca bir daha gösterilmez.

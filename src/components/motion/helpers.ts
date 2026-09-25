@@ -1,6 +1,6 @@
 "use client";
 
-import { refreshLoupe } from "@/components/loupe/useLoupe";
+import { refreshLoupe } from "@/components/loupe/refresh";
 import { gsap } from "@/lib/gsap";
 import { DURATION, EASE } from "@/lib/tokens";
 

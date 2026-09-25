@@ -5,7 +5,7 @@ import { PlateFrame } from "@/components/layout/PlateFrame";
 import { Button } from "@/components/primitives/Button";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { RingFront } from "@/components/product/drawings/RingFront";
-import { MagazaMotion } from "@/components/motion/MagazaMotion";
+import { MagazaMotion } from "@/components/motion/lazy";
 import { waLink } from "@/lib/whatsapp";
 import { OpenStatus } from "./OpenStatus";
 
