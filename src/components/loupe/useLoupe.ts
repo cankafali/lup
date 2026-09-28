@@ -279,14 +279,20 @@ function createLoupe(
   const blockScroll = (e: TouchEvent) => e.preventDefault();
 
   const onTouchDown = (e: PointerEvent) => {
+    // İlk dokunuş klonu boşta kurdurur; dokunuşun kendisi (link, menü) beklemez (INP, inceleme 2.2)
     if (deferred) {
       deferred = false;
-      build();
+      scheduleBuild();
     }
     cancelHold();
     holdStart = { x: e.clientX, y: e.clientY };
     holdTimer = window.setTimeout(() => {
       if (!holdStart) return;
+      // Boşta kurulum daha çalışmadıysa şimdi: basılı tutmada kısa bekleme dokunuşa yansımaz
+      if (!clone && !failed) {
+        cancelIdle();
+        build();
+      }
       setMode("touch");
       touchActive = true;
       // Yalnızca lup açıkken: pasif olmayan dinleyici kaydırmayı ana iş parçacığına bağlar (inceleme 2.1)
