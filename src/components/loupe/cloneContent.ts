@@ -18,12 +18,15 @@ export type StickyClone = {
  * `#lup-content`'in lup için temizlenmiş kopyası (§9.2 adım 3):
  * id'ler silinir, odaklanabilir öğeler sekme sırasından çıkar, tüm klon `inert`,
  * `data-loupe-hide` öğeleri silinir, zemindeki sabit grid çizgileri mutlak konuma geçer.
+ * Betikler (JSON-LD ikinci kez görünmesin) ve yalnızca ekran okuyucuya yönelik metinler de silinir.
  */
 export function cloneContent(source: HTMLElement): HTMLElement {
   const clone = source.cloneNode(true) as HTMLElement;
   clone.removeAttribute("id");
   clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
   clone.querySelectorAll("[data-loupe-hide]").forEach((el) => el.remove());
+  // Klonda işlevsiz: yapısal veri iki kez görünmesin, görünmez metinler DOM'u büyütmesin (inceleme 3.4)
+  clone.querySelectorAll("script, noscript, template, .sr-only").forEach((el) => el.remove());
   clone.querySelectorAll<HTMLElement>(FOCUSABLE).forEach((el) => el.setAttribute("tabindex", "-1"));
   clone.inert = true;
   clone.querySelectorAll<HTMLElement>("[data-grid-lines]").forEach((el) => {
