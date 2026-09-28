@@ -84,7 +84,6 @@ export default function OpengraphImage() {
             overflow: "hidden",
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse düz <img> ister */}
           <img
             src={photoSrc}
             alt=""
