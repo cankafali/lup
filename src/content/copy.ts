@@ -2,7 +2,8 @@ import { getProduct } from "./products";
 import { site, YEAR } from "./site";
 
 // Bölüm metinleri (§12.4). Mono etiketler büyük harfle yazılır; birimler küçük kalır (K-014).
-// Buton metinlerine ok (→) yazılmaz; Button bileşeni ekler (K-022).
+// Buton metinlerine ok (→) yazılmaz; Button bileşeni ekler (K-022). Diğer linklerde ok ayrı alanda
+// (`arrow`), ekran okuyucuda "sağ ok" diye okunmasın diye aria-hidden verilir (inceleme 4.5).
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 const upper = (s: string) => s.toLocaleUpperCase("tr-TR");
@@ -33,7 +34,7 @@ export const nav = {
     { no: "02", label: "ATÖLYE", title: "Atölye", href: "/#atolye" },
     { no: "03", label: "MAĞAZA", title: "Mağaza", href: "/#magaza" },
   ],
-  cta: { label: "RANDEVU →", href: "/#magaza" },
+  cta: { label: "RANDEVU", arrow: "→", href: "/#magaza" },
   /** Mobil menü (§8.9) */
   menu: "MENÜ",
   close: "KAPAT",
@@ -67,7 +68,7 @@ export const hero = {
     mouse: "SOL TIKA 2 SN BASILI TUTUN —\nLUP AÇILIR. BIRAKINCA KAPANIR.",
     touch: "BİR PARÇAYA BASILI TUTUN —\nLUP AÇILIR.",
   },
-  down: { label: "↓  TEZGÂHA İN", href: "#vitrin" },
+  down: { arrow: "↓", label: "TEZGÂHA İN", href: "#vitrin" },
   lens: {
     mark: "10×",
     /** Örnek lup notunun ilk satırı, cihaza göre (K-106) */
@@ -209,13 +210,13 @@ export const footer = {
   stamps: { founded: String(site.founded), hallmark: "750" },
   copyright: `© ${YEAR} ${upper(site.brandFull)} · ${site.address.plate} ${upper(site.address.city)}`,
   motto: "BU SİTEDE HER ŞEY 10×",
-  top: "YUKARI ↑",
+  top: { label: "YUKARI", arrow: "↑" },
 };
 
 const [masterFirst = "", ...masterRest] = site.master.name.split(" ");
 
 export const productPage = {
-  back: { label: "← TEZGÂHA DÖN", href: "/#vitrin" },
+  back: { arrow: "←", label: "TEZGÂHA DÖN", href: "/#vitrin" },
   plate: (no: string, total: number) => `LEVHA ${no} / ${pad2(total)}`,
   scale: "ÖLÇEK 2:1\nÖLÇÜLER mm",
   views: {

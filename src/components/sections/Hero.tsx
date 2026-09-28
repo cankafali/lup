@@ -182,6 +182,8 @@ export function Hero() {
                 href={hero.down.href}
                 className="mt-5 tap inline-block font-mono text-mono whitespace-pre underline-offset-4 hover:underline max-md:mt-3"
               >
+                <span aria-hidden>{hero.down.arrow}</span>
+                {"  "}
                 {hero.down.label}
               </a>
             </div>

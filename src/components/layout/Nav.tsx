@@ -44,7 +44,7 @@ export function Nav() {
             href={nav.cta.href}
             className="col-span-2 col-start-11 tap justify-self-end font-mono text-mono text-stamp hover:underline max-lg:col-start-7 max-md:hidden"
           >
-            {nav.cta.label}
+            {nav.cta.label} <span aria-hidden>{nav.cta.arrow}</span>
           </Link>
 
           <NavMenu className="col-span-2 col-start-3 justify-self-end md:hidden" />

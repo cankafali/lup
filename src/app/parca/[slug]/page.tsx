@@ -47,7 +47,7 @@ export default async function ProductPage({ params }: PageProps<"/parca/[slug]">
           href={productPage.back.href}
           className="tap font-mono text-mono underline-offset-4 hover:underline"
         >
-          {productPage.back.label}
+          <span aria-hidden>{productPage.back.arrow}</span> {productPage.back.label}
         </Link>
         <MonoLabel size="s" tone="lead">
           {productPage.plate(product.no, products.length)}

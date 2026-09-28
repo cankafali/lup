@@ -111,7 +111,7 @@ export function NavMenu({ className }: { className?: string }) {
                 onClick={() => setOpen(false)}
                 className="tap font-mono text-mono text-stamp"
               >
-                {nav.cta.label}
+                {nav.cta.label} <span aria-hidden>{nav.cta.arrow}</span>
               </Link>
             </div>
           </div>,

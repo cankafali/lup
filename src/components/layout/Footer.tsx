@@ -67,7 +67,7 @@ export function Footer() {
           <span>{footer.copyright}</span>
           <span className="text-center max-md:text-left">{footer.motto}</span>
           <a href="#" className={`justify-self-end max-md:justify-self-start ${LINK}`}>
-            {footer.top}
+            {footer.top.label} <span aria-hidden>{footer.top.arrow}</span>
           </a>
         </div>
       </div>
