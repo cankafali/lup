@@ -31,6 +31,12 @@
     touch-action: pan-x pan-y;
   }
 
+  /* Başka sayfadan çapayla gelişte (/#magaza) ya da tarayıcı kaydırdığında bölüm başı sabit
+     Nav altında kalmasın; Lenis sayfa içinde aynı payı kendisi veriyor (inceleme 2.6) */
+  :where(section[id], main[id]) {
+    scroll-margin-top: var(--nav-h);
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-graphite);
     outline-offset: 3px;

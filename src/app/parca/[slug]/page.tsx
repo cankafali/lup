@@ -40,7 +40,7 @@ export default async function ProductPage({ params }: PageProps<"/parca/[slug]">
   if (!product) notFound();
 
   return (
-    <main id="icerik" tabIndex={-1} data-intro className="pt-24 max-md:pt-16">
+    <main id="icerik" tabIndex={-1} data-intro className="pt-(--nav-h)">
       <PlateMotion />
       <div className="container-lup flex items-baseline justify-between py-4">
         <Link

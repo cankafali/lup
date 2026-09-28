@@ -15,7 +15,7 @@ export function Nav() {
       <div className="container-lup">
         <nav
           aria-label={nav.label}
-          className="grid-lup h-24 items-center border-b border-line-strong max-md:h-16"
+          className="grid-lup h-(--nav-h) items-center border-b border-line-strong"
         >
           <Link
             href="/"
