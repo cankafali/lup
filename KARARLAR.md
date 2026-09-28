@@ -826,3 +826,14 @@
 - **Sapma:** İncelemede örnek lup notu "SOL TIK · 2 SN = LUP" tek metindi. Bu not ≥ 1024px'te görünüyor; yatay iPad gibi dokunmatik ekranda yanlış talimat olurdu. İlk satır da cihaza göre ikiye ayrıldı: fare "SOL TIK · 2 SN = LUP", dokunmatik "BASILI TUT = LUP".
 - **Gerekçe:** İnceleme A.3: imleç artık lup değil; cihaza göre doğru talimat.
 - **Geri alma:** `copy.ts` → `hero.howTo`, `hero.lens.howTo`; `Hero.tsx`'teki iki satır çifti.
+
+### K-107 · 2026-09-28 · Bulanık yer tutucular üretilmiş veriden
+
+- **Karar:** `placeholder="blur"` için görseller statik içe aktarılmadı. 12px genişlikte WebP yer tutucular bir kez üretildi, `src/content/blur.ts`'te duruyor (9 görsel, toplam ≈ 1.2 KB). `blurProps(src)` (`lib/blur.ts`) PhotoOverlay, Lens ve tepsi hücresine veriyor.
+- **Sapma:** İnceleme statik içe aktarmayı öneriyordu (Next otomatik `blurDataURL` üretir). O yol:
+  - görselleri `_next/static/media`'ya hash'li ikinci kopya olarak taşırdı;
+  - lupun hi-res adreslerini (`/images/…`) ve içerik dosyasındaki yol verisini değiştirirdi.
+- **Üretim:** Yeni bağımlılık yok. Next'in getirdiği `sharp` ile tek seferlik komut (README → "Görseller").
+- **Ek:** Tepsi `sizes` mobilde 2 kolona göre `50vw` (önce `100vw`), telkari lupu `21vw / 32vw`.
+- **Gerekçe:** İnceleme 3.5.
+- **Geri alma:** Üç bileşendeki `{...blurProps(…)}` satırlarını ve `blur.ts` dosyalarını sil.

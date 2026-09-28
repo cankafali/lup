@@ -6,6 +6,7 @@ import { Lens } from "@/components/primitives/Lens";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
 import { Stamp } from "@/components/primitives/Stamp";
 import type { ViewBox } from "@/lib/overlay";
+import { blurProps } from "@/lib/blur";
 import { PartLink } from "./PartLink";
 
 /** Hücre koordinat uzayı (§10.2): 4:5, 1440'ta ≈ 437×546. */
@@ -67,7 +68,7 @@ export function TrayCell({ product: p, compact = false }: TrayCellProps) {
             alt={p.image.alt}
             diameter={300}
             diameterCss="calc(300 / 440 * 100cqw)"
-            sizes={compact ? "164px" : "(min-width: 1024px) 21vw, 50vw"}
+            sizes={compact ? "164px" : "(min-width: 768px) 21vw, 32vw"}
             ring={8}
             label={vitrin.lensMark}
             axes
@@ -79,10 +80,11 @@ export function TrayCell({ product: p, compact = false }: TrayCellProps) {
             src={p.image.src}
             alt={p.image.alt}
             fill
-            sizes={compact ? "240px" : "(min-width: 1024px) 33vw, 100vw"}
+            sizes={compact ? "240px" : "(min-width: 768px) 33vw, 50vw"}
             className="object-cover"
             style={p.image.objectPosition ? { objectPosition: p.image.objectPosition } : undefined}
             data-hires={p.image.hires}
+            {...blurProps(p.image.src)}
           />
         </div>
       )}

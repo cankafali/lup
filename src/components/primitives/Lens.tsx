@@ -1,5 +1,6 @@
 import Image from "next/image";
 import clsx from "clsx";
+import { blurProps } from "@/lib/blur";
 import { hiresUrl } from "@/lib/hires";
 import { CANVAS_REF } from "@/lib/tokens";
 import { Axis } from "./Axis";
@@ -66,6 +67,7 @@ export function Lens({
             sizes={sizes ?? `${diameter}px`}
             className="object-cover"
             data-hires={hiresUrl(src)}
+            {...blurProps(src)}
           />
         </div>
       </div>
