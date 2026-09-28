@@ -43,8 +43,9 @@ export function OpenStatus({ fallback }: OpenStatusProps) {
     refreshLoupe();
   }, [label]);
 
+  // role="status": 19:00'da kapanınca olduğu gibi değişim ekran okuyucuya nazikçe duyurulur (inceleme 4.3)
   return (
-    <p className="flex items-center gap-2">
+    <p role="status" className="flex items-center gap-2">
       <PulseDot active={status?.open ?? false} />
       <MonoLabel>{label}</MonoLabel>
     </p>
