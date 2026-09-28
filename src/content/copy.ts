@@ -145,9 +145,38 @@ export const magaza = {
   directions: "Yol tarifi",
 };
 
+// Saatin bulunma hâli eki, okunuşun son kelimesine göre (inceleme 2.9): "10:00'DA", "11:00'DE", "09:15'TE"
+const SUFFIX_ONES: Record<number, string> = {
+  1: "DE",
+  2: "DE",
+  3: "TE",
+  4: "TE",
+  5: "TE",
+  6: "DA",
+  7: "DE",
+  8: "DE",
+  9: "DA",
+};
+const SUFFIX_TENS: Record<number, string> = {
+  0: "DA",
+  10: "DA",
+  20: "DE",
+  30: "DA",
+  40: "TA",
+  50: "DE",
+};
+
+/** "10:00" → "DA", "11:00" → "DE", "09:15" → "TE". Dakika varsa dakikaya, yoksa saate göre. */
+export function timeSuffix(hhmm: string) {
+  const [h = 0, m = 0] = hhmm.split(":").map(Number);
+  const n = m || h;
+  return SUFFIX_ONES[n % 10] ?? SUFFIX_TENS[n - (n % 10)] ?? "DA";
+}
+
 export const openStatus = {
   open: "ŞU AN AÇIK",
-  closed: (day: string) => `ŞU AN KAPALI — ${day} ${site.hours.from}'DA AÇILIR`,
+  closed: (day: string) =>
+    `ŞU AN KAPALI — ${day} ${site.hours.from}'${timeSuffix(site.hours.from)} AÇILIR`,
   days: ["PAZAR", "PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "CUMARTESİ"],
 };
 
