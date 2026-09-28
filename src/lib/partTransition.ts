@@ -17,6 +17,8 @@ const FADE_MS = 240;
 const TIMEOUT_MS = 3500;
 
 let pending: { path: string; done: () => void } | null = null;
+/** Geçiş sürüyor: tıklamadan geçişin bitişine (ya da atlanmasına) kadar. */
+let busy = false;
 
 /** Yeni sayfanın içeriği commit edildi (MotionReady'nin yerleşim efekti, sayfa efektlerinden sonra). */
 export function pageReady(pathname: string) {
@@ -43,12 +45,18 @@ function navigate(router: Router, href: string) {
 /** Geçişi başlatır; `false` dönerse Next'in normal gezinmesi sürer. */
 export function openPart(router: Router, href: string, link: HTMLElement): boolean {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  // Geçiş sürerken ikinci tıklama yutulur: ilk gezinmenin beklemesini (pending) bozmasın (inceleme 2.8)
+  if (busy) return true;
+  busy = true;
   const root = document.documentElement;
 
   if (typeof document.startViewTransition !== "function") {
     root.classList.add("part-leaving");
     window.setTimeout(() => {
-      const show = () => root.classList.remove("part-leaving");
+      const show = () => {
+        root.classList.remove("part-leaving");
+        busy = false;
+      };
       navigate(router, href).then(show, show);
     }, FADE_MS);
     return true;
@@ -63,7 +71,10 @@ export function openPart(router: Router, href: string, link: HTMLElement): boole
       ? document.startViewTransition({ update, types: ["part-open"] })
       : document.startViewTransition(update);
   // Zaman aşımında geçişin sözleri reddedilir (geçiş atlanır); gezinme yine olur
-  const cleanup = () => photo?.style.removeProperty("view-transition-name");
+  const cleanup = () => {
+    photo?.style.removeProperty("view-transition-name");
+    busy = false;
+  };
   transition.ready.catch(() => {});
   transition.updateCallbackDone.catch(() => {});
   transition.finished.then(cleanup, cleanup);
