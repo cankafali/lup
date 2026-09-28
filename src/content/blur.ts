@@ -1,6 +1,6 @@
 /**
  * Görsellerin yüklenirken gösterilen bulanık yer tutucuları (inceleme 3.5): 12px genişlik, WebP.
- * Üretilmiş veri; görsel değişirse README'deki komutla yeniden üretilir.
+ * Üretilmiş veri; görsel değişirse `node scripts/blur.mjs` ile yeniden üretilir.
  */
 export const BLUR: Readonly<Record<string, string>> = {
   "/images/atolye.jpg":
