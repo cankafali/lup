@@ -846,3 +846,20 @@
   - `sitemap.ts` her zaman üretiliyor (ana sayfa + altı parça).
 - **Gerekçe:** İnceleme 6: "`indexable: false` iken robots `disallow` kalmalı". Önceden robots.txt yoktu, herkes tarayabiliyordu. Tümüyle `Disallow` yapılsaydı robots.txt'e uyan önizleme botları (ör. Twitterbot) paylaşım kartını (K-100) göstermezdi. Pitch aşamasında link WhatsApp/sosyal medyada paylaşılacak.
 - **Geri alma:** `robots.ts`'teki `PREVIEW_BOTS` kuralını sil.
+
+### K-109 · 2026-09-28 · Ürüne özel paylaşım görseli
+
+- **Karar:** `app/parca/[slug]/opengraph-image.tsx`, ana sayfa görseliyle aynı dilde:
+  - solda lup dairesinde parçanın fotoğrafı (ürünün `objectPosition` kırpması);
+  - sağda levha no, ad (Geist Medium 88px), "SERTİFİKA · No. 0147", kırmızı ayar damgası ve veri satırı;
+  - altta "SÖNMEZ — SİTEDE 10×. MAĞAZADA 1:1.", köşelerde kesim izleri.
+
+  Alt metin `generateImageMetadata` ile ürüne göre.
+- **Ortak parçalar** (`lib/og.tsx`):
+  - fontlar, fotoğraf okuma, lup ve kesim izleri;
+  - kesim izleri dizi olarak döner: ImageResponse, bileşenin döndürdüğü fragment'ı mutlak konumlamıyor;
+  - fotoğraf yolu `public/images` klasörüyle sınırlı: değişken yol Turbopack'e tüm projeyi izletiyordu.
+- **Fontlar:** Geist Sans Medium da repoda (`src/assets/fonts`, OFL; K-inceleme 5.4 ile aynı gerekçe).
+- **Boyut:** Görseller 220–355 KB PNG (ImageResponse yalnızca PNG üretiyor). WhatsApp önizlemesi büyük görselleri atlayabiliyor; gerçek cihazda denenmeli (ILERLEME Aşama 9).
+- **Gerekçe:** İnceleme 6.4: sitenin asıl paylaşım kanalı muhtemelen WhatsApp, altı ürün sayfası da genel lup görselini paylaşıyordu.
+- **Geri alma:** `app/parca/[slug]/opengraph-image.tsx`'i sil. Ürün sayfası yeniden üstteki görseli devralır.

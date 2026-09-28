@@ -294,4 +294,7 @@ export const certificate = {
 export const og = {
   line: `${upper(site.brand)} — ${upper(site.tagline)}`,
   alt: `${site.brandFull}: lup dairesi içinde pırlantanın makro görüntüsü, altında "${site.tagline}"`,
+  /** Ürün paylaşım görseli (inceleme 6) */
+  productAlt: (name: string) =>
+    `${site.brandFull}: lup dairesi içinde ${name} fotoğrafı, sertifika numarası ve ayar damgası`,
 };
