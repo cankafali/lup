@@ -37,3 +37,9 @@ export const site = {
     { value: 1, unit: "tezgâh" },
   ],
 } as const;
+
+// Gerçek numaralar kuyumcudan gelene kadar derlemede uyarı (inceleme 1.1). Yayını kırmasın diye
+// throw değil; tarayıcı konsoluna düşmesin diye yalnızca sunucuda.
+if (typeof window === "undefined" && /0{6,}/.test(site.whatsapp + site.phone.tel)) {
+  console.warn("⚠ site.ts: WhatsApp/telefon hâlâ yer tutucu — yayından önce değiştirin");
+}
