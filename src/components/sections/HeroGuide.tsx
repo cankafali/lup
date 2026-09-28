@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { refreshLoupe } from "@/components/loupe/refresh";
 import { MOTION, onDone } from "@/components/motion/helpers";
-import { introTime } from "@/components/motion/intro";
+import { introSkipped, introTime } from "@/components/motion/intro";
 import { gsap, useGSAP } from "@/lib/gsap";
 // DrawSVG kaydı (bu bileşen motion/lazy paketinde)
 import "@/lib/scroll";
@@ -66,7 +66,7 @@ export function HeroGuide({ fit, stone }: HeroGuideProps) {
       const el = svgRef.current?.querySelector("[data-hero-guide]");
       if (!line || !el || drawn.current) return;
       drawn.current = true;
-      if (!window.matchMedia(MOTION).matches) return;
+      if (!window.matchMedia(MOTION).matches || introSkipped()) return;
       gsap.fromTo(
         el,
         { drawSVG: "100% 100%" },

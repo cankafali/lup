@@ -29,6 +29,12 @@ export function markNavigated() {
 /** İlk yükleme mi (henüz sayfa içi gezinme yok)? */
 export const isFirstLoad = () => !navigated;
 
+/**
+ * Giriş gizlemesi 4 sn yedeğiyle kalktı (introScript): içerik zaten görünüyor. Giriş animasyonları
+ * (hero, levha) kurulmaz; kaydırmaya bağlı olanlar kurulur (inceleme 2.7).
+ */
+export const introSkipped = () => document.documentElement.classList.contains("intro-skipped");
+
 export function resetIntro() {
   start = 0;
 }
