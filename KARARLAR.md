@@ -789,3 +789,26 @@
 - **Gerekçe:** Kullanıcı isteği (inceleme A.1): büyütmeyi lup üstleniyor.
 - **Bilinen yan etki:** WCAG 1.4.4'e aykırı. Lighthouse `meta-viewport` denetimi başarısız, Accessibility 100'ün altına düşer (≈ 90–95). Bilinçli karar; düzeltilmeyecek.
 - **Geri alma:** `layout.tsx`'teki `viewport` export'unu ve `globals.css`'teki `touch-action` kuralını sil.
+
+### K-105 · 2026-09-28 · Masaüstünde lup basılı tutunca açılır
+
+- **Karar** (fare/kalem, `pointerType !== "touch"`):
+  - Lup normalde kapalı, sistem imleci olduğu gibi. Linkler, metin seçimi ve sürükleme her zamanki gibi çalışıyor.
+  - Sol tık basılıyken dış halka ve üstünde tutma süresinde dolan 1px kırmızı yay beliriyor (`html[data-loupe-holding]`). 2 sn (`LOUPE.mouseHoldMs`) dolunca lup imlecin ortasında açılıyor; imleç gizleniyor, metin seçimi kapanıyor (`html.loupe-open`).
+  - Tutma şu durumlarda iptal:
+    - 10px'ten fazla hareket (`LOUPE.touchSlop`);
+    - sağ tık, `blur`, pencereden çıkış, `pointercancel`.
+  - Basılıyken:
+    - lup her yerde büyütüyor, yalnızca `data-loupe-off` alanlarında (Nav, footer, mobil menü) dış halkaya dönüyor;
+    - link üstünde küçülme, kenar boşluğu ve 1.2 sn boşta kuralları kalktı (K-056 ve K-057'nin fare kısmının yerine geçer; `LOUPE.idleMs` silindi).
+  - Bırakınca lup kapanıyor ve bırakmayı izleyen tek tıklama yutuluyor, link üstünde bırakınca sayfa değişmiyor (`lib/clickGuard`). Aynı yutma dokunmatik basılı tutmada da var (inceleme 2.3). Lenis'in anchor işleyicisi yakalama evresinde önce çalıştığı için o da `clickSwallowed()`'a bakıyor.
+  - Basılıyken:
+    - tarayıcının sürükle-bırakı engelleniyor (titreme tutmayı bozmasın; yan etkisi: sitede görsel/link sürükleme yok);
+    - lup açıkken `selectstart` engelleniyor;
+    - şerit (`DragScroll`) sürüklemeye başlamıyor.
+  - Reduced motion: lerp 1, yay dolmadan tam daire; süre aynı.
+  - `data-loupe-magnify` lupta işlevsiz kaldı; hücre seçicisi olarak `data-tray-cell` adını aldı (VitrinMotion).
+- **Kırmızı bütçesi:** Yay sayfadaki üç odak kırmızısına (§8.1) sayılmıyor: kalıcı değil, yalnızca basılı tutarken görünen geçici bir etkileşim göstergesi.
+- **Dokunmatik:** Değişmedi (180 ms basılı tutma, parmağın 60px üstünde).
+- **Gerekçe:** Kullanıcı isteği (inceleme A.2): lup sürekli açık olmasın, imleç normal kalsın.
+- **Geri alma:** Bu commit'i geri al (`useLoupe.ts`, `Loupe.tsx`, `globals.css` lup kuralları, `clickGuard.ts`).

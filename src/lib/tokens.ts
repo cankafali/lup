@@ -20,7 +20,7 @@ export const LOUPE = {
   touchOffsetY: 60, // mobilde parmağın üstüne kaydırma
   touchHoldMs: 180,
   touchSlop: 10, // basılı tutma sayılmadan önce izin verilen kayma (px)
-  idleMs: 1200, // hareketsizlikten sonra boşta (§9.1)
+  mouseHoldMs: 2000, // masaüstünde sol tık basılı tutma süresi (K-105)
   stretch: 0.04, // hıza göre en fazla ±%4 esneme (§9.3)
   crosshair: 8, // nişan kolu (px)
 } as const;

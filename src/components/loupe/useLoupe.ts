@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type RefObject } from "react";
 import { usePathname } from "next/navigation";
+import { swallowNextClick } from "@/lib/clickGuard";
 import { gsap } from "@/lib/gsap";
 import { LOUPE } from "@/lib/tokens";
 import {
@@ -17,12 +18,10 @@ import {
 import { markHintSeen } from "./hint";
 import { setLoupeRefresh } from "./refresh";
 
-/** Üzerindeyken sistem imleci geri gelir, lup dış halkaya küçülür (§9.4). */
-const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, summary, label';
-/** Tamamı link olan büyük alanlar (tepsi hücresi): içerik gibi büyütülür (K-056). */
-const MAGNIFY = "[data-loupe-magnify]";
-/** Lupun boşta kaldığı alanlar (§9.4): harita, footer. */
+/** Lupun boşta (yalnızca dış halka) kaldığı alanlar (§9.4): Nav, footer, mobil menü. */
 const OFF_AREA = "[data-loupe-off]";
+/** Fareyle basılı tutma bu öğelerde başlamaz (yazı girişi). */
+const EDITABLE = "input, textarea, select, [contenteditable]";
 const REFRESH_MS = 100; // §9.5
 const RESIZE_MS = 150; // §9.5
 
@@ -67,8 +66,12 @@ function createLoupe(
   let r = LOUPE.diameter / 2;
   let state: State = "off";
   let present = false; // imleç pencerede / parmak basılı
-  let hoverIdle = false; // etkileşimli öğe, kapalı alan ya da kenar boşluğu üstünde
+  let offArea = false; // fare kapalı alan üstünde
   let touchActive = false;
+  // Fare/kalem (K-105): lup yalnızca sol tık 2 sn basılı tutulunca açılır, bırakınca kapanır
+  let mouseHeld = false;
+  let mouseHoldTimer: number | undefined;
+  let mouseHoldStart: { x: number; y: number } | null = null;
   let failed = false;
   let stale = false; // rota değişti, klon henüz yenilenmedi
   // Dokunmatik birincil cihazda lup yalnızca basılı tutunca açılır: klon ilk dokunuşta kurulur,
@@ -76,8 +79,6 @@ function createLoupe(
   let deferred = window.matchMedia("(pointer: coarse)").matches;
   let hires = false;
   let dirty = true;
-  let lastMove = 0;
-  let margin = 0;
   let destroyed = false;
   const target = { x: -1000, y: -1000 };
   const pos = { x: -1000, y: -1000 };
@@ -102,15 +103,17 @@ function createLoupe(
   };
 
   const evaluate = () => {
+    const held = mode === "touch" ? touchActive : mouseHeld;
     let next: State;
-    if (!present) next = "off";
-    else if (mode === "touch") next = touchActive ? "active" : "off";
-    else if (failed || stale || hoverIdle || performance.now() - lastMove > LOUPE.idleMs)
-      next = "idle";
+    if (!present || !held) next = "off";
+    // Klon yoksa (hata, rota değişimi) ya da kapalı alanda yalnızca dış halka
+    else if (failed || stale || (mode === "mouse" && offArea)) next = "idle";
     else next = "active";
     if (next === state) return;
     state = next;
     root.dataset.state = next;
+    // İmleç ve metin seçimi yalnızca lup açıkken kapalı (globals.css)
+    doc.classList.toggle("loupe-open", next === "active");
     // Kapalıyken katman tutulmasın (§9.8)
     stage.style.willChange = next === "active" ? "transform" : "";
     // Hi-res orijinaller yalnızca lup ilk kez etkinleşince yüklenir (§17)
@@ -172,22 +175,51 @@ function createLoupe(
     scheduleBuild();
   };
 
-  const measureMargins = () => {
-    const cs = getComputedStyle(doc);
-    const gridMargin = parseFloat(cs.getPropertyValue("--grid-margin")) || 0;
-    const gridMax = parseFloat(cs.getPropertyValue("--grid-max")) || 1312;
-    margin = Math.max(gridMargin, (doc.clientWidth - gridMax) / 2);
-  };
-  const onResize = debounce(() => {
-    measureMargins();
-    scheduleBuild();
-  }, RESIZE_MS);
+  const onResize = debounce(scheduleBuild, RESIZE_MS);
   const resizeObserver = new ResizeObserver(onResize);
 
-  // --- Fare / kalem ----------------------------------------------------------
+  // --- Fare / kalem: sol tık basılı tutunca (K-105) ---------------------------
 
-  const onPointerMove = (e: PointerEvent) => {
-    if (e.pointerType === "touch") return onTouchMove(e);
+  const cancelMouseHold = () => {
+    window.clearTimeout(mouseHoldTimer);
+    mouseHoldStart = null;
+    delete doc.dataset.loupeHolding;
+  };
+
+  /** Tutmayı ve açık lupu kapat; bırakmada bir sonraki tıklama yutulur (link açılmasın). */
+  const closeMouse = (swallow: boolean) => {
+    cancelMouseHold();
+    if (!mouseHeld) return;
+    mouseHeld = false;
+    if (swallow) swallowNextClick();
+    evaluate();
+  };
+
+  const onMouseDown = (e: PointerEvent) => {
+    if (e.button !== 0) return closeMouse(false);
+    const el = e.target instanceof Element ? e.target : null;
+    if (el?.closest(EDITABLE)) return;
+    setMode("mouse");
+    present = true;
+    target.x = pos.x = e.clientX;
+    target.y = pos.y = e.clientY;
+    offArea = !!el?.closest(OFF_AREA);
+    dirty = true;
+    cancelMouseHold();
+    mouseHoldStart = { x: e.clientX, y: e.clientY };
+    // Basılı tutma göstergesi: dış halka ve dolan yay (globals.css)
+    doc.dataset.loupeHolding = "";
+    mouseHoldTimer = window.setTimeout(() => {
+      if (!mouseHoldStart) return;
+      cancelMouseHold();
+      mouseHeld = true;
+      dirty = true;
+      window.getSelection()?.removeAllRanges();
+      evaluate();
+    }, LOUPE.mouseHoldMs);
+  };
+
+  const onMouseMove = (e: PointerEvent) => {
     // Dokunmatik cihaza fare bağlandı: ertelenen klonu şimdi kur
     if (deferred) {
       deferred = false;
@@ -202,28 +234,32 @@ function createLoupe(
       pos.y = target.y;
       dirty = true;
     }
-    lastMove = performance.now();
+    // Bırakma kaçırıldıysa (pencere dışında bırakıldı)
+    if ((mouseHeld || mouseHoldStart) && !(e.buttons & 1)) closeMouse(false);
+    // Sürükleme ya da metin seçimi niyeti: tutma iptal
+    if (
+      mouseHoldStart &&
+      Math.hypot(e.clientX - mouseHoldStart.x, e.clientY - mouseHoldStart.y) > LOUPE.touchSlop
+    )
+      cancelMouseHold();
     const el = e.target instanceof Element ? e.target : null;
-    const interactive = el?.closest(INTERACTIVE);
-    hoverIdle =
-      (!!interactive && !interactive.matches(MAGNIFY)) ||
-      !!el?.closest(OFF_AREA) ||
-      e.clientX < margin ||
-      e.clientX > doc.clientWidth - margin;
+    offArea = !!el?.closest(OFF_AREA);
     evaluate();
   };
 
   const onLeave = () => {
     if (mode !== "mouse") return;
+    closeMouse(false);
     present = false;
     evaluate();
   };
 
-  // Kaydırma da etkinliktir: içerik lupun altında akarken lup boşa düşmesin.
-  const onScroll = () => {
-    if (mode !== "mouse" || !present) return;
-    lastMove = performance.now();
-    evaluate();
+  // Basılıyken tarayıcının sürükle-bırakı ve metin seçimi araya girmesin
+  const onDragStart = (e: DragEvent) => {
+    if (mouseHoldStart || mouseHeld) e.preventDefault();
+  };
+  const onSelectStart = (e: Event) => {
+    if (mouseHeld) e.preventDefault();
   };
   // İç kaydırma (yatay şerit): olay kabarcıklanmaz, yakalama aşamasında dinlenir
   const onInnerScroll = (e: Event) => {
@@ -240,8 +276,7 @@ function createLoupe(
     holdStart = null;
   };
 
-  const onPointerDown = (e: PointerEvent) => {
-    if (e.pointerType !== "touch") return;
+  const onTouchDown = (e: PointerEvent) => {
     if (deferred) {
       deferred = false;
       build();
@@ -273,12 +308,13 @@ function createLoupe(
       cancelHold();
   };
 
-  const onPointerEnd = (e: PointerEvent) => {
-    if (e.pointerType !== "touch") return;
+  /** Parmak kalktı: basılı tutup bırakınca gelen tıklama yutulur (hücre linki açılmasın). */
+  const onTouchEnd = (swallow: boolean) => {
     cancelHold();
     if (!touchActive) return;
     touchActive = false;
     delete doc.dataset.loupeTouch;
+    if (swallow) swallowNextClick();
     evaluate();
   };
 
@@ -287,8 +323,21 @@ function createLoupe(
     if (touchActive) e.preventDefault();
   };
   const onContextMenu = (e: Event) => {
-    if (touchActive || holdStart) e.preventDefault();
+    if (touchActive || holdStart) return e.preventDefault();
+    // Sağ tık tutmayı ve lupu iptal eder
+    closeMouse(false);
   };
+
+  // --- Olay dağıtımı -----------------------------------------------------------
+
+  const onPointerMove = (e: PointerEvent) =>
+    e.pointerType === "touch" ? onTouchMove(e) : onMouseMove(e);
+  const onPointerDown = (e: PointerEvent) =>
+    e.pointerType === "touch" ? onTouchDown(e) : onMouseDown(e);
+  const onPointerUp = (e: PointerEvent) =>
+    e.pointerType === "touch" ? onTouchEnd(true) : closeMouse(true);
+  const onPointerCancel = (e: PointerEvent) =>
+    e.pointerType === "touch" ? onTouchEnd(false) : closeMouse(false);
 
   // --- Aynalama (K-066) -------------------------------------------------------
 
@@ -314,9 +363,16 @@ function createLoupe(
   // --- Kare döngüsü (GSAP ticker; Lenis ile aynı saat, §9.3) -------------------
 
   const tick = () => {
-    if (state === "active" && mode === "mouse" && performance.now() - lastMove > LOUPE.idleMs)
-      evaluate();
     if (!present && !dirty) return;
+    // Görünmezken yazma yok; açılınca imlecin olduğu yerden başlar
+    if (state === "off" && !mouseHoldStart) {
+      if (pos.x !== target.x || pos.y !== target.y) {
+        pos.x = target.x;
+        pos.y = target.y;
+        dirty = true;
+      }
+      return;
+    }
 
     const k = reduce.matches ? 1 : LOUPE.lerp;
     const vx = (target.x - pos.x) * k;
@@ -355,22 +411,21 @@ function createLoupe(
   // --- Kurulum / söküm ---------------------------------------------------------
 
   root.dataset.state = state;
-  doc.classList.add("has-loupe");
-  measureMargins();
   resizeObserver.observe(source);
   setLoupeRefresh(refresh);
   gsap.ticker.add(tick);
 
   window.addEventListener("pointermove", onPointerMove, { passive: true });
   window.addEventListener("pointerdown", onPointerDown, { passive: true });
-  window.addEventListener("pointerup", onPointerEnd, { passive: true });
-  window.addEventListener("pointercancel", onPointerEnd, { passive: true });
-  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("pointerup", onPointerUp, { passive: true });
+  window.addEventListener("pointercancel", onPointerCancel, { passive: true });
   document.addEventListener("scroll", onInnerScroll, { capture: true, passive: true });
   window.addEventListener("blur", onLeave);
   doc.addEventListener("pointerleave", onLeave);
   document.addEventListener("touchmove", onNativeTouchMove, { passive: false });
   document.addEventListener("contextmenu", onContextMenu);
+  document.addEventListener("dragstart", onDragStart);
+  document.addEventListener("selectstart", onSelectStart);
 
   return {
     scheduleBuild,
@@ -379,23 +434,25 @@ function createLoupe(
       destroyed = true;
       cancelIdle();
       cancelHold();
+      cancelMouseHold();
       refresh.cancel();
       onResize.cancel();
       resizeObserver.disconnect();
       gsap.ticker.remove(tick);
       setLoupeRefresh(() => {});
-      doc.classList.remove("has-loupe");
+      doc.classList.remove("loupe-open");
       delete doc.dataset.loupeTouch;
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("pointerup", onPointerEnd);
-      window.removeEventListener("pointercancel", onPointerEnd);
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerCancel);
       document.removeEventListener("scroll", onInnerScroll, { capture: true });
       window.removeEventListener("blur", onLeave);
       doc.removeEventListener("pointerleave", onLeave);
       document.removeEventListener("touchmove", onNativeTouchMove);
       document.removeEventListener("contextmenu", onContextMenu);
+      document.removeEventListener("dragstart", onDragStart);
+      document.removeEventListener("selectstart", onSelectStart);
     },
   };
 }
@@ -407,7 +464,8 @@ type LoupeRefs = {
 };
 
 /**
- * İmleç lupu (§9): `#lup-content`'in klonu büyütülüp kaydırılır; konum GSAP ticker'ında lerp'lenir.
+ * Lup (§9): `#lup-content`'in klonu büyütülüp kaydırılır; konum GSAP ticker'ında lerp'lenir.
+ * Fareyle sol tık 2 sn basılı tutunca, dokunmatikte 180 ms basılı tutunca açılır (K-105, §9.6).
  * Klon fontlar ve görseller yüklendikten sonra boşta oluşturulur; boyut ve rota değişiminde yenilenir.
  */
 export function useLoupe({ root, ring, stage }: LoupeRefs) {

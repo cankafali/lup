@@ -6,9 +6,9 @@ import { LOUPE } from "@/lib/tokens";
 import { useLoupe } from "./useLoupe";
 
 /**
- * İmleç lupu (§9.1): iç Ø 200 (mobil 140), 1px graphite kenar, 16px %25 dış halka,
+ * Lup (§9.1): iç Ø 200 (mobil 140), 1px graphite kenar, 16px %25 dış halka,
  * sağ üstte "10×", merkezde nişan. Görünüm durumları `data-state` (off / idle / active)
- * ve `globals.css`'teki `.loupe*` kurallarıyla.
+ * ve `globals.css`'teki `.loupe*` kurallarıyla. Fareyle basılı tutarken dış halkada dolan yay (K-105).
  */
 export function Loupe() {
   const root = useRef<HTMLDivElement>(null);
@@ -29,9 +29,14 @@ export function Loupe() {
         "--loupe-ring": `${LOUPE.ring}px`,
         "--loupe-ring-opacity": LOUPE.ringOpacity,
         "--loupe-cross": `${LOUPE.crosshair}px`,
+        "--loupe-hold": `${LOUPE.mouseHoldMs}ms`,
       }}
     >
       <div ref={ring} className="loupe-ring" />
+      {/* viewBox yok: birim px, çizgi 1px kalır (non-scaling-stroke pathLength ile tutarsız) */}
+      <svg className="loupe-progress">
+        <circle cx="50%" cy="50%" r="49.5%" pathLength={1} />
+      </svg>
       <div className="loupe-glass">
         <div ref={stage} className="loupe-stage" />
       </div>
