@@ -248,6 +248,14 @@ export const productPage = {
   },
 };
 
+/** Bilinmeyen adres (inceleme 6). */
+export const notFoundPage = {
+  title: "Levha bulunamadı",
+  label: "404 — ARŞİVDE YOK",
+  heading: [{ text: "Bu levha" }, { text: "arşivde yok.", italic: true }],
+  note: "ARADIĞINIZ PARÇA TEZGÂHTA DEĞİL.\nTÜM PARÇALAR MAĞAZADA, ELDE, 1:1.",
+};
+
 export const certificate = {
   title: "SERTİFİKA",
   no: (certNo: string) => `No. ${certNo}`,
