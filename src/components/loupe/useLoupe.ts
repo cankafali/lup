@@ -275,6 +275,9 @@ function createLoupe(
     holdStart = null;
   };
 
+  // Lup açıkken sayfa kaymaz (§9.6)
+  const blockScroll = (e: TouchEvent) => e.preventDefault();
+
   const onTouchDown = (e: PointerEvent) => {
     if (deferred) {
       deferred = false;
@@ -286,6 +289,8 @@ function createLoupe(
       if (!holdStart) return;
       setMode("touch");
       touchActive = true;
+      // Yalnızca lup açıkken: pasif olmayan dinleyici kaydırmayı ana iş parçacığına bağlar (inceleme 2.1)
+      document.addEventListener("touchmove", blockScroll, { passive: false });
       present = true;
       target.x = pos.x = holdStart.x;
       target.y = pos.y = holdStart.y - LOUPE.touchOffsetY;
@@ -311,15 +316,12 @@ function createLoupe(
     cancelHold();
     if (!touchActive) return;
     touchActive = false;
+    document.removeEventListener("touchmove", blockScroll);
     delete doc.dataset.loupeTouch;
     if (swallow) swallowNextClick();
     evaluate();
   };
 
-  // Lup açıkken sayfa kaymaz (§9.6)
-  const onNativeTouchMove = (e: TouchEvent) => {
-    if (touchActive) e.preventDefault();
-  };
   const onContextMenu = (e: Event) => {
     if (touchActive || holdStart) return e.preventDefault();
     // Sağ tık tutmayı ve lupu iptal eder
@@ -420,7 +422,6 @@ function createLoupe(
   document.addEventListener("scroll", onInnerScroll, { capture: true, passive: true });
   window.addEventListener("blur", onLeave);
   doc.addEventListener("pointerleave", onLeave);
-  document.addEventListener("touchmove", onNativeTouchMove, { passive: false });
   document.addEventListener("contextmenu", onContextMenu);
   document.addEventListener("dragstart", onDragStart);
   document.addEventListener("selectstart", onSelectStart);
@@ -447,7 +448,7 @@ function createLoupe(
       document.removeEventListener("scroll", onInnerScroll, { capture: true });
       window.removeEventListener("blur", onLeave);
       doc.removeEventListener("pointerleave", onLeave);
-      document.removeEventListener("touchmove", onNativeTouchMove);
+      document.removeEventListener("touchmove", blockScroll);
       document.removeEventListener("contextmenu", onContextMenu);
       document.removeEventListener("dragstart", onDragStart);
       document.removeEventListener("selectstart", onSelectStart);
