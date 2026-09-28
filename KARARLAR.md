@@ -863,3 +863,13 @@
 - **Boyut:** Görseller 220–355 KB PNG (ImageResponse yalnızca PNG üretiyor). WhatsApp önizlemesi büyük görselleri atlayabiliyor; gerçek cihazda denenmeli (ILERLEME Aşama 9).
 - **Gerekçe:** İnceleme 6.4: sitenin asıl paylaşım kanalı muhtemelen WhatsApp, altı ürün sayfası da genel lup görselini paylaşıyordu.
 - **Geri alma:** `app/parca/[slug]/opengraph-image.tsx`'i sil. Ürün sayfası yeniden üstteki görseli devralır.
+
+### K-110 · 2026-09-28 · Birim testleri ve CI
+
+- **Karar:**
+  - Tek yeni geliştirme bağımlılığı `vitest`, 4.x sürümü. 5.x `@types/node` ≥ 22 istiyor; projede 20 var, tip paketini yükseltmek yerine uyumlu sürüm seçildi.
+  - `pnpm test` = `vitest run`; yapılandırma `vitest.config.mts` (`@` takma adı, node ortamı). Testler kaynağın yanında (`*.test.ts`).
+  - `.github/workflows/ci.yml`: push (master) ve PR'da `lint` (0 uyarı), `typecheck`, `prettier --check`, `test`, `build`. Node 22, pnpm sürümü `packageManager`'dan.
+  - Uçtan uca testler (Playwright, inceleme 7.1b) yok: başka bir bağımlılık ve tarayıcı kurulumu ister. Elle yapılan tarayıcı denetimleri ILERLEME'de.
+- **Gerekçe:** İnceleme 7.1a, 7.2. Şartnamenin bağımlılık listesinde test aracı yok; inceleme bunu açıkça istiyor, yalnızca geliştirmede.
+- **Geri alma:** `pnpm remove vitest`; `*.test.ts`, `vitest.config.mts` ve `.github/workflows/ci.yml`'yi sil.
