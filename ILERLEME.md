@@ -306,7 +306,7 @@
 
 **Kabul** (yerel üretim derlemesi, mobil Lighthouse 12 benzetimli + CDP denetimleri)
 
-- [x] Accessibility 100 (hedef ≥ 95).
+- [x] Accessibility 100 (hedef ≥ 95). İstisna (K-104, 2026-09-28): mobilde yakınlaştırma kullanıcı isteğiyle kapalı; `meta-viewport` denetimi bilerek başarısız, puan ≈ 90–95.
 - [x] JS ilk yük 152KB gzip (bütçe ≤ 180KB).
 - [x] CLS 0.
 - [ ] Performance ≥ 90: yerelde 79–90 (K-102). LCP yerelde ölçülemiyor (`localhost` yan etkisi); Vercel önizlemesinde ölçülecek.

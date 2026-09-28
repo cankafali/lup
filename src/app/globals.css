@@ -26,6 +26,11 @@
 }
 
 @layer base {
+  html {
+    /* İki parmakla ve çift dokunuşla yakınlaştırma kapalı, kaydırma serbest (K-104) */
+    touch-action: pan-x pan-y;
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-graphite);
     outline-offset: 3px;

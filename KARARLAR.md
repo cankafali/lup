@@ -778,3 +778,14 @@
     - 3 sn güvenlik zamanlayıcısı var.
 - **Gerekçe:** §17 "sayfa başına ilk yük ≤ 180 KB gzip". Ölçüm: ana sayfa 185KB (ScrollTrigger çıkınca) → 180KB (lup ve kılavuz çizgi çıkınca, bütçenin 86 bayt üstü) → 152KB (GSAP çekirdeği çıkınca). Test: hero bindirmeleri ilk `anim-ready` karesinde zaten başlangıç halinde (bir an görünüp kaybolma yok). Hareket, geçiş, şerit, menü, klavye ve lup testleri (masaüstü ve dokunmatik) yeniden geçti.
 - **Geri alma:** Bölümlerde `motion/lazy` yerine doğrudan içe aktarma; `lib/gsap`'a ScrollTrigger ve DrawSVG kaydı.
+
+### K-104 · 2026-09-28 · Mobilde yakınlaştırma kapalı
+
+- **Karar:** Mobilde iki parmakla ve çift dokunuşla yakınlaştırma kapalı:
+  - `layout.tsx` → `viewport`: `maximumScale: 1`, `userScalable: false`;
+  - `globals.css` → `html { touch-action: pan-x pan-y }`. iOS Safari 10+ `user-scalable=no`'yu yok sayıyor, bu kural orada da çalışıyor.
+
+  Başka öğede `touch-action` kullanılmıyor. Lup basılı tutması ve şerit kaydırması etkilenmiyor.
+- **Gerekçe:** Kullanıcı isteği (inceleme A.1): büyütmeyi lup üstleniyor.
+- **Bilinen yan etki:** WCAG 1.4.4'e aykırı. Lighthouse `meta-viewport` denetimi başarısız, Accessibility 100'ün altına düşer (≈ 90–95). Bilinçli karar; düzeltilmeyecek.
+- **Geri alma:** `layout.tsx`'teki `viewport` export'unu ve `globals.css`'teki `touch-action` kuralını sil.
