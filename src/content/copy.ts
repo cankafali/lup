@@ -1,3 +1,4 @@
+import { getProduct } from "./products";
 import { site, YEAR } from "./site";
 
 // Bölüm metinleri (§12.4). Mono etiketler büyük harfle yazılır; birimler küçük kalır (K-014).
@@ -35,6 +36,15 @@ export const nav = {
 
 const { lat, lng } = site.address.coords;
 
+/** Hero ve 10× bölümündeki taş/bant ölçüleri Tektaş'ın verisinden (inceleme 2.11, K-047). */
+function solitaireData() {
+  const p = getProduct("tektas-ruya");
+  const spec = p?.drawingSpec;
+  if (!p?.stone || spec?.kind !== "solitaire") throw new Error("copy.ts: Tektaş verisi eksik");
+  return { spec, stone: p.stone, karat: p.karat.label };
+}
+const tektas = solitaireData();
+
 export const hero = {
   srTitle: `${site.brandFull} — Yakından bakın.`,
   image: {
@@ -56,13 +66,13 @@ export const hero = {
     mark: "10×",
     /** Örnek lup notunun ilk satırı, cihaza göre (K-106) */
     howTo: { mouse: "SOL TIK · 2 SN = LUP", touch: "BASILI TUT = LUP" },
-    caption: "TAŞ  Ø 5.1 mm · 0.50 ct · F · VS1",
+    caption: `TAŞ  Ø ${tektas.spec.stone} mm · ${tektas.stone.carat} · ${tektas.stone.color} · ${tektas.stone.clarity}`,
     alt: "Dört tırnaklı yuvadaki yuvarlak pırlantanın turuncu yansımalı makro görüntüsü",
   },
   overlay: {
-    stone: "Ø 5.1 mm",
+    stone: `Ø ${tektas.spec.stone} mm`,
     section: "A",
-    band: "BANT  2.2 mm\n18K · 750",
+    band: `BANT  ${tektas.spec.section.width} mm\n${tektas.karat}`,
   },
 };
 
@@ -90,7 +100,7 @@ export const makro = {
     hammer: "ÇEKİÇ İZİ\nMAKİNE DEĞİL, EL",
     girdle: "RUNDİST\nİNCE · CİLALI",
   },
-  diameter: "Ø 5.10 mm  ·  ÖLÇEK 10:1",
+  diameter: `Ø ${tektas.spec.stone.toFixed(2)} mm  ·  ÖLÇEK 10:1`,
 };
 
 export const atolye = {
