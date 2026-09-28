@@ -837,3 +837,12 @@
 - **Ek:** Tepsi `sizes` mobilde 2 kolona göre `50vw` (önce `100vw`), telkari lupu `21vw / 32vw`.
 - **Gerekçe:** İnceleme 3.5.
 - **Geri alma:** Üç bileşendeki `{...blurProps(…)}` satırlarını ve `blur.ts` dosyalarını sil.
+
+### K-108 · 2026-09-28 · robots.txt kapalı sitede önizleme botlarına izinli
+
+- **Karar:**
+  - `robots.ts`: `site.indexable: false` iken `User-Agent: *` için `Disallow: /`. Site haritası adresi yalnızca site açılınca veriliyor.
+  - Bağlantı önizleme botlarına (`Twitterbot`, `facebookexternalhit`, `LinkedInBot`, `Slackbot`, `TelegramBot`, `WhatsApp`) izin var. Arama motoru değiller; sayfalar `noindex, nofollow` kalıyor.
+  - `sitemap.ts` her zaman üretiliyor (ana sayfa + altı parça).
+- **Gerekçe:** İnceleme 6: "`indexable: false` iken robots `disallow` kalmalı". Önceden robots.txt yoktu, herkes tarayabiliyordu. Tümüyle `Disallow` yapılsaydı robots.txt'e uyan önizleme botları (ör. Twitterbot) paylaşım kartını (K-100) göstermezdi. Pitch aşamasında link WhatsApp/sosyal medyada paylaşılacak.
+- **Geri alma:** `robots.ts`'teki `PREVIEW_BOTS` kuralını sil.
