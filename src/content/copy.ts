@@ -1,4 +1,4 @@
-import { site } from "./site";
+import { site, YEAR } from "./site";
 
 // Bölüm metinleri (§12.4). Mono etiketler büyük harfle yazılır; birimler küçük kalır (K-014).
 // Buton metinlerine ok (→) yazılmaz; Button bileşeni ekler (K-022).
@@ -191,7 +191,7 @@ export const footer = {
   instagram: "Instagram",
   wordmark: upper(site.brand),
   stamps: { founded: String(site.founded), hallmark: "750" },
-  copyright: `© 2026 ${upper(site.brandFull)} · ${site.address.plate} ${upper(site.address.city)}`,
+  copyright: `© ${YEAR} ${upper(site.brandFull)} · ${site.address.plate} ${upper(site.address.city)}`,
   motto: "BU SİTEDE HER ŞEY 10×",
   top: "YUKARI ↑",
 };
@@ -228,7 +228,6 @@ export const productPage = {
     date: "TARİH",
     masterValue: `${masterFirst.charAt(0)}. ${masterRest.join(" ")}`,
     scaleValue: "2:1",
-    dateValue: "03.2026",
   },
 };
 
