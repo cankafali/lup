@@ -870,6 +870,28 @@
   - Tek yeni geliştirme bağımlılığı `vitest`, 4.x sürümü. 5.x `@types/node` ≥ 22 istiyor; projede 20 var, tip paketini yükseltmek yerine uyumlu sürüm seçildi.
   - `pnpm test` = `vitest run`; yapılandırma `vitest.config.mts` (`@` takma adı, node ortamı). Testler kaynağın yanında (`*.test.ts`).
   - `.github/workflows/ci.yml`: push (master) ve PR'da `lint` (0 uyarı), `typecheck`, `prettier --check`, `test`, `build`. Node 22, pnpm sürümü `packageManager`'dan.
-  - Uçtan uca testler (Playwright, inceleme 7.1b) yok: başka bir bağımlılık ve tarayıcı kurulumu ister. Elle yapılan tarayıcı denetimleri ILERLEME'de.
+  - Uçtan uca testler ayrı karar: K-111.
 - **Gerekçe:** İnceleme 7.1a, 7.2. Şartnamenin bağımlılık listesinde test aracı yok; inceleme bunu açıkça istiyor, yalnızca geliştirmede.
 - **Geri alma:** `pnpm remove vitest`; `*.test.ts`, `vitest.config.mts` ve `.github/workflows/ci.yml`'yi sil.
+
+### K-111 · 2026-09-28 · Uçtan uca duman testleri (Playwright)
+
+- **Karar:**
+  - İkinci ve son yeni geliştirme bağımlılığı `@playwright/test`.
+  - `pnpm test:e2e`, `e2e/smoke.spec.ts`: üretim derlemesine karşı (`pnpm start -p 3100`), iki proje:
+    - masaüstü 1440×900;
+    - mobil (Pixel 7: dokunmatik, `pointer: coarse`).
+  - Kapsam:
+    - konsol hatası ve yatay taşma yok (390 / 768 / 1440);
+    - reduced motion'da giriş bölgeleri ve tepsi hücreleri görünür;
+    - vitrin hücresi ürün sayfasını açar;
+    - `/parca/yok` 404;
+    - WhatsApp linki parça adını ve numarasını kodlanmış taşır;
+    - mobil menü (açılır, arka plan `inert`, Escape, odak dönüşü);
+    - fareyle lup (2 sn basılı tut → açık, bırak → kapalı, link açılmaz);
+    - robots.txt kapalı.
+  - Tarayıcı:
+    - yerelde indirmeden kurulu tarayıcıyla: `PW_CHANNEL=msedge pnpm test:e2e`;
+    - CI'da `playwright install --with-deps chromium` (derlemeden sonra aynı işte).
+- **Gerekçe:** İnceleme 7.1b ("zaman kalırsa en sona"). Elle CDP ile yapılan denetimlerin en kritik kısmı tekrarlanabilir oldu.
+- **Geri alma:** `pnpm remove @playwright/test`; `e2e/`, `playwright.config.ts` ve CI'daki iki adımı sil.
