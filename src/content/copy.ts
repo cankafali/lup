@@ -256,6 +256,15 @@ export const notFoundPage = {
   note: "ARADIĞINIZ PARÇA TEZGÂHTA DEĞİL.\nTÜM PARÇALAR MAĞAZADA, ELDE, 1:1.",
 };
 
+/** Beklenmeyen hata (inceleme 6): kök hata sınırı. */
+export const errorPage = {
+  label: "HATA — LEVHA ÇİZİLEMEDİ",
+  title: [{ text: "Bir şey" }, { text: "ters gitti.", italic: true }],
+  note: "SAYFA YÜKLENİRKEN BİR SORUN ÇIKTI.\nPARÇALAR YERİNDE: MAĞAZADA, 1:1.",
+  retry: "Yeniden dene",
+  home: { arrow: "←", label: "ANA SAYFA", href: "/" },
+};
+
 export const certificate = {
   title: "SERTİFİKA",
   no: (certNo: string) => `No. ${certNo}`,
