@@ -36,7 +36,7 @@ export function cloneContent(source: HTMLElement): HTMLElement {
 }
 
 /**
- * Hi-res görsel değişimi (§9.2, §17): `data-hires` olan görsellerde src orijinal dosyaya çevrilir,
+ * Hi-res görsel değişimi (§9.2, §17): `data-hires` olan görsellerde src yüksek çözünürlüklü kopyaya çevrilir,
  * srcset/sizes silinir. Büyütülen fotoğraf bulanık görünmesin diye; lup ilk kez etkinleşince çağrılır.
  */
 export function applyHires(clone: HTMLElement) {

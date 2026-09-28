@@ -1,5 +1,6 @@
 import Image from "next/image";
 import clsx from "clsx";
+import { hiresUrl } from "@/lib/hires";
 
 type PhotoOverlayProps = {
   src: string;
@@ -68,7 +69,7 @@ export function PhotoOverlay({
           sizes={sizes}
           className="object-cover"
           style={{ objectPosition: "calc(var(--photo-x) * 100%) calc(var(--photo-y) * 100%)" }}
-          data-hires={src}
+          data-hires={hiresUrl(src)}
           {...(priority ? { loading: "eager" as const, fetchPriority: "high" as const } : {})}
         />
         {children && (

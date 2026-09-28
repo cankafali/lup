@@ -1,3 +1,4 @@
+import { hiresUrl } from "@/lib/hires";
 import type { Side } from "@/lib/overlay";
 
 /**
@@ -86,7 +87,7 @@ const whatsappMessage = (name: string, certNo: string) =>
 
 const img = (file: string, w: number, h: number, alt: string, objectPosition?: string) => ({
   src: `/images/${file}`,
-  hires: `/images/${file}`,
+  hires: hiresUrl(`/images/${file}`),
   w,
   h,
   alt,
