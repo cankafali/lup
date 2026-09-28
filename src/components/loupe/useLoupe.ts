@@ -15,7 +15,6 @@ import {
   type StickyClone,
   type SyncPair,
 } from "./cloneContent";
-import { markHintSeen } from "./hint";
 import { setLoupeRefresh } from "./refresh";
 
 /** Lupun boşta (yalnızca dış halka) kaldığı alanlar (§9.4): Nav, footer, mobil menü. */
@@ -293,7 +292,6 @@ function createLoupe(
       dirty = true;
       doc.dataset.loupeTouch = "";
       navigator.vibrate?.(8);
-      markHintSeen();
       evaluate();
     }, LOUPE.touchHoldMs);
   };

@@ -45,13 +45,18 @@ export const hero = {
   },
   title: [{ text: "Yakından" }, { text: "bakın.", italic: true }],
   coords: `${lat.toFixed(4)}° K / ${lng.toFixed(4)}° D`,
-  note: "BU SİTEDE HER ŞEY\nKASITLI OLARAK KÜÇÜK.\nİMLECİNİZ BİR LUPTUR.",
+  note: "BU SİTEDE HER ŞEY\nKASITLI OLARAK KÜÇÜK.",
+  /** Kullanım bilgisi (K-106): cihaza göre biri görünür, kalıcı */
+  howTo: {
+    mouse: "SOL TIKA 2 SN BASILI TUTUN —\nLUP AÇILIR. BIRAKINCA KAPANIR.",
+    touch: "BİR PARÇAYA BASILI TUTUN —\nLUP AÇILIR.",
+  },
   down: { label: "↓  TEZGÂHA İN", href: "#vitrin" },
-  /** Dokunmatik cihazlarda ilk ziyaret ipucu (§9.6) */
-  loupeHint: "BİR PARÇAYA BASILI TUTUN — LUP AÇILIR",
   lens: {
     mark: "10×",
-    caption: "LUP = İMLECİNİZ\nTAŞ  Ø 5.1 mm · 0.50 ct · F · VS1",
+    /** Örnek lup notunun ilk satırı, cihaza göre (K-106) */
+    howTo: { mouse: "SOL TIK · 2 SN = LUP", touch: "BASILI TUT = LUP" },
+    caption: "TAŞ  Ø 5.1 mm · 0.50 ct · F · VS1",
     alt: "Dört tırnaklı yuvadaki yuvarlak pırlantanın turuncu yansımalı makro görüntüsü",
   },
   overlay: {
@@ -64,7 +69,7 @@ export const hero = {
 export const vitrin = {
   label: "02 — VİTRİN",
   title: [{ text: "Tezgâhta" }, { text: "altı parça.", italic: true }],
-  note: "FİYAT YOK.\nHER PARÇA MAĞAZADA, ELDE, 1:1.\nİMLECİ BİR PARÇANIN ÜZERİNE GETİRİN.",
+  note: "FİYAT YOK.\nHER PARÇA MAĞAZADA, ELDE, 1:1.\nBİR PARÇAYA BASILI TUTUP YAKINDAN BAKIN.",
   end: (count: number) => `TEZGÂHIN SONU — ${pad2(count)} / ${pad2(count)}`,
   all: { label: "Tüm parçalar mağazada", href: "#magaza" },
   inspect: "İNCELE →",

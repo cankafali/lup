@@ -812,3 +812,17 @@
 - **Dokunmatik:** Değişmedi (180 ms basılı tutma, parmağın 60px üstünde).
 - **Gerekçe:** Kullanıcı isteği (inceleme A.2): lup sürekli açık olmasın, imleç normal kalsın.
 - **Geri alma:** Bu commit'i geri al (`useLoupe.ts`, `Loupe.tsx`, `globals.css` lup kuralları, `clickGuard.ts`).
+
+### K-106 · 2026-09-28 · Hero'da cihaza göre kullanım bilgisi
+
+- **Karar:**
+  - Hero notundan "İMLECİNİZ BİR LUPTUR." çıktı. Notun altında cihaza göre tek satır çifti, kalıcı:
+    - `pointer: fine`: "SOL TIKA 2 SN BASILI TUTUN — LUP AÇILIR. BIRAKINCA KAPANIR.";
+    - `pointer: coarse`: "BİR PARÇAYA BASILI TUTUN — LUP AÇILIR.".
+  - Renk damga kırmızısı (`tone="stamp"`). "10×" etiketleri gibi mono damga dili sayıldı, sayfanın üç odak kırmızısına (§8.1) girmiyor (K-054 ile aynı ayrım).
+  - Lup kopyasında görünmüyor (`data-loupe-hide`).
+  - Vitrin notu: "BİR PARÇAYA BASILI TUTUP YAKINDAN BAKIN."
+  - İlk ziyaret ipucu (`LoupeHint`, `hint.ts`, "görüldü" kaydı) silindi; bilgi artık hep görünür.
+- **Sapma:** İncelemede örnek lup notu "SOL TIK · 2 SN = LUP" tek metindi. Bu not ≥ 1024px'te görünüyor; yatay iPad gibi dokunmatik ekranda yanlış talimat olurdu. İlk satır da cihaza göre ikiye ayrıldı: fare "SOL TIK · 2 SN = LUP", dokunmatik "BASILI TUT = LUP".
+- **Gerekçe:** İnceleme A.3: imleç artık lup değil; cihaza göre doğru talimat.
+- **Geri alma:** `copy.ts` → `hero.howTo`, `hero.lens.howTo`; `Hero.tsx`'teki iki satır çifti.

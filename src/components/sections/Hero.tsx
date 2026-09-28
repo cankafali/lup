@@ -1,5 +1,4 @@
 import { hero, photoNote, plate } from "@/content/copy";
-import { LoupeHint } from "@/components/loupe/LoupeHint";
 import { PlateFrame } from "@/components/layout/PlateFrame";
 import { Axis } from "@/components/primitives/Axis";
 import { Callout } from "@/components/primitives/Callout";
@@ -129,7 +128,13 @@ export function Hero() {
                   <MonoLabel tone="stamp" className="block">
                     {hero.lens.mark}
                   </MonoLabel>
-                  <MonoLabel className="mt-1 block">{hero.lens.caption}</MonoLabel>
+                  <MonoLabel className="mt-1 hidden [@media(pointer:fine)]:block">
+                    {hero.lens.howTo.mouse}
+                  </MonoLabel>
+                  <MonoLabel className="mt-1 hidden [@media(pointer:coarse)]:block">
+                    {hero.lens.howTo.touch}
+                  </MonoLabel>
+                  <MonoLabel className="block">{hero.lens.caption}</MonoLabel>
                 </p>
               </div>
             </div>
@@ -158,13 +163,27 @@ export function Hero() {
               className="pointer-events-auto col-span-3 col-start-10 max-w-[240px] max-lg:col-span-3 max-lg:col-start-6"
             >
               <MonoLabel className="block">{hero.note}</MonoLabel>
+              {/* Kullanım bilgisi (K-106): cihaza göre biri; lupun kopyasında yok */}
+              <MonoLabel
+                tone="stamp"
+                data-loupe-hide
+                className="mt-3 hidden [@media(pointer:fine)]:block"
+              >
+                {hero.howTo.mouse}
+              </MonoLabel>
+              <MonoLabel
+                tone="stamp"
+                data-loupe-hide
+                className="mt-3 hidden [@media(pointer:coarse)]:block"
+              >
+                {hero.howTo.touch}
+              </MonoLabel>
               <a
                 href={hero.down.href}
                 className="mt-5 tap inline-block font-mono text-mono whitespace-pre underline-offset-4 hover:underline max-md:mt-3"
               >
                 {hero.down.label}
               </a>
-              <LoupeHint text={hero.loupeHint} className="mt-3" />
             </div>
           </div>
         </div>
