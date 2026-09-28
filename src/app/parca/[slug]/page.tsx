@@ -30,6 +30,7 @@ export async function generateMetadata(
   return {
     title,
     description: product.description,
+    alternates: { canonical: `/parca/${product.slug}` },
     openGraph: { ...openGraph, title, description: product.description },
   };
 }
