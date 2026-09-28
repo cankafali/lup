@@ -35,6 +35,7 @@ pnpm dev
 | `pnpm lint` | ESLint, uyarı sınırı 0 |
 | `pnpm typecheck` | Rota tipleri + `tsc --noEmit` |
 | `pnpm test` | Birim testleri (Vitest) |
+| `pnpm test:e2e` | Uçtan uca duman testleri (Playwright; önce `pnpm build`, yerelde `PW_CHANNEL=msedge`) |
 | `pnpm format` | Prettier |
 
 Her push (master) ve PR'da GitHub Actions aynı denetimleri çalıştırır (`.github/workflows/ci.yml`).
