@@ -7,7 +7,7 @@ import { useMotion } from "./useMotion";
 
 /**
  * Nav (§8.9): sayfa başında durur; aşağı kayarken gizlenir, yukarı kayarken geri gelir.
- * Yalnızca transform (yPercent). Reduced motion'da sabit, hep görünür.
+ * Yalnızca transform (yPercent). İçine odak gelince görünür. Reduced motion'da sabit, hep görünür.
  */
 export function NavMotion() {
   const anchor = useMotion((header) => {
@@ -28,6 +28,10 @@ export function NavMotion() {
       end: "max",
       onUpdate: (self) => show(self.scroll() < height || self.direction < 0),
     });
+    // Klavyeyle Nav linkine dönülünce (Shift+Tab) odak ekran dışında kalmasın (WCAG 2.4.11)
+    const onFocusIn = () => show(true);
+    header.addEventListener("focusin", onFocusIn);
+    return () => header.removeEventListener("focusin", onFocusIn);
   });
 
   return <span ref={anchor} hidden />;
