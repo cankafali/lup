@@ -23,10 +23,15 @@ export function NavMenu({ className }: { className?: string }) {
   useEffect(() => {
     if (!open) return;
     lenis?.stop();
+    // Odak ve ekran okuyucu panelde kalsın: arka plan etkisiz (panel body'de, #lup-content dışında)
+    const content = document.getElementById("lup-content");
+    content?.setAttribute("inert", "");
     close.current?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     // Lenis, kaydırma başlamadan açılmalı: start() sürmekte olan scrollTo animasyonunu sıfırlar.
+    // inert de hemen kalkar: anchor işleyicisi birazdan odağı bölüme taşıyacak
     const onAnchor = () => {
+      content?.removeAttribute("inert");
       lenis?.start();
       setOpen(false);
     };
@@ -34,6 +39,7 @@ export function NavMenu({ className }: { className?: string }) {
     window.addEventListener(ANCHOR_EVENT, onAnchor);
     const trigger = button.current;
     return () => {
+      content?.removeAttribute("inert");
       lenis?.start();
       window.removeEventListener("keydown", onKey);
       window.removeEventListener(ANCHOR_EVENT, onAnchor);
