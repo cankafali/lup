@@ -7,6 +7,12 @@ import { site, YEAR } from "./site";
 const pad2 = (n: number) => String(n).padStart(2, "0");
 const upper = (s: string) => s.toLocaleUpperCase("tr-TR");
 
+/** Yalnızca ekran okuyucuya yönelik ekler (§16). */
+export const a11y = {
+  /** Yeni sekmede açılan linklerin sonuna (inceleme 4.2) */
+  newTab: " (yeni sekmede açılır)",
+};
+
 export const plate = {
   /** "ÖLÇEK 1:1 — LEVHA 02/05" */
   label: (no: number, total: number) => `ÖLÇEK 1:1 — LEVHA ${pad2(no)}/${pad2(total)}`,

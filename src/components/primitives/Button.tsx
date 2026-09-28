@@ -1,5 +1,6 @@
 import Link from "next/link";
 import clsx from "clsx";
+import { a11y } from "@/content/copy";
 
 type ButtonProps = {
   href: string;
@@ -45,6 +46,7 @@ export function Button({
       >
         →
       </span>
+      {external && <span className="sr-only">{a11y.newTab}</span>}
     </>
   );
 
