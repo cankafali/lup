@@ -16,7 +16,8 @@ const MARK = 24;
 const INSET = 32;
 
 const [mono, photo] = await Promise.all([
-  readFile(join(process.cwd(), "node_modules/geist/dist/fonts/geist-mono/GeistMono-Medium.ttf")),
+  // Font repoda (OFL, src/assets/fonts): geist paketinin iç klasör yapısı değişirse derleme kırılmasın (inceleme 5.4)
+  readFile(join(process.cwd(), "src/assets/fonts/GeistMono-Medium.ttf")),
   readFile(join(process.cwd(), "public/images/lup-detay.jpg")),
 ]);
 const photoSrc = `data:image/jpeg;base64,${photo.toString("base64")}`;
