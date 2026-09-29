@@ -395,7 +395,7 @@ Kaynak: `lup-inceleme.md` (28.09.2026, dış kod incelemesi), otonom çalışma 
 | 7.1a | Vitest, 41 birim testi | `65dcf95` | K-110 |
 | 7.2 | GitHub Actions CI | `b62bfc5` | K-110 |
 | 7.1b | Playwright duman testleri (zaman kaldı, en sona) | `f0ff69e` | K-111 |
-| 8 | README, `data-*` sözlüğü, ekran görüntüleri, `scripts/blur.mjs`; 3.2 `sharp` notu README'de | `a923edb` | — |
+| 8 | README, `data-*` sözlüğü, ekran görüntüleri, `scripts/blur.mjs`; 3.2 `sharp` notu. 29.09: README sadeleşti, sözlük ve teknik ayrıntılar `docs/TEKNIK.md`'ye taşındı | `a923edb` | — |
 
 **Kabul** (yerel üretim derlemesi; headless Edge + CDP betikleri ve Playwright)
 
@@ -463,7 +463,7 @@ Kaynak: `lup-inceleme.md` (28.09.2026, dış kod incelemesi), otonom çalışma 
   - masaüstünde 2 sn basılı tutma hissi.
 - 3.3: klonu bölümlerle sınırlama (büyük refaktör).
 - 9: CMS, çoklu dil, analitik, kroki.
-- 8 notu: şartname (`§` atıfları) repoda değil. Repo herkese açıksa belgeyi eklemek kullanıcının kararı; README atıfların neye işaret ettiğini anlatıyor.
+- 8 notu: şartname (`§` atıfları) repoda değil. Repo herkese açıksa belgeyi eklemek kullanıcının kararı; `docs/TEKNIK.md` atıfların neye işaret ettiğini anlatıyor.
 - 5.6 notu: CSP ayrı adım. Satır içi `INTRO_SCRIPT` ve JSON-LD için hash ya da nonce gerekir.
 
 **Talimat gereği atlananlar ve listede olmayanlar**

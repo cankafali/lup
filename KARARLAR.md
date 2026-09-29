@@ -833,7 +833,7 @@
 - **Sapma:** İnceleme statik içe aktarmayı öneriyordu (Next otomatik `blurDataURL` üretir). O yol:
   - görselleri `_next/static/media`'ya hash'li ikinci kopya olarak taşırdı;
   - lupun hi-res adreslerini (`/images/…`) ve içerik dosyasındaki yol verisini değiştirirdi.
-- **Üretim:** Yeni bağımlılık yok. Next'in getirdiği `sharp` ile tek seferlik komut (README → "Görseller").
+- **Üretim:** Yeni bağımlılık yok. Next'in getirdiği `sharp` ile tek seferlik komut: `node scripts/blur.mjs` (docs/TEKNIK.md → "Görseller").
 - **Ek:** Tepsi `sizes` mobilde 2 kolona göre `50vw` (önce `100vw`), telkari lupu `21vw / 32vw`.
 - **Gerekçe:** İnceleme 3.5.
 - **Geri alma:** Üç bileşendeki `{...blurProps(…)}` satırlarını ve `blur.ts` dosyalarını sil.
