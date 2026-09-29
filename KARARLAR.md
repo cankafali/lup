@@ -895,3 +895,16 @@
     - CI'da `playwright install --with-deps chromium` (derlemeden sonra aynı işte).
 - **Gerekçe:** İnceleme 7.1b ("zaman kalırsa en sona"). Elle CDP ile yapılan denetimlerin en kritik kısmı tekrarlanabilir oldu.
 - **Geri alma:** `pnpm remove @playwright/test`; `e2e/`, `playwright.config.ts` ve CI'daki iki adımı sil.
+
+### K-112 · 2026-09-29 · CI'da uçtan uca testlere süre sınırı ve teşhis
+
+- **Durum:** PR #1'in ilk CI çalışmasında `pnpm test:e2e` adımı 8 dakikadan uzun sürdü, iptal edildi. Önceki 11 adım 1 dakikada geçmişti. Yerelde aynı dal CI ayarlarıyla (kendi sunucusunu başlatarak) 11 sn'de geçiyor.
+  - "github" raporlayıcısı sonuçları yalnızca sonda yazdığı için hangi testin takıldığı loga düşmedi.
+  - İşin varsayılan süre sınırı 6 saat.
+- **Karar:**
+  - İş 20 dk, test adımı 8 dk, Playwright çalışması (`globalTimeout`) 5 dk ile sınırlı.
+  - CI'da `list` raporlayıcısı da açık: her test bitince loga yazılır.
+  - Hata olursa html raporu ve iz dosyaları (`trace: retain-on-failure`) çalışmaya indirilebilir çıktı olarak yüklenir.
+  - Test sunucusu `pnpm start` yerine doğrudan `next start`: kapanışta süreç ağacı temiz ölsün (yerelde `pnpm start`'ın alt süreci sarmalayıcı öldürülünce açık kalıyordu).
+  - Aynı dala yeni push gelince süren çalışma iptal edilir (`concurrency`).
+- **Geri alma:** `playwright.config.ts` ve `.github/workflows/ci.yml`'deki bu ayarları kaldır.
