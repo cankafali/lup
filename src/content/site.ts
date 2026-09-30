@@ -1,7 +1,11 @@
+const FOUNDED = 1987;
+/** Derleme yılı: sayfalar statik üretildiği için yılda bir yeniden yayın yeterli (inceleme 2.10). */
+export const YEAR = new Date().getFullYear();
+
 export const site = {
   brand: "Sönmez",
   brandFull: "Sönmez Kuyumculuk",
-  founded: 1987,
+  founded: FOUNDED,
   tagline: "Sitede 10×. Mağazada 1:1.",
   description:
     "Kapalıçarşı'da 1987'den beri aynı tezgâh. Parçaları sitede 10× büyütün, mağazada 1:1 görün.",
@@ -32,8 +36,14 @@ export const site = {
   },
   master: { name: "Mehmet Sönmez", initials: "M.S." },
   stats: [
-    { value: 39, unit: "yıl" },
+    { value: YEAR - FOUNDED, unit: "yıl" },
     { value: 3, unit: "kuşak" },
     { value: 1, unit: "tezgâh" },
   ],
 } as const;
+
+// Gerçek numaralar kuyumcudan gelene kadar derlemede uyarı (inceleme 1.1). Yayını kırmasın diye
+// throw değil; tarayıcı konsoluna düşmesin diye yalnızca sunucuda.
+if (typeof window === "undefined" && /0{6,}/.test(site.whatsapp + site.phone.tel)) {
+  console.warn("⚠ site.ts: WhatsApp/telefon hâlâ yer tutucu — yayından önce değiştirin");
+}

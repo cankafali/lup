@@ -4,7 +4,7 @@ import { gsap } from "@/lib/gsap";
 import { ScrollTrigger } from "@/lib/scroll";
 import { DURATION, EASE } from "@/lib/tokens";
 import { $, $$, clearDraw, drawDimension, onDone, UNDRAWN } from "./helpers";
-import { introReady } from "./intro";
+import { introReady, introSkipped } from "./intro";
 import { useMotion } from "./useMotion";
 
 const SHAPES = "path, circle, rect, line, polygon, polyline, ellipse";
@@ -149,6 +149,8 @@ function revealCertificate(tl: gsap.core.Timeline, cert: Element, at: number) {
  */
 export function PlateMotion() {
   const anchor = useMotion((root) => {
+    // Yedek devreye girdiyse (JS 4 sn'de gelmedi) levha çizili kalır
+    if (introSkipped()) return;
     // Yalnızca görünen levhalar (mobilde masaüstü levhası, masaüstünde pencereler display:none)
     const plates = $$(root, "[data-plate]").filter((p) => p.getClientRects().length > 0);
     // İlk boyamada hazır gelen (data-intro-keep: mobil sertifika başlığı) açılmaz

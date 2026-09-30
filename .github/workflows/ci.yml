@@ -1,0 +1,42 @@
+# Her push (master) ve PR'da: lint, tip, biçim, birim testi, derleme, uçtan uca duman testi (inceleme 7.2).
+# pnpm sürümü package.json → packageManager'dan.
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+# Aynı dala yeni push gelince süren çalışma iptal edilir
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    # Takılan bir adım işi 6 saat (varsayılan) açık tutmasın (K-112)
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm exec prettier --check .
+      - run: pnpm test
+      - run: pnpm build
+      # Uçtan uca duman testleri (K-111): derlemeye karşı, Playwright Chromium
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+        timeout-minutes: 8
+      # Hata olursa rapor ve iz dosyaları: Actions → çalışma → Artifacts
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-raporu
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

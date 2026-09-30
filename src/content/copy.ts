@@ -1,10 +1,18 @@
-import { site } from "./site";
+import { getProduct } from "./products";
+import { site, YEAR } from "./site";
 
 // Bölüm metinleri (§12.4). Mono etiketler büyük harfle yazılır; birimler küçük kalır (K-014).
-// Buton metinlerine ok (→) yazılmaz; Button bileşeni ekler (K-022).
+// Buton metinlerine ok (→) yazılmaz; Button bileşeni ekler (K-022). Diğer linklerde ok ayrı alanda
+// (`arrow`), ekran okuyucuda "sağ ok" diye okunmasın diye aria-hidden verilir (inceleme 4.5).
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 const upper = (s: string) => s.toLocaleUpperCase("tr-TR");
+
+/** Yalnızca ekran okuyucuya yönelik ekler (§16). */
+export const a11y = {
+  /** Yeni sekmede açılan linklerin sonuna (inceleme 4.2) */
+  newTab: " (yeni sekmede açılır)",
+};
 
 export const plate = {
   /** "ÖLÇEK 1:1 — LEVHA 02/05" */
@@ -26,7 +34,7 @@ export const nav = {
     { no: "02", label: "ATÖLYE", title: "Atölye", href: "/#atolye" },
     { no: "03", label: "MAĞAZA", title: "Mağaza", href: "/#magaza" },
   ],
-  cta: { label: "RANDEVU →", href: "/#magaza" },
+  cta: { label: "RANDEVU", arrow: "→", href: "/#magaza" },
   /** Mobil menü (§8.9) */
   menu: "MENÜ",
   close: "KAPAT",
@@ -34,6 +42,15 @@ export const nav = {
 };
 
 const { lat, lng } = site.address.coords;
+
+/** Hero ve 10× bölümündeki taş/bant ölçüleri Tektaş'ın verisinden (inceleme 2.11, K-047). */
+function solitaireData() {
+  const p = getProduct("tektas-ruya");
+  const spec = p?.drawingSpec;
+  if (!p?.stone || spec?.kind !== "solitaire") throw new Error("copy.ts: Tektaş verisi eksik");
+  return { spec, stone: p.stone, karat: p.karat.label };
+}
+const tektas = solitaireData();
 
 export const hero = {
   srTitle: `${site.brandFull} — Yakından bakın.`,
@@ -45,26 +62,31 @@ export const hero = {
   },
   title: [{ text: "Yakından" }, { text: "bakın.", italic: true }],
   coords: `${lat.toFixed(4)}° K / ${lng.toFixed(4)}° D`,
-  note: "BU SİTEDE HER ŞEY\nKASITLI OLARAK KÜÇÜK.\nİMLECİNİZ BİR LUPTUR.",
-  down: { label: "↓  TEZGÂHA İN", href: "#vitrin" },
-  /** Dokunmatik cihazlarda ilk ziyaret ipucu (§9.6) */
-  loupeHint: "BİR PARÇAYA BASILI TUTUN — LUP AÇILIR",
+  note: "BU SİTEDE HER ŞEY\nKASITLI OLARAK KÜÇÜK.",
+  /** Kullanım bilgisi (K-106): cihaza göre biri görünür, kalıcı */
+  howTo: {
+    mouse: "SOL TIKA 2 SN BASILI TUTUN —\nLUP AÇILIR. BIRAKINCA KAPANIR.",
+    touch: "BİR PARÇAYA BASILI TUTUN —\nLUP AÇILIR.",
+  },
+  down: { arrow: "↓", label: "TEZGÂHA İN", href: "#vitrin" },
   lens: {
     mark: "10×",
-    caption: "LUP = İMLECİNİZ\nTAŞ  Ø 5.1 mm · 0.50 ct · F · VS1",
+    /** Örnek lup notunun ilk satırı, cihaza göre (K-106) */
+    howTo: { mouse: "SOL TIK · 2 SN = LUP", touch: "BASILI TUT = LUP" },
+    caption: `TAŞ  Ø ${tektas.spec.stone} mm · ${tektas.stone.carat} · ${tektas.stone.color} · ${tektas.stone.clarity}`,
     alt: "Dört tırnaklı yuvadaki yuvarlak pırlantanın turuncu yansımalı makro görüntüsü",
   },
   overlay: {
-    stone: "Ø 5.1 mm",
+    stone: `Ø ${tektas.spec.stone} mm`,
     section: "A",
-    band: "BANT  2.2 mm\n18K · 750",
+    band: `BANT  ${tektas.spec.section.width} mm\n${tektas.karat}`,
   },
 };
 
 export const vitrin = {
   label: "02 — VİTRİN",
   title: [{ text: "Tezgâhta" }, { text: "altı parça.", italic: true }],
-  note: "FİYAT YOK.\nHER PARÇA MAĞAZADA, ELDE, 1:1.\nİMLECİ BİR PARÇANIN ÜZERİNE GETİRİN.",
+  note: "FİYAT YOK.\nHER PARÇA MAĞAZADA, ELDE, 1:1.\nBİR PARÇAYA BASILI TUTUP YAKINDAN BAKIN.",
   end: (count: number) => `TEZGÂHIN SONU — ${pad2(count)} / ${pad2(count)}`,
   all: { label: "Tüm parçalar mağazada", href: "#magaza" },
   inspect: "İNCELE →",
@@ -85,7 +107,7 @@ export const makro = {
     hammer: "ÇEKİÇ İZİ\nMAKİNE DEĞİL, EL",
     girdle: "RUNDİST\nİNCE · CİLALI",
   },
-  diameter: "Ø 5.10 mm  ·  ÖLÇEK 10:1",
+  diameter: `Ø ${tektas.spec.stone.toFixed(2)} mm  ·  ÖLÇEK 10:1`,
 };
 
 export const atolye = {
@@ -140,9 +162,38 @@ export const magaza = {
   directions: "Yol tarifi",
 };
 
+// Saatin bulunma hâli eki, okunuşun son kelimesine göre (inceleme 2.9): "10:00'DA", "11:00'DE", "09:15'TE"
+const SUFFIX_ONES: Record<number, string> = {
+  1: "DE",
+  2: "DE",
+  3: "TE",
+  4: "TE",
+  5: "TE",
+  6: "DA",
+  7: "DE",
+  8: "DE",
+  9: "DA",
+};
+const SUFFIX_TENS: Record<number, string> = {
+  0: "DA",
+  10: "DA",
+  20: "DE",
+  30: "DA",
+  40: "TA",
+  50: "DE",
+};
+
+/** "10:00" → "DA", "11:00" → "DE", "09:15" → "TE". Dakika varsa dakikaya, yoksa saate göre. */
+export function timeSuffix(hhmm: string) {
+  const [h = 0, m = 0] = hhmm.split(":").map(Number);
+  const n = m || h;
+  return SUFFIX_ONES[n % 10] ?? SUFFIX_TENS[n - (n % 10)] ?? "DA";
+}
+
 export const openStatus = {
   open: "ŞU AN AÇIK",
-  closed: (day: string) => `ŞU AN KAPALI — ${day} ${site.hours.from}'DA AÇILIR`,
+  closed: (day: string) =>
+    `ŞU AN KAPALI — ${day} ${site.hours.from}'${timeSuffix(site.hours.from)} AÇILIR`,
   days: ["PAZAR", "PAZARTESİ", "SALI", "ÇARŞAMBA", "PERŞEMBE", "CUMA", "CUMARTESİ"],
 };
 
@@ -157,15 +208,15 @@ export const footer = {
   instagram: "Instagram",
   wordmark: upper(site.brand),
   stamps: { founded: String(site.founded), hallmark: "750" },
-  copyright: `© 2026 ${upper(site.brandFull)} · ${site.address.plate} ${upper(site.address.city)}`,
+  copyright: `© ${YEAR} ${upper(site.brandFull)} · ${site.address.plate} ${upper(site.address.city)}`,
   motto: "BU SİTEDE HER ŞEY 10×",
-  top: "YUKARI ↑",
+  top: { label: "YUKARI", arrow: "↑" },
 };
 
 const [masterFirst = "", ...masterRest] = site.master.name.split(" ");
 
 export const productPage = {
-  back: { label: "← TEZGÂHA DÖN", href: "/#vitrin" },
+  back: { arrow: "←", label: "TEZGÂHA DÖN", href: "/#vitrin" },
   plate: (no: string, total: number) => `LEVHA ${no} / ${pad2(total)}`,
   scale: "ÖLÇEK 2:1\nÖLÇÜLER mm",
   views: {
@@ -194,8 +245,24 @@ export const productPage = {
     date: "TARİH",
     masterValue: `${masterFirst.charAt(0)}. ${masterRest.join(" ")}`,
     scaleValue: "2:1",
-    dateValue: "03.2026",
   },
+};
+
+/** Bilinmeyen adres (inceleme 6). */
+export const notFoundPage = {
+  title: "Levha bulunamadı",
+  label: "404 — ARŞİVDE YOK",
+  heading: [{ text: "Bu levha" }, { text: "arşivde yok.", italic: true }],
+  note: "ARADIĞINIZ PARÇA TEZGÂHTA DEĞİL.\nTÜM PARÇALAR MAĞAZADA, ELDE, 1:1.",
+};
+
+/** Beklenmeyen hata (inceleme 6): kök hata sınırı. */
+export const errorPage = {
+  label: "HATA — LEVHA ÇİZİLEMEDİ",
+  title: [{ text: "Bir şey" }, { text: "ters gitti.", italic: true }],
+  note: "SAYFA YÜKLENİRKEN BİR SORUN ÇIKTI.\nPARÇALAR YERİNDE: MAĞAZADA, 1:1.",
+  retry: "Yeniden dene",
+  home: { arrow: "←", label: "ANA SAYFA", href: "/" },
 };
 
 export const certificate = {
@@ -227,4 +294,7 @@ export const certificate = {
 export const og = {
   line: `${upper(site.brand)} — ${upper(site.tagline)}`,
   alt: `${site.brandFull}: lup dairesi içinde pırlantanın makro görüntüsü, altında "${site.tagline}"`,
+  /** Ürün paylaşım görseli (inceleme 6) */
+  productAlt: (name: string) =>
+    `${site.brandFull}: lup dairesi içinde ${name} fotoğrafı, sertifika numarası ve ayar damgası`,
 };

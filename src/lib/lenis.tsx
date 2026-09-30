@@ -1,6 +1,7 @@
 "use client";
 
 import Lenis from "lenis";
+import { clickSwallowed } from "./clickGuard";
 import { createContext, useContext, useEffect, useSyncExternalStore } from "react";
 
 // Lenis örneği modül düzeyinde tutulur; bileşenler useLenis ile okur (efekt içinde setState yok).
@@ -32,6 +33,8 @@ function onAnchorClick(e: MouseEvent) {
   const lenis = instance;
   if (!lenis || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey)
     return;
+  // Lupla basılı tutup bırakınca gelen tıklama kaydırmasın (K-105)
+  if (clickSwallowed()) return;
   const a = e.target instanceof Element ? e.target.closest("a[href]") : null;
   if (!(a instanceof HTMLAnchorElement) || a.target === "_blank") return;
   const url = new URL(a.href, location.href);

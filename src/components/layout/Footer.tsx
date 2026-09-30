@@ -1,4 +1,4 @@
-import { footer } from "@/content/copy";
+import { a11y, footer } from "@/content/copy";
 import { site } from "@/content/site";
 import { FitText } from "@/components/primitives/FitText";
 import { MonoLabel } from "@/components/primitives/MonoLabel";
@@ -34,6 +34,7 @@ export function Footer() {
             {"\n"}
             <a href={waLink()} target="_blank" rel="noopener noreferrer" className={LINK}>
               {footer.whatsapp}
+              <span className="sr-only">{a11y.newTab}</span>
             </a>
           </Column>
           <Column
@@ -42,6 +43,7 @@ export function Footer() {
           <Column title={footer.columns.follow}>
             <a href={site.instagram.url} target="_blank" rel="noopener noreferrer" className={LINK}>
               {footer.instagram}
+              <span className="sr-only">{a11y.newTab}</span>
             </a>
           </Column>
         </div>
@@ -65,7 +67,7 @@ export function Footer() {
           <span>{footer.copyright}</span>
           <span className="text-center max-md:text-left">{footer.motto}</span>
           <a href="#" className={`justify-self-end max-md:justify-self-start ${LINK}`}>
-            {footer.top}
+            {footer.top.label} <span aria-hidden>{footer.top.arrow}</span>
           </a>
         </div>
       </div>

@@ -26,6 +26,17 @@
 }
 
 @layer base {
+  html {
+    /* İki parmakla ve çift dokunuşla yakınlaştırma kapalı, kaydırma serbest (K-104) */
+    touch-action: pan-x pan-y;
+  }
+
+  /* Başka sayfadan çapayla gelişte (/#magaza) ya da tarayıcı kaydırdığında bölüm başı sabit
+     Nav altında kalmasın; Lenis sayfa içinde aynı payı kendisi veriyor (inceleme 2.6) */
+  :where(section[id], main[id]) {
+    scroll-margin-top: var(--nav-h);
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-graphite);
     outline-offset: 3px;
@@ -35,22 +46,16 @@
     outline: none;
   }
 
-  /* Lup imleci (§9.4): yalnızca JS lupu kurduğunda (`has-loupe`) ve ince imleçte.
-     Etkileşimli öğelerde sistem imleci geri gelir; tamamı link olan tepsi hücreleri hariç (K-056). */
+  /* Lup yalnızca sol tık basılı tutulunca açılır (K-105): imleç ve metin seçimi yalnızca
+     açıkken kapalı, gerisinde sistem imleci olduğu gibi. */
   @media (pointer: fine) {
-    html.has-loupe,
-    html.has-loupe * {
-      cursor: none;
+    html.loupe-open,
+    html.loupe-open * {
+      cursor: none !important;
     }
-    html.has-loupe
-      :is(a, button, [role="button"], summary, label, select):not([data-loupe-magnify]),
-    html.has-loupe
-      :is(a, button, [role="button"], summary, label, select):not([data-loupe-magnify])
-      * {
-      cursor: pointer;
-    }
-    html.has-loupe :is(input, textarea) {
-      cursor: text;
+    html.loupe-open {
+      -webkit-user-select: none;
+      user-select: none;
     }
   }
 
@@ -155,7 +160,8 @@
     /* Her karede transform değişir; kendi katmanında kalsın, boyama olmasın (§9.8) */
     will-change: transform;
   }
-  .loupe:is([data-state="idle"], [data-state="active"]) {
+  .loupe:is([data-state="idle"], [data-state="active"]),
+  html[data-loupe-holding] .loupe {
     opacity: 1;
   }
 
@@ -218,8 +224,43 @@
     transition: opacity var(--duration-fast) var(--ease-lup);
   }
 
-  .loupe[data-state="idle"] :is(.loupe-glass, .loupe-label) {
+  /* Boşta ve basılı tutarken yalnızca dış halka; cam açılışta halkayla birlikte belirir */
+  .loupe:not([data-state="active"]) :is(.loupe-glass, .loupe-label) {
     opacity: 0;
+  }
+
+  /* Basılı tutma göstergesi (K-105): dış halkanın üstünde, tutma süresinde dolan kırmızı yay.
+     Reduced motion'da tam daire, süre sonunda lup doğrudan açılır. */
+  .loupe-progress {
+    position: absolute;
+    inset: calc(-1 * var(--loupe-ring));
+    width: calc(100% + 2 * var(--loupe-ring));
+    height: calc(100% + 2 * var(--loupe-ring));
+    rotate: -90deg;
+    opacity: 0;
+    pointer-events: none;
+    & circle {
+      fill: none;
+      stroke: var(--color-stamp);
+      stroke-width: 1;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+  }
+  html[data-loupe-holding] .loupe-progress {
+    opacity: 1;
+    & circle {
+      animation: loupe-hold var(--loupe-hold) linear forwards;
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+        stroke-dashoffset: 0;
+      }
+    }
+  }
+  @keyframes loupe-hold {
+    to {
+      stroke-dashoffset: 0;
+    }
   }
 }
 

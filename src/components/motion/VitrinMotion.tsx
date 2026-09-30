@@ -16,7 +16,7 @@ export function VitrinMotion() {
 
       const tray = $(root, "[data-tray]");
       if (!tray) return;
-      const cells = $$(tray, "[data-loupe-magnify]");
+      const cells = $$(tray, "[data-tray-cell]");
       let entered = false;
 
       const tl = gsap.timeline({

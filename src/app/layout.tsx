@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Instrument_Serif } from "next/font/google";
@@ -34,6 +34,14 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
   // Pitch aşaması: kuyumcu onaylayana kadar indekslenmez (§18).
   robots: { index: site.indexable, follow: site.indexable },
+};
+
+// Mobilde yakınlaştırma kapalı; büyütmeyi lup üstleniyor (K-104). iOS bunu yok sayar: globals.css touch-action
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

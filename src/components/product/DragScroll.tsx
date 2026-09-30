@@ -61,6 +61,8 @@ export function DragScroll({
       if (e.pointerId !== pointer) return;
       const dx = e.clientX - startX;
       if (!dragged) {
+        // Lup basılı tutularak açıldıysa fare lupu gezdirir, şeridi sürüklemez (K-105)
+        if (document.documentElement.classList.contains("loupe-open")) return;
         if (Math.abs(dx) < THRESHOLD) return;
         dragged = true;
         el.dataset.dragging = "";

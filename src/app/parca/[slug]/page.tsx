@@ -30,6 +30,7 @@ export async function generateMetadata(
   return {
     title,
     description: product.description,
+    alternates: { canonical: `/parca/${product.slug}` },
     openGraph: { ...openGraph, title, description: product.description },
   };
 }
@@ -40,14 +41,14 @@ export default async function ProductPage({ params }: PageProps<"/parca/[slug]">
   if (!product) notFound();
 
   return (
-    <main id="icerik" tabIndex={-1} data-intro className="pt-24 max-md:pt-16">
+    <main id="icerik" tabIndex={-1} data-intro className="pt-(--nav-h)">
       <PlateMotion />
       <div className="container-lup flex items-baseline justify-between py-4">
         <Link
           href={productPage.back.href}
           className="tap font-mono text-mono underline-offset-4 hover:underline"
         >
-          {productPage.back.label}
+          <span aria-hidden>{productPage.back.arrow}</span> {productPage.back.label}
         </Link>
         <MonoLabel size="s" tone="lead">
           {productPage.plate(product.no, products.length)}

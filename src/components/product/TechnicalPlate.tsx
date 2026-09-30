@@ -131,7 +131,7 @@ export function titleCells(product: Product) {
     { label: t.no, value: product.certNo },
     { label: t.master, value: t.masterValue },
     { label: t.scale, value: t.scaleValue },
-    { label: t.date, value: t.dateValue },
+    { label: t.date, value: product.drawnAt },
   ];
 }
 

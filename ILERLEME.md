@@ -11,6 +11,7 @@
 | 6 — Mobil ve tablet | 2026-09-24 | 2026-09-24 | Tamam |
 | 7 — Kalan çizim tipleri ve cilalar | 2026-09-25 | 2026-09-25 | Tamam |
 | 8 — Erişilebilirlik, performans, SEO, deploy | 2026-09-25 | — | Kod tamam; yayın ve önizleme ölçümü kullanıcıda |
+| 9 — İnceleme düzeltmeleri | 2026-09-28 | 2026-09-28 | Tamam (dal `feat/lup-basili-tut`); yayın ve cihaz testi kullanıcıda |
 
 ---
 
@@ -306,7 +307,7 @@
 
 **Kabul** (yerel üretim derlemesi, mobil Lighthouse 12 benzetimli + CDP denetimleri)
 
-- [x] Accessibility 100 (hedef ≥ 95).
+- [x] Accessibility 100 (hedef ≥ 95). İstisna (K-104, 2026-09-28): mobilde yakınlaştırma kullanıcı isteğiyle kapalı; `meta-viewport` denetimi bilerek başarısız, puan ≈ 90–95.
 - [x] JS ilk yük 152KB gzip (bütçe ≤ 180KB).
 - [x] CLS 0.
 - [ ] Performance ≥ 90: yerelde 79–90 (K-102). LCP yerelde ölçülemiyor (`localhost` yan etkisi); Vercel önizlemesinde ölçülecek.
@@ -338,7 +339,7 @@
 
 1. `npx vercel login`: hesapla giriş.
 2. Proje klasöründe `npx vercel`: önizleme dağıtımı. İlk seferde proje bağlanır; çerçeve Next.js, ayarlar varsayılan.
-3. Verilen önizleme adresini bu dosyaya yaz.
+3. Verilen önizleme adresini bu dosyaya yaz. (30.09: Vercel GitHub'a bağlandı; adres Aşama 9 → "PR, CI ve önizleme".)
 4. Önizlemede ölçüm: [PageSpeed Insights](https://pagespeed.web.dev/) (mobil) ya da `npx lighthouse <adres> --form-factor=mobile`.
    - Vercel önizlemeleri varsayılan olarak "Vercel Authentication" ile korunur. PageSpeed için proje ayarlarında Deployment Protection'ı önizleme süresince kapatmak ya da paylaşılabilir bağlantı kullanmak gerekebilir.
    - Site `noindex, nofollow` olduğundan arama motorlarına girmez.
@@ -348,3 +349,141 @@
 - Yayın ve önizleme ölçümü (yukarıda).
 - Figma karşılaştırması: Figma MCP Starter planın çağrı sınırında. Plan yükseltilirse ya da iki çerçeve (node 12-2 ve 6-305) PNG olarak dışa aktarılırsa yapılabilir.
 - Yeni görünüşlerin ölçüleri temsili (K-086) ve dükkân konumu (kroki, K-094): kuyumcudan bilgi gelince.
+
+## Aşama 9 — İnceleme düzeltmeleri
+
+Kaynak: `lup-inceleme.md` (28.09.2026, dış kod incelemesi), otonom çalışma talimatıyla uygulandı.
+
+- Dal `feat/lup-basili-tut`; `master`'a dokunulmadı.
+- Her madde ayrı commit. Her commit'ten önce `pnpm lint`, `pnpm typecheck`, `pnpm build`.
+- Kararlar K-104…K-111.
+
+**Yapılanlar**
+
+| Madde | Ne | Commit | Karar |
+|---|---|---|---|
+| A.1 | Mobilde yakınlaştırma kapalı (`viewport` + `touch-action`) | `1cc0939` | K-104 |
+| A.2 + 2.3 | Masaüstünde lup sol tık 2 sn basılı tutunca; bırakınca kapanır, izleyen tıklama yutulur (fare ve dokunmatik) | `7c7965e` | K-105 |
+| A.3 | Hero'da cihaza göre kullanım bilgisi, "imleç = lup" metinleri kalktı | `f0f7e25` | K-106 |
+| 1.1 | Telefon/WhatsApp yer tutucuysa derlemede uyarı (throw değil) | `54ca943` | — |
+| 2.1 | Pasif olmayan `touchmove` yalnızca lup açıkken | `016e0c3` | — |
+| 2.2 | İlk dokunuşta klon boşta kurulur | `c589239` | — |
+| 2.4 | Nav'a odak gelince gizliyse görünür | `871bfbc` | — |
+| 2.5 | Mobil menü açıkken arka plan `inert` | `b6f2378` | — |
+| 2.6 | `scroll-margin-top`; Nav yüksekliği tek token (`--nav-h`) | `8524f78` | — |
+| 2.7 | Yedek (4 sn) devreye girdiyse giriş animasyonu kurulmaz | `135c313` | — |
+| 2.8 | Geçiş sürerken ikinci hücre tıklaması yutulur | `07562ec` | — |
+| 2.9 | Açılış saati eki saate göre (`timeSuffix`) | `de3bea1` | — |
+| 2.10 | "39 yıl" ve telif yılı derleme yılından; levha tarihi ürün verisinde | `101a0a8` | — |
+| 2.11 | Hero/10× ölçüleri Tektaş verisinden (çıktı birebir aynı) | `1a2faed` | — |
+| 3.1 | Lupun hi-res görselleri `/_next/image` (≈ 5.1 MB → ≈ 390 KB) | `6fadd9b` | — |
+| 3.4 | Klondan betik, `noscript`, `template`, `.sr-only` çıkar | `7e227f3` | — |
+| 3.5 | Bulanık yer tutucu; mobil tepsi `sizes` 50vw | `d215d15` | K-107 |
+| 4.2 | Yeni sekme linkleri ekran okuyucuya bildirilir | `de1a7ea` | — |
+| 4.3 | Açık/kapalı durumu `role="status"` | `caea394` | — |
+| 4.5 | Link okları `aria-hidden` | `566a935` | — |
+| 5.1 | `--max-warnings=0`; OG `<img>` istisnası yapılandırmada | `5929332` | — |
+| 5.2 | `/_kit` silindi | `c9c5433` | — |
+| 5.3 | `NEXT_PUBLIC_SITE_URL` | `1827ccc` | — |
+| 5.4 | OG fontu repoda (`src/assets/fonts`, OFL) | `aefce72` | — |
+| 5.6 | Güvenlik başlıkları, `x-powered-by` kapalı | `50d9620` | — |
+| 6 | robots + sitemap | `5e95f91` | K-108 |
+| 6 | canonical | `58418c1` | — |
+| 6 | 404 sayfası | `0335b4c` | — |
+| 6 | kök hata sınırı (`error.tsx`) | `6cb53e9` | — |
+| 6 | ürüne özel OG görseli | `5e95ef4` | K-109 |
+| 7.1a | Vitest, 41 birim testi | `65dcf95` | K-110 |
+| 7.2 | GitHub Actions CI | `b62bfc5` | K-110 |
+| 7.1b | Playwright duman testleri (zaman kaldı, en sona) | `f0ff69e` | K-111 |
+| 8 | README, `data-*` sözlüğü, ekran görüntüleri, `scripts/blur.mjs`; 3.2 `sharp` notu. 29.09: README sadeleşti, sözlük ve teknik ayrıntılar `docs/TEKNIK.md`'ye taşındı | `a923edb` | — |
+
+**Kabul** (yerel üretim derlemesi; headless Edge + CDP betikleri ve Playwright)
+
+- [x] Denetimler:
+  - `pnpm lint` 0 uyarı, `typecheck`, `prettier --check`, `build`;
+  - `pnpm test` 41/41;
+  - `pnpm test:e2e` 16 geçti, 2 atlandı (mobil menü masaüstünde, fare lupu mobilde).
+- [x] A.1:
+  - `viewport` meta `maximum-scale=1, user-scalable=no`;
+  - normal kaydırma ve lup basılı tutması çalışıyor;
+  - Lighthouse Accessibility 94 (ana sayfa) / 95 (Tektaş). Yalnız `meta-viewport` düşüyor, bilinçli (K-104).
+- [x] A.2:
+  - açılışta lup yok, linklerde el imleci;
+  - fareyle sürükleyince tutma iptal, metin seçiliyor;
+  - 2 sn basılı: yay dolar (saat 12'den saat yönünde), lup açılır, imleç gizlenir;
+  - basılıyken gezdirme: link üstünde küçülmüyor, footer'da halkaya dönüyor;
+  - bırakınca kapanıyor, hücre üstünde bırakınca sayfa değişmiyor, ardından kısa tık ürün sayfasını açıyor;
+  - sağ tık ve `blur` iptal ediyor;
+  - dokunmatikte 180 ms değişmedi.
+- [x] A.3:
+  - masaüstünde "SOL TIKA 2 SN…", dokunmatikte (390 / 768) "BİR PARÇAYA BASILI TUTUN…";
+  - `grep -rn "İMLEC" src` boş;
+  - bilgi satırları lup klonunda yok;
+  - 390px'te taşma yok.
+- [x] 2.1:
+  - dinleyici listesi: lup kapalıyken pasif olmayan `touchmove` yok, açıkken var, kalkınca gidiyor;
+  - lup açıkken sayfa kaymıyor, kapalıyken kayıyor.
+- [x] 2.2: 4× yavaşlatılmış CPU'da ilk dokunuşun işlenmesi 1 ms. İlk etkileşim doğrudan basılı tutma olunca lup içerikle açılıyor.
+- [x] 2.4–2.6:
+  - Nav gizliyken odak gelince iniyor;
+  - menüde Tab panelde kalıyor, Escape odağı MENÜ'ye döndürüyor, menüden bölüme gidince odak bölümde;
+  - `/#magaza` doğrudan açılınca bölüm başı Nav'ın hemen altında (96 / 64px).
+- [x] 2.7: JS 5 sn gecikince hero ve levha öğeleri yedekten sonra hiç gizlenmiyor (en düşük opaklık 1).
+- [x] 2.8: İki hücreye art arda tıklama: ilk geçiş tamamlanıyor, ikinci yutuluyor, sonraki tık çalışıyor.
+- [x] Regresyon:
+  - sayfa geçişleri (View Transition, desteksiz tarayıcı, şerit);
+  - şerit sürükleme ve yapışma;
+  - hızlı kaydırma, pin, reduced motion;
+  - 360–1920 arası 8 genişlikte yatay taşma yok;
+  - mobil menü ve dokunma hedefleri;
+  - yapı denetimi (tek main, başlık sırası, adsız link yok);
+  - konsol hataları temiz.
+- [x] SEO:
+  - `/robots.txt` (kapalı, önizleme botları hariç), `/sitemap.xml`, canonical;
+  - `/parca/yok` 404 ve `noindex`;
+  - ürün OG görselleri 220–355 KB.
+- [x] JS ilk yük (eski tarayıcı yamaları hariç, gzip): ana sayfa 155.9 KB. `master` aynı yöntemle 151.7 KB; bütçe 180 KB.
+- [ ] Lighthouse Performance ≥ 90: yerelde 89 (ana sayfa) / 90 (Tektaş). LCP yerelde hâlâ ölçülemiyor (K-102); Vercel önizlemesinde ölçülecek.
+- [ ] Gerçek cihaz (aşağıda).
+
+**Yapılamayan / kısmen**
+
+- 3.1'in ek önerisi yapılmadı: kaynak JPEG'lerin mozjpeg ile yeniden sıkıştırılması. Kaynak görsel kalitesini değiştirir. Site artık WebP/AVIF sunuyor, fark yalnızca depo boyutunda.
+- Başarısız olup geri alınan commit yok.
+- `c9c5433` (5.2) commit'lendikten sonra typecheck yerelde eski bir `next dev` çıktısı (`.next/dev/types`) yüzünden düştü. Kod değil, silinen rotaya işaret eden üretilmiş dosyaydı; silinince aynı commit temiz geçti. CI temiz checkout'ta çalıştığı için etkilenmez.
+
+**PR, CI ve önizleme** (29–30.09)
+
+- PR [cankafali/lup#1](https://github.com/cankafali/lup/pull/1): `feat/lup-basili-tut` → `master`. Açık, çakışma yok, henüz merge edilmedi.
+- CI:
+  - İlk çalışmada `test:e2e` adımı 8 dakikadan uzun sürüp iptal edildi. Sebep test sunucusunun `pnpm start` sarmalayıcısıydı: kapanışta süreç ağacı ölmüyordu.
+  - Düzeltme `7d28eac` (K-112): doğrudan `next start`, süre sınırları, canlı test logu, hata raporu çıktısı. Sonrasında tüm iş 1 dakikada yeşil.
+- Vercel GitHub'a bağlı, her push'ta önizleme dağıtımı yapıyor. Dal önizlemesi: https://lup-git-feat-lup-basili-tut-talas2.vercel.app
+  - "Vercel Authentication" ile korunuyor. PageSpeed ve kuyumcu için Deployment Protection kapatılmalı ya da paylaşılabilir link verilmeli.
+- 30.09: README'deki ajan anlatımı kısaltıldı. `.claude/` (yapay zekâ asistanının yerel ayarları) repodan çıkarılıp yok sayıldı.
+
+**Kullanıcıya bırakılanlar** (dış bilgi ya da karar gerekiyor)
+
+- 1.1: gerçek telefon ve WhatsApp numarası. Derleme uyarıyor. Aşama 2'deki "yer tutucu yok" ifadesi bu iki değer için doğru değildi.
+- 1.2: adres, koordinat, Instagram hesabı ve saatlerin (Pazartesi kapalı mı?) kuyumcudan teyidi.
+- 1.3: temsili ölçüler (K-086) ve kroki (K-094). Gelmeden `indexable: true` yapılmamalı.
+- 1.4: Vercel yayını, önizlemede mobil Lighthouse ve gerçek cihaz testi. Bu turda eklenen kontroller:
+  - iOS Safari'de basılı tutunca sayfanın kaymadığı (2.1, dinleyici tutma anında ekleniyor);
+  - WhatsApp'ta ürün linki önizlemesi (OG görseli 220–355 KB);
+  - masaüstünde 2 sn basılı tutma hissi.
+- 3.3: klonu bölümlerle sınırlama (büyük refaktör).
+- 9: CMS, çoklu dil, analitik, kroki.
+- 8 notu: şartname (`§` atıfları) repoda değil. Repo herkese açıksa belgeyi eklemek kullanıcının kararı; `docs/TEKNIK.md` atıfların neye işaret ettiğini anlatıyor.
+- 5.6 notu: CSP ayrı adım. Satır içi `INTRO_SCRIPT` ve JSON-LD için hash ya da nonce gerekir.
+
+**Talimat gereği atlananlar ve listede olmayanlar**
+
+- Atlandı:
+  - 4.1: A.2 ile gereksiz;
+  - 5.5: `useLoupe` ayrıştırma, büyük refaktör.
+- Uygulama listesinde yoktu, dokunulmadı:
+  - 3.6: bundle analyzer, Lighthouse CI;
+  - 4.4: şerit ok düğmeleri;
+  - 5.7: notlar;
+  - 6.7: JSON-LD `priceRange` / `hasMap`. `priceRange` fiyat dili, §20'ye aykırı.
+- 7.3: dal akışı bu dalla başladı.

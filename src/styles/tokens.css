@@ -93,6 +93,7 @@
   --grid-max: 1312px; /* 1440 tuvalde içerik genişliği */
   --italic-scale: 1.15; /* başlıktaki italik kelime / başlık boyutu (§6) */
   --stat-unit-scale: 0.423; /* atölye birimi / rakam: 44/104 masaüstü, 20/48 mobil (§10.4, §15) */
+  --nav-h: 96px; /* Nav yüksekliği (§8.9); mobilde 64 */
 }
 
 /* Tablet (768–1023) */
@@ -110,6 +111,7 @@
     --grid-cols: 4;
     --grid-margin: 20px;
     --grid-gutter: 16px;
+    --nav-h: 64px;
   }
 }
 

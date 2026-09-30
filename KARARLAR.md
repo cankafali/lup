@@ -778,3 +778,133 @@
     - 3 sn güvenlik zamanlayıcısı var.
 - **Gerekçe:** §17 "sayfa başına ilk yük ≤ 180 KB gzip". Ölçüm: ana sayfa 185KB (ScrollTrigger çıkınca) → 180KB (lup ve kılavuz çizgi çıkınca, bütçenin 86 bayt üstü) → 152KB (GSAP çekirdeği çıkınca). Test: hero bindirmeleri ilk `anim-ready` karesinde zaten başlangıç halinde (bir an görünüp kaybolma yok). Hareket, geçiş, şerit, menü, klavye ve lup testleri (masaüstü ve dokunmatik) yeniden geçti.
 - **Geri alma:** Bölümlerde `motion/lazy` yerine doğrudan içe aktarma; `lib/gsap`'a ScrollTrigger ve DrawSVG kaydı.
+
+### K-104 · 2026-09-28 · Mobilde yakınlaştırma kapalı
+
+- **Karar:** Mobilde iki parmakla ve çift dokunuşla yakınlaştırma kapalı:
+  - `layout.tsx` → `viewport`: `maximumScale: 1`, `userScalable: false`;
+  - `globals.css` → `html { touch-action: pan-x pan-y }`. iOS Safari 10+ `user-scalable=no`'yu yok sayıyor, bu kural orada da çalışıyor.
+
+  Başka öğede `touch-action` kullanılmıyor. Lup basılı tutması ve şerit kaydırması etkilenmiyor.
+- **Gerekçe:** Kullanıcı isteği (inceleme A.1): büyütmeyi lup üstleniyor.
+- **Bilinen yan etki:** WCAG 1.4.4'e aykırı. Lighthouse `meta-viewport` denetimi başarısız, Accessibility 100'ün altına düşer (≈ 90–95). Bilinçli karar; düzeltilmeyecek.
+- **Geri alma:** `layout.tsx`'teki `viewport` export'unu ve `globals.css`'teki `touch-action` kuralını sil.
+
+### K-105 · 2026-09-28 · Masaüstünde lup basılı tutunca açılır
+
+- **Karar** (fare/kalem, `pointerType !== "touch"`):
+  - Lup normalde kapalı, sistem imleci olduğu gibi. Linkler, metin seçimi ve sürükleme her zamanki gibi çalışıyor.
+  - Sol tık basılıyken dış halka ve üstünde tutma süresinde dolan 1px kırmızı yay beliriyor (`html[data-loupe-holding]`). 2 sn (`LOUPE.mouseHoldMs`) dolunca lup imlecin ortasında açılıyor; imleç gizleniyor, metin seçimi kapanıyor (`html.loupe-open`).
+  - Tutma şu durumlarda iptal:
+    - 10px'ten fazla hareket (`LOUPE.touchSlop`);
+    - sağ tık, `blur`, pencereden çıkış, `pointercancel`.
+  - Basılıyken:
+    - lup her yerde büyütüyor, yalnızca `data-loupe-off` alanlarında (Nav, footer, mobil menü) dış halkaya dönüyor;
+    - link üstünde küçülme, kenar boşluğu ve 1.2 sn boşta kuralları kalktı (K-056 ve K-057'nin fare kısmının yerine geçer; `LOUPE.idleMs` silindi).
+  - Bırakınca lup kapanıyor ve bırakmayı izleyen tek tıklama yutuluyor, link üstünde bırakınca sayfa değişmiyor (`lib/clickGuard`). Aynı yutma dokunmatik basılı tutmada da var (inceleme 2.3). Lenis'in anchor işleyicisi yakalama evresinde önce çalıştığı için o da `clickSwallowed()`'a bakıyor.
+  - Basılıyken:
+    - tarayıcının sürükle-bırakı engelleniyor (titreme tutmayı bozmasın; yan etkisi: sitede görsel/link sürükleme yok);
+    - lup açıkken `selectstart` engelleniyor;
+    - şerit (`DragScroll`) sürüklemeye başlamıyor.
+  - Reduced motion: lerp 1, yay dolmadan tam daire; süre aynı.
+  - `data-loupe-magnify` lupta işlevsiz kaldı; hücre seçicisi olarak `data-tray-cell` adını aldı (VitrinMotion).
+- **Kırmızı bütçesi:** Yay sayfadaki üç odak kırmızısına (§8.1) sayılmıyor: kalıcı değil, yalnızca basılı tutarken görünen geçici bir etkileşim göstergesi.
+- **Dokunmatik:** Değişmedi (180 ms basılı tutma, parmağın 60px üstünde).
+- **Gerekçe:** Kullanıcı isteği (inceleme A.2): lup sürekli açık olmasın, imleç normal kalsın.
+- **Geri alma:** Bu commit'i geri al (`useLoupe.ts`, `Loupe.tsx`, `globals.css` lup kuralları, `clickGuard.ts`).
+
+### K-106 · 2026-09-28 · Hero'da cihaza göre kullanım bilgisi
+
+- **Karar:**
+  - Hero notundan "İMLECİNİZ BİR LUPTUR." çıktı. Notun altında cihaza göre tek satır çifti, kalıcı:
+    - `pointer: fine`: "SOL TIKA 2 SN BASILI TUTUN — LUP AÇILIR. BIRAKINCA KAPANIR.";
+    - `pointer: coarse`: "BİR PARÇAYA BASILI TUTUN — LUP AÇILIR.".
+  - Renk damga kırmızısı (`tone="stamp"`). "10×" etiketleri gibi mono damga dili sayıldı, sayfanın üç odak kırmızısına (§8.1) girmiyor (K-054 ile aynı ayrım).
+  - Lup kopyasında görünmüyor (`data-loupe-hide`).
+  - Vitrin notu: "BİR PARÇAYA BASILI TUTUP YAKINDAN BAKIN."
+  - İlk ziyaret ipucu (`LoupeHint`, `hint.ts`, "görüldü" kaydı) silindi; bilgi artık hep görünür.
+- **Sapma:** İncelemede örnek lup notu "SOL TIK · 2 SN = LUP" tek metindi. Bu not ≥ 1024px'te görünüyor; yatay iPad gibi dokunmatik ekranda yanlış talimat olurdu. İlk satır da cihaza göre ikiye ayrıldı: fare "SOL TIK · 2 SN = LUP", dokunmatik "BASILI TUT = LUP".
+- **Gerekçe:** İnceleme A.3: imleç artık lup değil; cihaza göre doğru talimat.
+- **Geri alma:** `copy.ts` → `hero.howTo`, `hero.lens.howTo`; `Hero.tsx`'teki iki satır çifti.
+
+### K-107 · 2026-09-28 · Bulanık yer tutucular üretilmiş veriden
+
+- **Karar:** `placeholder="blur"` için görseller statik içe aktarılmadı. 12px genişlikte WebP yer tutucular bir kez üretildi, `src/content/blur.ts`'te duruyor (9 görsel, toplam ≈ 1.2 KB). `blurProps(src)` (`lib/blur.ts`) PhotoOverlay, Lens ve tepsi hücresine veriyor.
+- **Sapma:** İnceleme statik içe aktarmayı öneriyordu (Next otomatik `blurDataURL` üretir). O yol:
+  - görselleri `_next/static/media`'ya hash'li ikinci kopya olarak taşırdı;
+  - lupun hi-res adreslerini (`/images/…`) ve içerik dosyasındaki yol verisini değiştirirdi.
+- **Üretim:** Yeni bağımlılık yok. Next'in getirdiği `sharp` ile tek seferlik komut: `node scripts/blur.mjs` (docs/TEKNIK.md → "Görseller").
+- **Ek:** Tepsi `sizes` mobilde 2 kolona göre `50vw` (önce `100vw`), telkari lupu `21vw / 32vw`.
+- **Gerekçe:** İnceleme 3.5.
+- **Geri alma:** Üç bileşendeki `{...blurProps(…)}` satırlarını ve `blur.ts` dosyalarını sil.
+
+### K-108 · 2026-09-28 · robots.txt kapalı sitede önizleme botlarına izinli
+
+- **Karar:**
+  - `robots.ts`: `site.indexable: false` iken `User-Agent: *` için `Disallow: /`. Site haritası adresi yalnızca site açılınca veriliyor.
+  - Bağlantı önizleme botlarına (`Twitterbot`, `facebookexternalhit`, `LinkedInBot`, `Slackbot`, `TelegramBot`, `WhatsApp`) izin var. Arama motoru değiller; sayfalar `noindex, nofollow` kalıyor.
+  - `sitemap.ts` her zaman üretiliyor (ana sayfa + altı parça).
+- **Gerekçe:** İnceleme 6: "`indexable: false` iken robots `disallow` kalmalı". Önceden robots.txt yoktu, herkes tarayabiliyordu. Tümüyle `Disallow` yapılsaydı robots.txt'e uyan önizleme botları (ör. Twitterbot) paylaşım kartını (K-100) göstermezdi. Pitch aşamasında link WhatsApp/sosyal medyada paylaşılacak.
+- **Geri alma:** `robots.ts`'teki `PREVIEW_BOTS` kuralını sil.
+
+### K-109 · 2026-09-28 · Ürüne özel paylaşım görseli
+
+- **Karar:** `app/parca/[slug]/opengraph-image.tsx`, ana sayfa görseliyle aynı dilde:
+  - solda lup dairesinde parçanın fotoğrafı (ürünün `objectPosition` kırpması);
+  - sağda levha no, ad (Geist Medium 88px), "SERTİFİKA · No. 0147", kırmızı ayar damgası ve veri satırı;
+  - altta "SÖNMEZ — SİTEDE 10×. MAĞAZADA 1:1.", köşelerde kesim izleri.
+
+  Alt metin `generateImageMetadata` ile ürüne göre.
+- **Ortak parçalar** (`lib/og.tsx`):
+  - fontlar, fotoğraf okuma, lup ve kesim izleri;
+  - kesim izleri dizi olarak döner: ImageResponse, bileşenin döndürdüğü fragment'ı mutlak konumlamıyor;
+  - fotoğraf yolu `public/images` klasörüyle sınırlı: değişken yol Turbopack'e tüm projeyi izletiyordu.
+- **Fontlar:** Geist Sans Medium da repoda (`src/assets/fonts`, OFL; K-inceleme 5.4 ile aynı gerekçe).
+- **Boyut:** Görseller 220–355 KB PNG (ImageResponse yalnızca PNG üretiyor). WhatsApp önizlemesi büyük görselleri atlayabiliyor; gerçek cihazda denenmeli (ILERLEME Aşama 9).
+- **Gerekçe:** İnceleme 6.4: sitenin asıl paylaşım kanalı muhtemelen WhatsApp, altı ürün sayfası da genel lup görselini paylaşıyordu.
+- **Geri alma:** `app/parca/[slug]/opengraph-image.tsx`'i sil. Ürün sayfası yeniden üstteki görseli devralır.
+
+### K-110 · 2026-09-28 · Birim testleri ve CI
+
+- **Karar:**
+  - Tek yeni geliştirme bağımlılığı `vitest`, 4.x sürümü. 5.x `@types/node` ≥ 22 istiyor; projede 20 var, tip paketini yükseltmek yerine uyumlu sürüm seçildi.
+  - `pnpm test` = `vitest run`; yapılandırma `vitest.config.mts` (`@` takma adı, node ortamı). Testler kaynağın yanında (`*.test.ts`).
+  - `.github/workflows/ci.yml`: push (master) ve PR'da `lint` (0 uyarı), `typecheck`, `prettier --check`, `test`, `build`. Node 22, pnpm sürümü `packageManager`'dan.
+  - Uçtan uca testler ayrı karar: K-111.
+- **Gerekçe:** İnceleme 7.1a, 7.2. Şartnamenin bağımlılık listesinde test aracı yok; inceleme bunu açıkça istiyor, yalnızca geliştirmede.
+- **Geri alma:** `pnpm remove vitest`; `*.test.ts`, `vitest.config.mts` ve `.github/workflows/ci.yml`'yi sil.
+
+### K-111 · 2026-09-28 · Uçtan uca duman testleri (Playwright)
+
+- **Karar:**
+  - İkinci ve son yeni geliştirme bağımlılığı `@playwright/test`.
+  - `pnpm test:e2e`, `e2e/smoke.spec.ts`: üretim derlemesine karşı (`pnpm start -p 3100`), iki proje:
+    - masaüstü 1440×900;
+    - mobil (Pixel 7: dokunmatik, `pointer: coarse`).
+  - Kapsam:
+    - konsol hatası ve yatay taşma yok (390 / 768 / 1440);
+    - reduced motion'da giriş bölgeleri ve tepsi hücreleri görünür;
+    - vitrin hücresi ürün sayfasını açar;
+    - `/parca/yok` 404;
+    - WhatsApp linki parça adını ve numarasını kodlanmış taşır;
+    - mobil menü (açılır, arka plan `inert`, Escape, odak dönüşü);
+    - fareyle lup (2 sn basılı tut → açık, bırak → kapalı, link açılmaz);
+    - robots.txt kapalı.
+  - Tarayıcı:
+    - yerelde indirmeden kurulu tarayıcıyla: `PW_CHANNEL=msedge pnpm test:e2e`;
+    - CI'da `playwright install --with-deps chromium` (derlemeden sonra aynı işte).
+- **Gerekçe:** İnceleme 7.1b ("zaman kalırsa en sona"). Elle CDP ile yapılan denetimlerin en kritik kısmı tekrarlanabilir oldu.
+- **Geri alma:** `pnpm remove @playwright/test`; `e2e/`, `playwright.config.ts` ve CI'daki iki adımı sil.
+
+### K-112 · 2026-09-29 · CI'da uçtan uca testlere süre sınırı ve teşhis
+
+- **Durum:** PR #1'in ilk CI çalışmasında `pnpm test:e2e` adımı 8 dakikadan uzun sürdü, iptal edildi. Önceki 11 adım 1 dakikada geçmişti. Yerelde aynı dal CI ayarlarıyla (kendi sunucusunu başlatarak) 11 sn'de geçiyor.
+  - "github" raporlayıcısı sonuçları yalnızca sonda yazdığı için hangi testin takıldığı loga düşmedi.
+  - İşin varsayılan süre sınırı 6 saat.
+- **Karar:**
+  - İş 20 dk, test adımı 8 dk, Playwright çalışması (`globalTimeout`) 5 dk ile sınırlı.
+  - CI'da `list` raporlayıcısı da açık: her test bitince loga yazılır.
+  - Hata olursa html raporu ve iz dosyaları (`trace: retain-on-failure`) çalışmaya indirilebilir çıktı olarak yüklenir.
+  - Test sunucusu `pnpm start` yerine doğrudan `next start`: kapanışta süreç ağacı temiz ölsün (yerelde `pnpm start`'ın alt süreci sarmalayıcı öldürülünce açık kalıyordu).
+  - Aynı dala yeni push gelince süren çalışma iptal edilir (`concurrency`).
+- **Geri alma:** `playwright.config.ts` ve `.github/workflows/ci.yml`'deki bu ayarları kaldır.

@@ -1,3 +1,4 @@
+import { hiresUrl } from "@/lib/hires";
 import type { Side } from "@/lib/overlay";
 
 /**
@@ -62,6 +63,8 @@ export type Product = {
   status: "Vitrinde" | "Sipariş üzerine";
   drawing: "solitaire" | "twist" | "drop-earring" | "tennis" | "pear-pendant" | "filigree";
   drawingSpec: DrawingSpec;
+  /** Levha antetindeki çizim tarihi (AA.YYYY) */
+  drawnAt: string;
   image: {
     src: string;
     hires: string;
@@ -84,7 +87,7 @@ const whatsappMessage = (name: string, certNo: string) =>
 
 const img = (file: string, w: number, h: number, alt: string, objectPosition?: string) => ({
   src: `/images/${file}`,
-  hires: `/images/${file}`,
+  hires: hiresUrl(`/images/${file}`),
   w,
   h,
   alt,
@@ -126,6 +129,7 @@ export const products: readonly Product[] = [
       stone: 5.1,
       section: { width: 2.2, thickness: 1.6 },
     },
+    drawnAt: "03.2026",
     image: img(
       "hero-tektas.jpg",
       1376,
@@ -154,6 +158,7 @@ export const products: readonly Product[] = [
     status: "Vitrinde",
     drawing: "twist",
     drawingSpec: { kind: "twist", innerDiameter: 18.2, band: 1.8, turns: 16 },
+    drawnAt: "03.2026",
     image: img(
       "vitrin-burma.jpg",
       928,
@@ -180,6 +185,7 @@ export const products: readonly Product[] = [
     status: "Vitrinde",
     drawing: "drop-earring",
     drawingSpec: { kind: "drop-earring", total: 24, stone: { length: 7, width: 5, depth: 3.2 } },
+    drawnAt: "03.2026",
     image: img(
       "vitrin-damla.jpg",
       928,
@@ -220,6 +226,7 @@ export const products: readonly Product[] = [
       stone: 2.4,
       length: 175,
     },
+    drawnAt: "03.2026",
     image: img(
       "vitrin-su-yolu.jpg",
       928,
@@ -251,6 +258,7 @@ export const products: readonly Product[] = [
       stone: { length: 8, width: 5.4, depth: 3.4 },
       chain: { length: 1.6, width: 1.2, wire: 0.3 },
     },
+    drawnAt: "03.2026",
     image: img(
       "vitrin-armut.jpg",
       928,
@@ -277,6 +285,7 @@ export const products: readonly Product[] = [
     status: "Vitrinde",
     drawing: "filigree",
     drawingSpec: { kind: "filigree", innerDiameter: 17.8, band: 2.6, stone: 4.3, wire: 0.3 },
+    drawnAt: "03.2026",
     image: img(
       "telkari-makro.jpg",
       1024,

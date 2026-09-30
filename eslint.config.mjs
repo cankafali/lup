@@ -5,6 +5,12 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  // Paylaşım görselleri ImageResponse ile düz <img> ister. Kural bu dosyaları kendisi atlıyor, ama yol
+  // karşılaştırması Windows'ta tutmuyor (yalnızca ilk ters bölü çevriliyor): iki ortamda aynı sonuç için
+  {
+    files: ["src/app/**/opengraph-image.tsx", "src/lib/og.tsx"],
+    rules: { "@next/next/no-img-element": "off" },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

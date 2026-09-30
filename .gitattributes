@@ -1,0 +1,3 @@
+# Satır sonları her bilgisayarda LF: Windows'ta core.autocrlf dosyaları CRLF'e çevirip
+# Prettier denetimini yerelde bozuyordu. İkili dosyalar (görsel, font) git'in kendi tespitiyle.
+* text=auto eol=lf
