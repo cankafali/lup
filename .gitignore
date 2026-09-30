@@ -39,6 +39,5 @@ desktop.ini
 .vscode/
 .idea/
 
-# Claude Code: kişisel ayarlar (paylaşılan launch.json repoda kalır)
-.claude/settings.local.json
-.claude/worktrees/
+# Yapay zekâ asistanının yerel ayarları
+.claude/

@@ -96,7 +96,5 @@ docs/           ekran görüntüleri ve teknik notlar
 ## Daha fazlası
 
 - [`docs/TEKNIK.md`](docs/TEKNIK.md): Kullanılan teknolojiler, lupun nasıl çalıştığı, `data-*` öznitelikleri, görseller, testler.
-- [`KARARLAR.md`](KARARLAR.md): Tasarım ve teknik kararların gerekçeleriyle kaydı (K-001 … K-111).
+- [`KARARLAR.md`](KARARLAR.md): Tasarım ve teknik kararların gerekçeleriyle kaydı.
 - [`ILERLEME.md`](ILERLEME.md): Aşama aşama ne yapıldı, neler doğrulandı, neler açık.
-
-Site bir uygulama şartnamesine göre, yapay zekâ ajanı (Claude Code) desteğiyle aşama aşama geliştirildi. `CLAUDE.md` ve `AGENTS.md` ajanın çalışma yönergeleri.

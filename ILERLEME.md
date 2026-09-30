@@ -339,7 +339,7 @@
 
 1. `npx vercel login`: hesapla giriş.
 2. Proje klasöründe `npx vercel`: önizleme dağıtımı. İlk seferde proje bağlanır; çerçeve Next.js, ayarlar varsayılan.
-3. Verilen önizleme adresini bu dosyaya yaz.
+3. Verilen önizleme adresini bu dosyaya yaz. (30.09: Vercel GitHub'a bağlandı; adres Aşama 9 → "PR, CI ve önizleme".)
 4. Önizlemede ölçüm: [PageSpeed Insights](https://pagespeed.web.dev/) (mobil) ya da `npx lighthouse <adres> --form-factor=mobile`.
    - Vercel önizlemeleri varsayılan olarak "Vercel Authentication" ile korunur. PageSpeed için proje ayarlarında Deployment Protection'ı önizleme süresince kapatmak ya da paylaşılabilir bağlantı kullanmak gerekebilir.
    - Site `noindex, nofollow` olduğundan arama motorlarına girmez.
@@ -451,6 +451,16 @@ Kaynak: `lup-inceleme.md` (28.09.2026, dış kod incelemesi), otonom çalışma 
 - 3.1'in ek önerisi yapılmadı: kaynak JPEG'lerin mozjpeg ile yeniden sıkıştırılması. Kaynak görsel kalitesini değiştirir. Site artık WebP/AVIF sunuyor, fark yalnızca depo boyutunda.
 - Başarısız olup geri alınan commit yok.
 - `c9c5433` (5.2) commit'lendikten sonra typecheck yerelde eski bir `next dev` çıktısı (`.next/dev/types`) yüzünden düştü. Kod değil, silinen rotaya işaret eden üretilmiş dosyaydı; silinince aynı commit temiz geçti. CI temiz checkout'ta çalıştığı için etkilenmez.
+
+**PR, CI ve önizleme** (29–30.09)
+
+- PR [cankafali/lup#1](https://github.com/cankafali/lup/pull/1): `feat/lup-basili-tut` → `master`. Açık, çakışma yok, henüz merge edilmedi.
+- CI:
+  - İlk çalışmada `test:e2e` adımı 8 dakikadan uzun sürüp iptal edildi. Sebep test sunucusunun `pnpm start` sarmalayıcısıydı: kapanışta süreç ağacı ölmüyordu.
+  - Düzeltme `7d28eac` (K-112): doğrudan `next start`, süre sınırları, canlı test logu, hata raporu çıktısı. Sonrasında tüm iş 1 dakikada yeşil.
+- Vercel GitHub'a bağlı, her push'ta önizleme dağıtımı yapıyor. Dal önizlemesi: https://lup-git-feat-lup-basili-tut-talas2.vercel.app
+  - "Vercel Authentication" ile korunuyor. PageSpeed ve kuyumcu için Deployment Protection kapatılmalı ya da paylaşılabilir link verilmeli.
+- 30.09: README'deki ajan anlatımı kısaltıldı. `.claude/` (yapay zekâ asistanının yerel ayarları) repodan çıkarılıp yok sayıldı.
 
 **Kullanıcıya bırakılanlar** (dış bilgi ya da karar gerekiyor)
 
